@@ -13,6 +13,7 @@ ELEC3304 Control, Assessment 2 project (Practicals Weeks 9–11).
 | [docs/03_design_requirements.md](docs/03_design_requirements.md) | Answers to the Lab 10 A1 questions, constraints, uncertainty, requirements → poles | Lab 10 A1 |
 | [docs/04_controller_and_observer.md](docs/04_controller_and_observer.md) | Pole placement results, LQR comparison, integral action, observer plan | Lab 10 A2–A3, Lab 11 |
 | [docs/05_test_plan.md](docs/05_test_plan.md) | Simulation test matrix, pass criteria, figures to produce | Lab 9 A2, Lab 10 A3 |
+| [docs/06_pole_placement_derivation.md](docs/06_pole_placement_derivation.md) | Step-by-step hand derivation of K (coefficient matching), Ackermann and `place` cross-checks | Lab 10 A2 |
 
 ## MATLAB code (`matlab/`)
 
@@ -24,6 +25,7 @@ ELEC3304 Control, Assessment 2 project (Practicals Weeks 9–11).
 | `furuta_sim_cl.m` | Nonlinear closed-loop simulation with saturation and disturbances |
 | `week9_model_and_openloop.m` | Model checks, linear vs nonlinear open loop, uncertainty sweep |
 | `week10_state_feedback.m` | Requirements → poles, `place`/`lqr`, nonlinear evaluation, robustness |
+| `week10_pole_placement_derivation.m` | Reproduces every number in doc 06 (no Symbolic Toolbox needed) |
 
 Run from inside `matlab/`. Requires the Control System Toolbox. Tested on R2025b. Figures are written to `figures/`.
 

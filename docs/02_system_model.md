@@ -18,7 +18,7 @@ A DC motor rotates a horizontal arm of length L_r. A pendulum of length L_p hang
 **Conventions:**
 
 - θ is positive counter-clockwise when viewed from above.
-- **α = 0 is upright** and α = π is hanging down. α is positive counter-clockwise when looking outward along the arm.
+- **α = 0 is upright** and α = π is hanging down. α is positive when the pendulum leans *backwards*, opposite to the direction of positive arm rotation. Viewed from the motor looking outward along the arm, that is clockwise. This sign is what gives the −½ m_p L_p L_r cos α coupling term below. It is also why a positive voltage makes both θ and α increase: the pendulum lags behind the accelerating arm.
 
 ## 2. Nonlinear equations of motion
 

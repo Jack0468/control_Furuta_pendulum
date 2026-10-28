@@ -14,6 +14,7 @@ ELEC3304 Control, Assessment 2 project (Practicals Weeks 9–11).
 | [docs/04_controller_and_observer.md](docs/04_controller_and_observer.md) | Pole placement results, LQR comparison, integral action, observer plan | Lab 10 A2–A3, Lab 11 |
 | [docs/05_test_plan.md](docs/05_test_plan.md) | Simulation test matrix, pass criteria, figures to produce | Lab 9 A2, Lab 10 A3 |
 | [docs/06_pole_placement_derivation.md](docs/06_pole_placement_derivation.md) | Step-by-step hand derivation of K (coefficient matching), Ackermann and `place` cross-checks | Lab 10 A2 |
+| [docs/07_code_explained.md](docs/07_code_explained.md) | Every MATLAB file explained from first principles (Lagrange, KVL, linearisation, ODE solving), plus assumptions | All |
 
 ## MATLAB code (`matlab/`)
 

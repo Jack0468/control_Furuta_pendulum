@@ -22,8 +22,13 @@ P.Lp  = 0.129;     % pendulum full length                      [m]
 P.Jp  = P.mp*P.Lp^2/12;  % pendulum inertia about its centre of mass [kg.m^2]
 P.Dp  = 0.0005;    % pendulum viscous damping (approximate)    [N.m.s/rad]
 
-% Sensors
-P.enc_counts = 2048;                 % encoder counts per revolution (quadrature)
-P.enc_res    = 2*pi/P.enc_counts;    % angle resolution        [rad]
+% Sensors: optical incremental encoders, 512 CPR read in 4x quadrature (docs/08)
+%   e.g. Broadcom HEDS-5540#I (512 CPR) or US Digital E5-512 (datasheets in references/)
+P.enc_cpr    = 512;                  % cycles per revolution (datasheet "CPR")
+P.enc_counts = 4*P.enc_cpr;          % counts per revolution in 4x quadrature = 2048
+P.enc_res    = 2*pi/P.enc_counts;    % quantisation step q     [rad] = 3.07 mrad
+P.enc_sigma  = P.enc_res/sqrt(12);   % quantisation noise std q/sqrt(12) [rad] = 0.886 mrad
+P.enc_pos_err_typ = deg2rad(10/60);  % HEDS-5540 position error, typical 10 arcmin [rad]
+P.enc_pos_err_max = deg2rad(40/60);  % HEDS-5540 position error, max 40 arcmin [rad]
 P.Ts         = 1e-3;                 % controller sample time  [s]
 end

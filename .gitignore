@@ -2,3 +2,11 @@
 *.mat
 slprj/
 *.slxc
+
+# Copyrighted reference PDFs (course material, vendor datasheets): kept locally only.
+# references/README.md lists every document with a public link.
+references/**
+!references/README.md
+
+# Working notes and throwaway scripts
+scratch/

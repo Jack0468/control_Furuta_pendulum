@@ -2,7 +2,7 @@
 
 ELEC3304 Open Design Project. **Due 11:59 pm, Friday 6 November 2026.**
 
-This logbook records what was done, what was decided and why, and what is still open. Add a new dated entry at the bottom for each work session. When a decision is made or reversed, also update the **Decision register**. When an issue is found or closed, update **Open issues**.
+This logbook records what was done, what was decided and why, and what is still open. The actionable checklist of open work is [TODO.md](TODO.md). Add a new dated entry at the bottom for each work session. When a decision is made or reversed, also update the **Decision register**. When an issue is found or closed, update **Open issues**.
 
 AI assistance (Claude) was used throughout for derivations, code and drafting. Every entry notes this so it can be declared in the report as required by the Lecture 1 guidelines.
 

@@ -9,13 +9,14 @@ We balance a Furuta (rotary inverted) pendulum in its upright position using **o
 - **Observer:** a discrete-time observer estimates the two unmeasured velocities from quantised encoder readings.
 - **Validation:** everything is tested on the full nonlinear model at 1 kHz, with datasheet-based encoder noise, motor saturation, disturbances and ±20% parameter uncertainty.
 
-Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGBOOK.md)**.
+Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGBOOK.md)**. Everything still to do is in **[docs/TODO.md](docs/TODO.md)**.
 
 ## Documents
 
 | File | Contents | Report section |
 | --- | --- | --- |
 | [docs/LOGBOOK.md](docs/LOGBOOK.md) | Dated work log, decision register, open issues, plan to submission | — |
+| [docs/TODO.md](docs/TODO.md) | Checklist of everything still open, with owner and date | — |
 | [docs/01_blueprint.md](docs/01_blueprint.md) | Feasibility, scope, control architecture, risks | Introduction |
 | [docs/02_system_model.md](docs/02_system_model.md) | Signals; nonlinear equations of motion derived step by step with references; linearisation; A/B/C/D; parameters; model properties | System Model, Problem Definition |
 | [docs/03_design_requirements.md](docs/03_design_requirements.md) | Why control is needed, constraints, requirements R1–R9 → pole locations | Problem Definition |

@@ -1,43 +1,74 @@
 # Furuta Pendulum: Upright Balance Control
 
-ELEC3304 Control, Assessment 2 project (Practicals Weeks 9–11).
+ELEC3304 Control, Open Design Project (University of Sydney, 2026 S2). Due 6 November 2026.
 
-**Verdict: feasible.** We linearise a Furuta (rotary inverted) pendulum about its upright equilibrium. This gives a 4-state LTI model with one actuator (motor voltage) and two sensors (arm and pendulum encoders). The model meets all five Lab 9 requirements, and it leads straight into state feedback (Week 10) and an observer (Week 11). See [docs/01_blueprint.md](docs/01_blueprint.md) for the full justification and the caveats to raise with the tutor.
+We balance a Furuta (rotary inverted) pendulum in its upright position using **observer-based state feedback**.
+
+- **Model:** nonlinear Lagrangian, linearised about upright, giving a 4-state LTI model. One actuator (motor voltage), two sensors (arm and pendulum encoders).
+- **Controller:** pole-placed state feedback with integral action on the arm angle (type-1 servo).
+- **Observer:** a discrete-time observer estimates the two unmeasured velocities from quantised encoder readings.
+- **Validation:** everything is tested on the full nonlinear model at 1 kHz, with datasheet-based encoder noise, motor saturation, disturbances and ±20% parameter uncertainty.
+
+Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGBOOK.md)**.
 
 ## Documents
 
-| File | Contents | Practical |
+| File | Contents | Report section |
 | --- | --- | --- |
-| [docs/01_blueprint.md](docs/01_blueprint.md) | Feasibility, scope, control architecture, plan, risks, tutor questions | All |
-| [docs/02_system_model.md](docs/02_system_model.md) | Signals, nonlinear EOM, linearisation, A/B/C/D, parameters, model properties | Lab 9 A1 |
-| [docs/03_design_requirements.md](docs/03_design_requirements.md) | Answers to the Lab 10 A1 questions, constraints, uncertainty, requirements → poles | Lab 10 A1 |
-| [docs/04_controller_and_observer.md](docs/04_controller_and_observer.md) | Pole placement results, LQR comparison, integral action, observer plan | Lab 10 A2–A3, Lab 11 |
-| [docs/05_test_plan.md](docs/05_test_plan.md) | Simulation test matrix, pass criteria, figures to produce | Lab 9 A2, Lab 10 A3 |
-| [docs/06_pole_placement_derivation.md](docs/06_pole_placement_derivation.md) | Step-by-step hand derivation of K (coefficient matching), Ackermann and `place` cross-checks | Lab 10 A2 |
-| [docs/07_code_explained.md](docs/07_code_explained.md) | Every MATLAB file explained from first principles (Lagrange, KVL, linearisation, ODE solving), plus assumptions | All |
+| [docs/LOGBOOK.md](docs/LOGBOOK.md) | Dated work log, decision register, open issues, plan to submission | — |
+| [docs/01_blueprint.md](docs/01_blueprint.md) | Feasibility, scope, control architecture, risks | Introduction |
+| [docs/02_system_model.md](docs/02_system_model.md) | Signals; nonlinear equations of motion derived step by step with references; linearisation; A/B/C/D; parameters; model properties | System Model, Problem Definition |
+| [docs/03_design_requirements.md](docs/03_design_requirements.md) | Why control is needed, constraints, requirements R1–R9 → pole locations | Problem Definition |
+| [docs/04_controller_and_observer.md](docs/04_controller_and_observer.md) | Pole placement, LQR comparison, integral action, type-1 servo, observer design and pole choice | Controller Design |
+| [docs/05_test_plan.md](docs/05_test_plan.md) | Test matrix, figure list, validation results vs requirements | Numerical Validations |
+| [docs/06_pole_placement_derivation.md](docs/06_pole_placement_derivation.md) | Hand derivation of K (coefficient matching), with Ackermann and `place` cross-checks | Controller Design |
+| [docs/07_code_explained.md](docs/07_code_explained.md) | The MATLAB code explained from first principles | — |
+| [docs/08_sensors_and_noise.md](docs/08_sensors_and_noise.md) | Encoder selection and noise model from the Broadcom/US Digital datasheets | System Model |
+| [docs/09_kalman_filter.md](docs/09_kalman_filter.md) | Kalman filter derivation and comparison with pole-placed observers | Controller Design (extension) |
+| [references/README.md](references/README.md) | Sources for the local reference PDFs (the PDFs themselves are not in the public repo) | — |
 
 ## MATLAB code (`matlab/`)
 
 | File | Purpose |
 | --- | --- |
-| `furuta_params.m` | Nominal parameters (Quanser QUBE-Servo 2 based) |
+| `run_all.m` | **Reproduces every result and figure** (about 5 min) |
+| `furuta_params.m` | Physical, motor and encoder parameters |
 | `furuta_linmodel.m` | Linearised A, B, C, D about upright |
 | `furuta_nl.m` | Full nonlinear dynamics (truth model), with disturbance torques |
-| `furuta_sim_cl.m` | Nonlinear closed-loop simulation with saturation and disturbances |
+| `furuta_design.m` | Final controller gains (Kₓ, kᵢ) and observer gain L |
+| `furuta_sim_cl.m` | Continuous-time, full-state closed loop (Week 10 studies) |
+| `furuta_sim_obs.m` | Final sampled-data loop: encoders, observer, saturation, anti-windup, noise |
 | `week9_model_and_openloop.m` | Model checks, linear vs nonlinear open loop, uncertainty sweep |
 | `week10_state_feedback.m` | Requirements → poles, `place`/`lqr`, nonlinear evaluation, robustness |
-| `week10_pole_placement_derivation.m` | Reproduces every number in doc 06 (no Symbolic Toolbox needed) |
-
-Run from inside `matlab/`. Requires the Control System Toolbox. Tested on R2025b. Figures are written to `figures/`.
+| `week10_pole_placement_derivation.m` | Reproduces every number in doc 06 |
+| `week11_observer.m` | Observer design, separation-principle check, pole choice, velocity estimate |
+| `week11_kalman.m` | Steady-state Kalman filter and the observer trade-off study |
+| `week12_validation.m` | Validation tests V1–V7 on the nonlinear plant |
 
 ```matlab
 cd matlab
-week9_model_and_openloop
-week10_state_feedback
+run_all
 ```
 
-## Key numbers (nominal model)
+Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `figures/`.
 
-- Open-loop poles: 0, −30.05, **+10.55**, −6.12 rad/s. The unstable time constant is 95 ms, and released from 2° the pendulum passes 15° after 0.23 s.
-- Reachability rank 4/4. Observability rank 4/4 with both encoders, 4/4 with θ alone, and only 3/4 with α alone.
-- θ/V_m has a right-half-plane zero at **+8.97 rad/s**. The system is non-minimum phase: the arm first moves the wrong way.
+## Key numbers
+
+- **Open-loop poles:** 0, −30.05, **+10.55**, −6.12 rad/s. Released at 2°, the pendulum passes 15° in 0.23 s.
+- **Structure:** reachable (rank 4); observable from both encoders (rank 4). θ/V_m has a right-half-plane zero at **+8.97 rad/s** (non-minimum phase).
+- **Sensors:** 512-CPR optical encoders in 4× quadrature. Resolution q = 3.07 mrad; quantisation noise σ = 0.886 mrad.
+- **Final design:**
+  - Controller poles −2.8 ± 2.86j, −12, −15, −5 (integrator).
+  - Observer poles −100 … −130.
+  - 30° step: T_s 1.26 s, overshoot 1.5%.
+  - Recovers from a 10° tilt in 0.96 s, using at most 3.5 V.
+
+## Repository layout
+
+```
+docs/        design documents and logbook
+matlab/      all code (run_all.m reproduces everything)
+figures/     generated figures
+references/  local copies of course PDFs and datasheets (git-ignored; README lists sources)
+scratch/     working scripts and drafts (git-ignored)
+```

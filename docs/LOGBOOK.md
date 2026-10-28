@@ -127,10 +127,18 @@ Commits: `b78618a`, `3c9ed74`, `a9bf321`. AI-assisted: model derivation, scripts
 
 ### Plan for the rest of today
 
-- [ ] Write `docs/08_sensors_and_noise.md`: encoder choice, datasheet table, noise model.
-- [ ] Write `docs/09_kalman_filter.md` and `matlab/week11_kalman.m`. Derive the steady-state Kalman filter for this plant (process noise = torque disturbances, measurement noise = quantisation). Compare it with the pole-placed observers on noise, tap response and robustness, then decide D-12.
-- [ ] Update docs 04 and 05 with the observer and validation results; add `run_all.m`; update the README.
+- [x] Write `docs/08_sensors_and_noise.md`: encoder choice, datasheet table (with page numbers), noise model (S1)–(S3).
+- [x] Write `docs/09_kalman_filter.md` and `matlab/week11_kalman.m`. Derive the steady-state Kalman filter for this plant (process noise = torque disturbances, measurement noise = quantisation). Compare it with the pole-placed observers on noise, tap response and robustness.
+- [x] Update docs 04 and 05 with the observer and validation results; add `run_all.m` (full reproduction in about 3.5 min, checked); update the README.
 - [ ] Commit, then ask Jack before pushing.
+
+### Kalman study outcome (evening)
+
+- The steady-state Kalman gain was derived from recursive least squares (MIT 6.241J §2.6) and the DARE. It matches MATLAB's `kalman()` to 9 × 10⁻¹⁴.
+- **Kalman gains beat pole placement on every measure.** Kalman Q×100 vs poles −100…−130: voltage noise 0.056 vs 0.089 V, unstable plants 3/200 vs 6/200, tap 18.8° vs 18.0°.
+- **The "matched" Kalman filter (Q = the real random-torque noise) lets the pendulum fall after the tap.** Q must represent all unmodelled torques.
+- **R6 (≤ 15°) is only met at Q×10⁶, with 0.53 V RMS of noise.** No observer reaches the full-state 14.1°.
+- **D-12 is open, a decision for Jack.** Option A (recommended): keep the pole-placed observer as the assessed design and present the Kalman filter as the extension. Options B/C: adopt Kalman Q×100 or Q×10⁴ if the lecturer accepts it. Next technical step for I-01: a disturbance-estimating Kalman filter.
 
 ### Plan to submission
 

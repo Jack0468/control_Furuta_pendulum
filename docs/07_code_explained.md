@@ -254,6 +254,42 @@ This file reproduces doc 06 numerically, step by step:
 
 ---
 
+## 8a. Week 11–12 files (added 2026-10-29)
+
+### `furuta_design.m`: the final gains in one place
+
+Every Week 11–12 script calls this file, so changing a pole here changes everything consistently. It returns:
+
+- `K`: the D2 gain without an integrator.
+- `Kx`, `Ki`: the 5-pole integral design, used in the type-1 servo law u = −Kₓx̂ − kᵢξ.
+- `Ad`, `Bd`: the plant sampled at 1 ms with a zero-order hold (`c2d`). The real controller only updates u once per sample and holds it constant in between, so the observer must use the sampled model.
+- `L`: the observer gain, from `place(Ad', C', exp(p_obs*Ts))'`.
+  - **Why transposes:** the eigenvalues of Ad − LC equal those of (Ad − LC)′ = Ad′ − C′L′. That is a *controller* placement problem for (Ad′, C′). This is the duality between observers and controllers.
+  - **Why exp(p·Ts):** a continuous pole s maps to the discrete pole z = e^{sT_s}.
+
+### `furuta_sim_obs.m`: the realistic loop
+
+Each 1 ms sample does what a real microcontroller would:
+
+1. **Read the encoders.** `q*round(y/q)` reproduces exactly what a 2048-count encoder reports (doc 08, S1).
+2. **Compute u from the estimate x̂, not the true x**, then clip it to ±10 V.
+3. **Update the integrator, unless saturated.** Conditional integration is the simplest anti-windup: stop accumulating error while the actuator can't respond.
+4. **Update the observer with the voltage actually applied.** If the observer were told the unclipped voltage, it would predict motion that never happens.
+5. **Advance the nonlinear plant 1 ms.** Four RK4 steps of 0.25 ms with u held constant: that is the zero-order hold.
+
+Options switch on offsets, noise, perturbed plants (`Pplant`), a different observer gain (`L`) or true-state feedback (`full_state`, for comparisons).
+
+### `week11_observer.m`, `week11_kalman.m`, `week12_validation.m`
+
+| Script | What it shows | Theory |
+| --- | --- | --- |
+| `week11_observer.m` §1 | eig of the full loop [x; ξ; x̂] = eig(controller) ∪ eig(observer) | **Separation principle:** in coordinates [x; ξ; e = x − x̂] the closed-loop matrix is block-triangular, so its eigenvalues are those of the diagonal blocks |
+| `week11_observer.m` §3–4 | Observer speed vs noise; finite difference vs observer | Faster poles mean a larger L, which amplifies the quantisation noise |
+| `week11_kalman.m` | L from the Riccati equation instead of chosen poles | Doc 09 |
+| `week12_validation.m` | V1–V7 against requirements R1–R9 | Doc 05 results table |
+
+---
+
 ## 9. Assumptions and limitations to state in the report
 
 | Assumption | Where | Effect |
@@ -263,7 +299,8 @@ This file reproduces doc 06 numerically, step by step:
 | Viscous friction only | `furuta_nl` | Real bearings also have Coulomb friction (a dead-band) |
 | Motor inductance neglected | `furuta_nl` line 14 | Electrical time constant ≪ mechanical, so this is fine |
 | Linear model valid for \|α\| ≲ 15° | `furuta_linmodel` | Measured in Week 9 by comparing with the nonlinear model |
-| Full state available | `furuta_sim_cl` | Removed in Week 11 by the observer |
-| Continuous time, no noise or quantisation | `furuta_sim_cl` | Real controller runs at 1 kHz on 0.18° encoders |
-| No integrator anti-windup | `week10_state_feedback` §6 | Matters only under sustained saturation |
-| Parameter sweep checks linear stability only | `week9` §4, `week10` §5 | Nonlinear performance under uncertainty is not yet tested |
+| Full state available | `furuta_sim_cl` only | The final loop (`furuta_sim_obs`) uses the observer |
+| Encoder quantisation modelled exactly; position error as a constant offset | `furuta_sim_obs` | Datasheet-based (doc 08); missed counts are not modelled |
+| Random torque noise σ = [0.2, 0.05] mN·m | `week12_validation` V5 | **Assumed**, not measured; it only sets the noise level in V5 |
+| Simple conditional-integration anti-windup | `furuta_sim_obs` | Made no difference in the tests (saturation is brief) |
+| Robustness counts use the linear sampled loop | `week11_kalman`, `scratch` | The nonlinear Monte Carlo (V6) covers 40 plants only |

@@ -52,28 +52,73 @@ See `figures/w10_nonlinear_tests.png`.
 Aa = [A zeros(4,1); 1 0 0 0 0];   % xi_dot = theta - r
 Ba = [B; 0];
 Ka = place(Aa, Ba, [-2.8+2.86i, -2.8-2.86i, -12, -15, -5]);
-% u = -Ka * [x - [r;0;0;0]; xi]
+% Final control law (type-1 servo): u = -Ka(1:4)*x - Ka(5)*xi
 ```
 
 **Recommended Week 10 design: D2 + integrator.**
 
-## 4. Observer (Week 11 plan)
+### 3a. How the reference enters: type-1 servo (fixed 2026-10-29)
 
-Only θ and α are measured, so estimate x with a full-order Luenberger observer:
+The first version fed the reference twice: through u = −K_a[x − x_r; ξ] *and* through the integrator ξ̇ = θ − r. On a 30° step this gave **57% overshoot**. The disturbance tests above did not show it, because they use r = 0.
+
+The fix is the standard type-1 servo structure (Ogata, *Modern Control Engineering*, "servo system with integrator"), where r enters **only** through the integrator:
 
 $$
-\dot{\hat x} = A\hat x + Bu + L(y - C\hat x),\qquad u = -K\hat x \;(\text{plus the integrator on the measured } \theta)
+u = -K_x x - k_i\xi,\qquad \dot\xi = \theta - r
 $$
 
-- The pair (A, C) is observable (rank 4), so the eigenvalues of A − LC can be placed anywhere. Use `L = place(A', C', po)'`. With two outputs, `place` picks one of many valid L matrices; an alternative is `L = lqe`/`kalman` with noise covariances.
-- **Pole choice:** start 3–4× faster than the fastest controller pole, e.g. po = [−40, −45, −50, −55]. Then try [−80 … −100] and compare the noise in V_m when the measurements are quantised to 2π/2048 rad.
-- The integrator state uses the **measured** θ, not θ̂, so it needs no estimation.
-- Feed the **saturated** u into the observer.
-- Tests to add in `week11_observer.m`:
-    1. Initial estimation error, e.g. x̂(0) = 0 with x(0) = [0, 10°, 0, 0]: does the loop still recover?
-    2. Quantised and noisy y: how does the noise in V_m compare between slow and fast observer poles?
-    3. Compare with a simple dirty-derivative filter 50s/(s+50), the approach Quanser uses on the hardware.
-    4. Repeat the ±20% parameter sweep: the observer uses the nominal A and B while the plant is perturbed.
+With the same gains, the linear step response becomes T_s 1.80 s, OS 2.5%, US 2.2%, with half the voltage. On the nonlinear plant with the observer it is T_s 1.26 s, OS 1.5% (doc 05, V2).
+
+Feeding a fraction N_r·K_x(1) of the reference forward trades speed for overshoot:
+
+| N_r | T_s | OS | US |
+| --- | --- | --- | --- |
+| 1 (original) | 2.04 s | 57.5% | 14.4% |
+| 0.5 | 1.64 s | 14.7% | 7.8% |
+| 0.25 | 1.67 s | 4.2% | 4.6% |
+| **0 (chosen)** | 1.80 s | 2.5% | 2.2% |
+
+Produced by `scratch/ref_structure.m`, which is not part of the public repo.
+
+## 4. Observer (Week 11): design and results
+
+Only θ and α are measured (doc 08), so the velocities are estimated by a **discrete-time Luenberger observer** running at 1 kHz, in predictor form:
+
+$$
+\hat x_{k+1} = A_d\hat x_k + B_d u_k + L\left(y_k - C\hat x_k\right),\qquad u_k = \operatorname{sat}\!\left(-K_x\hat x_k - k_i\xi_k\right),\qquad \xi_{k+1} = \xi_k + T_s\left(y_{\theta,k} - r_k\right)
+$$
+
+- A_d and B_d are the zero-order-hold discretisation of (A, B) at T_s = 1 ms.
+- L is found with `place(Ad', C', exp(p_obs*Ts))'`, which places the observer poles at exp(p_obs·T_s). (A, C) is observable (rank 4).
+- The integrator uses the **measured** θ, so it needs no estimate.
+- The observer is driven by the **saturated** voltage, so its estimate stays right while the motor is saturated.
+- Code: [furuta_design.m](../matlab/furuta_design.m) (gains), [furuta_sim_obs.m](../matlab/furuta_sim_obs.m) (loop), [week11_observer.m](../matlab/week11_observer.m) (design and tests).
+
+**Final gains:**
+
+- K_x = [−1.861, 20.03, −0.985, 1.241] and k_i = −2.539, from controller poles −2.8 ± 2.86j, −12, −15, −5.
+- Observer poles −100, −110, −120, −130 rad/s.
+
+**Separation principle (verified).** The eigenvalues of the full sampled closed loop, with states [x; ξ; x̂], equal those of the controller plus those of the observer to 1.6 × 10⁻¹³. Largest |z| = 0.9972, so the loop is stable.
+
+### Choosing the observer poles
+
+Test: start at α₀ = 5° with x̂₀ = 0; quantised encoders; small random torques. The robustness column is the linear sampled loop on 500 plants with all parameters ±20%.
+
+| Observer poles | Error < 2% after | RMS u (V) | RMS α̇ error (deg/s) | Unstable / 500 |
+| --- | --- | --- | --- | --- |
+| −15…−18 | 0.55 s | 0.023 | 0.57 | 111 |
+| −40…−55 | 0.32 s | 0.046 | 1.04 | 39 |
+| **−100…−130 (chosen)** | 0.23 s | 0.092 | 2.59 | **6** |
+| −250…−280 | — (noise floor) | 0.190 | 6.53 | — (saturates at 10 V) |
+
+**Why fast poles were chosen (LOGBOOK D-10).** A slow observer gives smooth estimates but badly erodes robustness. The plants it fails on have a weaker motor than modelled (k_m low, R_m high). With full-state feedback only 1 in 500 plants is unstable. This is the known result that observer-based feedback has no guaranteed robustness margins (Doyle, 1978). −100…−130 recovers most of the robustness for 0.09 V RMS of noise. At −250 the quantisation noise drives the motor into saturation.
+
+**Velocity estimates vs differentiation.** Differentiating the encoder gives a 29 deg/s RMS error in α̇, because one count per sample is 176 deg/s. The observer gives 2.6 deg/s (`figures/w11_velocity_estimate.png`).
+
+**Cost of the observer.** It reacts later than full-state feedback to a sudden disturbance. A 20 mN·m, 20 ms tap gives max |α| = 18° with the observer, against 14° with the true state. The region of attraction is 22° instead of 31°.
+
+**A Kalman filter does this trade-off better.** For the same tap response, a Kalman gain is quieter and more robust: see [doc 09](09_kalman_filter.md). The choice between them is open decision D-12.
 
 ## 5. Discussion points for Assessment 2
 

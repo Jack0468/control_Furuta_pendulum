@@ -78,7 +78,7 @@ end
 %% 4. Trade-off figure: noise vs disturbance response, coloured by robustness
 % Only observers that survive the tap are plotted (the others fall, max|alpha| > 90 deg).
 figure('Position', [100 100 760 480]); hold on;
-isK = strcmp({cfg.kind}, 'K'); up = M(:,3) < 90;
+isK = strcmp({cfg.kind}, 'K').'; up = M(:,3) < 90;
 plot(M(isK & up,1), M(isK & up,3), '-o', 'LineWidth', 1.4, 'MarkerSize', 7);
 plot(M(~isK & up,1), M(~isK & up,3), '--s', 'LineWidth', 1.4, 'MarkerSize', 7);
 short = [arrayfun(@(s) sprintf('K Q\\times%g', s^2), scales, 'UniformOutput', false), ...

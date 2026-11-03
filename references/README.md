@@ -9,6 +9,7 @@ The PDFs in this folder are kept **locally only** and are git-ignored. They are 
 | `ELEC3304___LAB9-1.pdf` | Practical Week 9: Modelling a System in State-Space Form | ELEC3304 Canvas (USyd) |
 | `ELEC3304___LAB10.pdf` | Practical Week 10: Design of a State Feedback Control System | ELEC3304 Canvas (USyd) |
 | `ELEC3304___Open_Design_Project_Instructions.pdf` | Open Design Project brief (due 6 Nov 2026) | ELEC3304 Canvas (USyd) |
+| `ELEC3304___Open_Design_Project_Instructions_ANNOTATED.pdf` | Jack's annotated brief | Local only |
 | `MIT6_241JS11_textbook.pdf` | M. Dahleh, M. A. Dahleh, G. Verghese, *Lectures on Dynamic Systems and Control*, MIT OpenCourseWare 6.241J, Spring 2011 (CC BY-NC-SA) | [MIT OCW 6.241J](https://ocw.mit.edu/courses/6-241j-dynamic-systems-and-control-spring-2011/) |
 
 ## Encoder datasheets (`datasheets/`)
@@ -20,6 +21,10 @@ The PDFs in this folder are kept **locally only** and are git-ignored. They are 
 | `USDigital_EM1_datasheet.pdf` | US Digital EM1 Transmissive Optical Encoder Module (the sensor inside the E5) | 2026.04.14 | [cdn2.usdigital.com/datasheets/EM1-Datasheet.pdf](https://cdn2.usdigital.com/datasheets/EM1-Datasheet.pdf) |
 
 The numbers taken from these datasheets are tabulated, with page references, in [docs/08_sensors_and_noise.md](../docs/08_sensors_and_noise.md).
+
+## Papers (`papers/`)
+
+Downloaded copies of openly available papers. The full list, with citations and how far each was checked, is in [docs/10_literature_review.md](../docs/10_literature_review.md).
 
 ## Papers cited but not stored here
 

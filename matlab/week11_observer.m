@@ -5,7 +5,6 @@
 clear; clc; close all;
 P = furuta_params();
 D = furuta_design(P);                      % controller (D2 + integrator) and default observer
-figdir = fullfile('..', 'figures'); if ~exist(figdir, 'dir'), mkdir(figdir); end
 A = D.A; B = D.B; C = D.C; Ts = D.Ts;
 
 %% 1. Observer design and checks
@@ -47,10 +46,10 @@ for i = 1:4
     if i == 1, legend('true', 'estimate'); title('Observer estimates, \alpha_0 = 10^\circ, estimate starts at 0'); end
 end
 subplot(3, 2, 5); semilogy(S_obs.t, vecnorm(S_obs.e, 2, 2)); grid on; xlim([0 1.5]);
-ylabel('estimation error norm'); xlabel('t [s]');
+ylabel('||e||'); xlabel('t [s]'); yticks([1e-3 1e-2 1e-1 1]);
 subplot(3, 2, 6); plot(S_fs.t, S_fs.u, S_obs.t, S_obs.u, '--'); grid on; xlim([0 1.5]);
-ylabel('V_m [V]'); xlabel('t [s]'); legend('full state', 'observer-based');
-exportgraphics(gcf, fullfile(figdir, 'w11_observer_convergence.png'));
+ylabel('V_m [V]'); xlabel('t [s]'); legend('full state', 'observer-based', 'Location', 'southeast');
+furuta_savefig(gcf, 'w11_observer_convergence', 7.16, 2.9);
 
 %% 3. Choice of observer poles: speed vs noise
 % Same test for each pole set: alpha0 = 5 deg, xhat0 = 0, quantised encoders,
@@ -72,7 +71,7 @@ for k = 1:numel(sets)
 end
 grid on; xlabel('t [s]'); ylabel('V_m [V]'); legend(names); xlim([2 3]);
 title('Steady-state voltage with quantised encoders (zoom 2-3 s)');
-exportgraphics(gcf, fullfile(figdir, 'w11_observer_poles_noise.png'));
+furuta_savefig(gcf, 'w11_observer_poles_noise', 3.5, 2.3);
 
 %% 4. Why not just differentiate the encoder signal?
 S = furuta_sim_obs(P, D, [0; deg2rad(5); 0; 0], 5, op);
@@ -85,4 +84,4 @@ figure; plot(S.t, rad2deg(ad_fd), S.t, rad2deg(S.xhat(:,4)), S.t, rad2deg(S.x(:,
 xlim([2 2.5]); xlabel('t [s]'); ylabel('\alpha'' [deg/s]');
 legend('finite difference of encoder', 'observer estimate', 'true');
 title('Pendulum velocity: differentiating a quantised angle vs the observer');
-exportgraphics(gcf, fullfile(figdir, 'w11_velocity_estimate.png'));
+furuta_savefig(gcf, 'w11_velocity_estimate', 3.5, 2.2);

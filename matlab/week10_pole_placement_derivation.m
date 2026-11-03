@@ -11,7 +11,7 @@ P = furuta_params();
 fmt = @(v) mat2str(v, 6);
 
 %% Step 1: requirements -> dominant poles
-OS = 5; Ts = 2.0;
+OS = 5; Ts = 2.5;
 zeta_min = -log(OS/100)/sqrt(pi^2 + log(OS/100)^2);
 fprintf('Step 1: zeta_min = %.4f, sigma_min = 4/Ts = %.4f\n', zeta_min, 4/Ts);
 zeta = 0.7; wn = 4;

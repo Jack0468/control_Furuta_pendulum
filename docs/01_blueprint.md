@@ -12,11 +12,12 @@
 | 4. LTI state-space form | ẋ = Ax + Bu, y = Cx after linearisation |
 | 5. At least one actuator, reachable | Motor voltage V_m. rank(ctrb(A,B)) = 4 (verified in MATLAB) |
 
-### Caveats: check these with the tutor in the Week 9 session
+### Caveats (status at 2026-11-03)
 
-1. **Similarity to lecture examples.** The cart–pole inverted pendulum is a common lecture or tutorial example. The Furuta pendulum is a different plant: it is rotary, the arm and pendulum are coupled through Coriolis and centripetal terms, and the motor's back-EMF enters the model. Even so, get explicit approval. If the tutor says no, fall-back plants that reuse most of this work are a reaction-wheel pendulum or a ball-and-beam.
+1. **Similarity to lecture examples: resolved.** The tutor confirmed the Furuta pendulum is allowed (2026-10-29).
+   Original concern: The cart–pole inverted pendulum is a common lecture or tutorial example. The Furuta pendulum is a different plant: it is rotary, the arm and pendulum are coupled through Coriolis and centripetal terms, and the motor's back-EMF enters the model. Even so, get explicit approval. If the tutor says no, fall-back plants that reuse most of this work are a reaction-wheel pendulum or a ball-and-beam.
 2. **The linear model is local.** It is valid for roughly |α| < 15°. The scope is therefore *balance plus arm positioning, starting near upright*. Swing-up from hanging is a stretch goal and is not needed for the assessment.
-3. **The unstable pole is fast** (+10.55 rad/s), and the input saturates at ±10 V. This limits how large a disturbance can be recovered. That is a feature for the Assessment 2 discussion, not a blocker.
+3. **The unstable pole is fast** (+9.96 rad/s), and the input saturates at ±10 V. This limits how large a disturbance can be recovered. That is a feature for the Assessment 2 discussion, not a blocker.
 
 ## 2. Scope
 
@@ -79,7 +80,7 @@ Suggested split for a group of two:
 | Constant arm torque (cable drag) causes θ offset | Fails tracking requirement | Add an integrator on θ (augmented 5-state design) |
 | Observer amplifies encoder quantisation | Noisy V_m, chatter | Observer poles 2–5× faster than the controller, not 20×; test with quantised y |
 
-## 6. Questions to ask the tutor
+## 6. Questions for the tutor (the first was answered on 2026-10-29; see the LOGBOOK)
 
 1. Is a Furuta pendulum acceptable given that the cart–pole was covered in lectures?
 2. Is a balance-only scope (start within ±10° of upright) acceptable, with swing-up optional?

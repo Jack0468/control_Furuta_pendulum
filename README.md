@@ -4,7 +4,7 @@ ELEC3304 Control, Open Design Project (University of Sydney, 2026 S2). Due 6 Nov
 
 We balance a Furuta (rotary inverted) pendulum in its upright position using **observer-based state feedback**.
 
-- **Model:** nonlinear Lagrangian, linearised about upright, giving a 4-state LTI model. One actuator (motor voltage), two sensors (arm and pendulum encoders).
+- **Model:** nonlinear Lagrangian, linearised about upright, giving a 4-state LTI model. One actuator (motor voltage), two sensors (arm and pendulum encoders). The arm is modelled as a uniform bar with the motor at one end, so J_r = m_rL_r²/3 ([why](docs/02_system_model.md#41-arm-geometry-assumption)).
 - **Controller:** pole-placed state feedback with integral action on the arm angle (type-1 servo).
 - **Observer:** a discrete-time observer estimates the two unmeasured velocities from quantised encoder readings.
 - **Validation:** everything is tested on the full nonlinear model at 1 kHz, with datasheet-based encoder noise, motor saturation, disturbances and ±20% parameter uncertainty.
@@ -26,17 +26,19 @@ Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGB
 | [docs/07_code_explained.md](docs/07_code_explained.md) | The MATLAB code explained from first principles | — |
 | [docs/08_sensors_and_noise.md](docs/08_sensors_and_noise.md) | Encoder selection and noise model from the Broadcom/US Digital datasheets | System Model |
 | [docs/09_kalman_filter.md](docs/09_kalman_filter.md) | Kalman filter derivation and comparison with pole-placed observers | Controller Design (extension) |
+| [docs/10_literature_review.md](docs/10_literature_review.md) | Sources and how far each was verified; material for the Introduction and System Model; rubric coverage | Introduction, System Model |
 | [references/README.md](references/README.md) | Sources for the local reference PDFs (the PDFs themselves are not in the public repo) | — |
 
 ## MATLAB code (`matlab/`)
 
 | File | Purpose |
 | --- | --- |
-| `run_all.m` | **Reproduces every result and figure** (about 5 min) |
+| `run_all.m` | **Reproduces every result and figure** (about 7 min) |
 | `furuta_params.m` | Physical, motor and encoder parameters |
 | `furuta_linmodel.m` | Linearised A, B, C, D about upright |
 | `furuta_nl.m` | Full nonlinear dynamics (truth model), with disturbance torques |
 | `furuta_design.m` | Final controller gains (Kₓ, kᵢ) and observer gain L |
+| `furuta_savefig.m` | Formats figures for the report; `FURUTA_FIGDIR` previews them elsewhere |
 | `furuta_sim_cl.m` | Continuous-time, full-state closed loop (Week 10 studies) |
 | `furuta_sim_obs.m` | Final sampled-data loop: encoders, observer, saturation, anti-windup, noise |
 | `week9_model_and_openloop.m` | Model checks, linear vs nonlinear open loop, uncertainty sweep |
@@ -45,29 +47,31 @@ Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGB
 | `week11_observer.m` | Observer design, separation-principle check, pole choice, velocity estimate |
 | `week11_kalman.m` | Steady-state Kalman filter and the observer trade-off study |
 | `week12_validation.m` | Validation tests V1–V7 on the nonlinear plant |
+| `week12_margins.m` | Bode/Nyquist margins, stable gain ranges, linear vs nonlinear, published parameter values |
 
 ```matlab
 cd matlab
 run_all
 ```
 
-Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `figures/`.
+Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `figures/`. To build the report PDF: `python report/build.py`.
 
 ## Key numbers
 
-- **Open-loop poles:** 0, −30.05, **+10.55**, −6.12 rad/s. Released at 2°, the pendulum passes 15° in 0.23 s.
+- **Open-loop poles:** 0, −17.73, **+9.96**, −4.06 rad/s. Released at 2°, the pendulum passes 15° in 0.26 s.
 - **Structure:** reachable (rank 4); observable from both encoders (rank 4). θ/V_m has a right-half-plane zero at **+8.97 rad/s** (non-minimum phase).
 - **Sensors:** 512-CPR optical encoders in 4× quadrature. Resolution q = 3.07 mrad; quantisation noise σ = 0.886 mrad.
 - **Final design:**
   - Controller poles −2.8 ± 2.86j, −12, −15, −5 (integrator).
   - Observer poles −100 … −130.
-  - 30° step: T_s 1.26 s, overshoot 1.5%.
-  - Recovers from a 10° tilt in 0.96 s, using at most 3.5 V.
+  - 30° step: T_s 1.81 s without quantisation, 2.40 s with it (encoder ripple, see doc 05); overshoot 2.0%.
+  - Recovers from a 10° tilt in 0.96 s, using at most 8.6 V.
 
 ## Repository layout
 
 ```
 docs/        design documents and logbook
+report/      LaTeX report and build.py (run: python report/build.py)
 matlab/      all code (run_all.m reproduces everything)
 figures/     generated figures
 references/  local copies of course PDFs and datasheets (git-ignored; README lists sources)

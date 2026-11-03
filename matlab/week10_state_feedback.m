@@ -4,11 +4,10 @@
 clear; clc; close all;
 P = furuta_params();
 [A, B, C, D] = furuta_linmodel(P);
-figdir = fullfile('..', 'figures'); if ~exist(figdir, 'dir'), mkdir(figdir); end
 
 %% 1. Requirements -> dominant poles
 OS_max = 5;      % [%]  max overshoot of theta (2nd-order estimate)
-Ts_max = 2.0;    % [s]  2% settling time of theta step
+Ts_max = 2.5;    % [s]  2% settling time of theta step
 zeta = -log(OS_max/100)/sqrt(pi^2 + log(OS_max/100)^2);
 sigma_min = 4/Ts_max;
 fprintf('Requirement => zeta >= %.2f, zeta*wn >= %.2f rad/s\n', zeta, sigma_min);
@@ -65,7 +64,7 @@ for i = 1:3
     subplot(3,3,6+i); plot(tests{i,1}, tests{i,3}); grid on; ylabel('V_m [V]'); xlabel('t [s]');
     yline([P.Vmax -P.Vmax], 'r--');
 end
-exportgraphics(gcf, fullfile(figdir, 'w10_nonlinear_tests.png'));
+furuta_savefig(gcf, 'w10_nonlinear_tests', 7.16, 4.2);
 fprintf('\nNonlinear (D2): max|u| = %.1f / %.1f / %.1f V; max|alpha| tap = %.1f deg; theta offset from drag = %.1f deg\n', ...
         max(abs(u1)), max(abs(u2)), max(abs(u3)), rad2deg(max(abs(x3(:,2)))), rad2deg(x3(end,1)));
 
@@ -110,7 +109,7 @@ figure; subplot(3,1,1); plot(t3, rad2deg(x3(:,1)), ti, rad2deg(zi(:,1))); grid o
 legend('D2 (no integrator)', 'D2 + integrator'); title('Pendulum tap at 0.5 s, constant arm drag from 2 s');
 subplot(3,1,2); plot(t3, rad2deg(x3(:,2)), ti, rad2deg(zi(:,2))); grid on; ylabel('\alpha [deg]');
 subplot(3,1,3); plot(t3, u3, ti, ui); grid on; ylabel('V_m [V]'); xlabel('t [s]');
-exportgraphics(gcf, fullfile(figdir, 'w10_integral_action.png'));
+furuta_savefig(gcf, 'w10_integral_action', 3.5, 3.2);
 
 %% 7. Figures: pole map (A2) and design comparison (A3)
 figure; hold on; grid on;
@@ -120,14 +119,14 @@ for k = 1:numel(designs_K)
     pc = eig(A - B*designs_K{k});
     plot(real(pc), imag(pc), mk{k}, 'MarkerSize', 7, 'LineWidth', 1.2);
 end
-% requirement region: zeta >= 0.69 and zeta*wn >= 2
+% requirement region: zeta >= 0.69 and zeta*wn >= 1.6
 th = acos(0.69); rr = 50;
 plot([0 -rr*cos(th)], [0 rr*sin(th)], 'k:', [0 -rr*cos(th)], [0 -rr*sin(th)], 'k:');
-xline(-2, 'k--'); xline(0, 'k-');
+xline(-1.6, 'k--'); xline(0, 'k-');
 xlim([-45 15]); ylim([-8 8]); xlabel('Re(s) [rad/s]'); ylabel('Im(s) [rad/s]');
-legend(['open loop', names, {'\zeta = 0.69', '', '\zeta\omega_n = 2'}], 'Location', 'southwest');
+legend(['open loop', names, {'\zeta = 0.69', '', '\zeta\omega_n = 1.6'}], 'Location', 'southwest');
 title('Open-loop and closed-loop poles');
-exportgraphics(gcf, fullfile(figdir, 'w10_pole_map.png'));
+furuta_savefig(gcf, 'w10_pole_map', 3.5, 2.6);
 
 figure('Position', [100 100 800 600]);
 tt = linspace(0, 4, 2001).';
@@ -144,4 +143,4 @@ subplot(3,1,1); grid on; ylabel('\theta [deg]'); title('30^\circ arm step, linea
 yline(rad2deg(r_step)*[0.98 1.02], 'k:', 'HandleVisibility', 'off'); legend(names, 'Location', 'southeast');
 subplot(3,1,2); grid on; ylabel('\alpha [deg]');
 subplot(3,1,3); grid on; ylabel('V_m [V]'); xlabel('t [s]');
-exportgraphics(gcf, fullfile(figdir, 'w10_design_comparison.png'));
+furuta_savefig(gcf, 'w10_design_comparison', 3.5, 3.2);

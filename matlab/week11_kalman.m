@@ -6,7 +6,6 @@
 clear; clc; close all;
 P = furuta_params();
 D = furuta_design(P);
-figdir = fullfile('..', 'figures'); if ~exist(figdir, 'dir'), mkdir(figdir); end
 A = D.A; C = D.C; Ts = D.Ts;
 
 %% 1. Noise model
@@ -81,20 +80,21 @@ figure('Position', [100 100 760 480]); hold on;
 isK = strcmp({cfg.kind}, 'K').'; up = M(:,3) < 90;
 plot(M(isK & up,1), M(isK & up,3), '-o', 'LineWidth', 1.4, 'MarkerSize', 7);
 plot(M(~isK & up,1), M(~isK & up,3), '--s', 'LineWidth', 1.4, 'MarkerSize', 7);
-short = [arrayfun(@(s) sprintf('K Q\\times%g', s^2), scales, 'UniformOutput', false), ...
-         {'P -15', 'P -40', 'P -100', 'P -250'}];
+short = [arrayfun(@(s) sprintf('Q\\times%g', s^2), scales, 'UniformOutput', false), ...
+         {'P-15', 'P-40', 'P-100', 'P-250'}];
 for i = find(up).'
-    dy = 0.35*(1 - 2*isK(i));                                 % Kalman labels below, poles above
-    text(M(i,1), M(i,3) + dy, sprintf('%s [%d]', short{i}, M(i,5)), 'FontSize', 9, ...
-         'HorizontalAlignment', 'center');
+    if isK(i), al = 'left'; dy = -0.55; else, al = 'right'; dy = 0.55; end   % Kalman below, poles above
+    if strcmp(short{i}, 'P-100'), al = 'left'; dy = 0.6; end                 % these two sit close together
+    if isK(i) && scales(i) == 10, al = 'right'; end
+    text(M(i,1), M(i,3) + dy, sprintf('%s [%d]', short{i}, M(i,5)), 'FontSize', 7, 'HorizontalAlignment', al);
 end
-set(gca, 'XScale', 'log'); grid on; ylim([13 28]);
-yline(15, 'r--', 'R6 limit 15^\circ', 'LabelHorizontalAlignment', 'left');
-xlabel('RMS voltage caused by sensor + torque noise [V]  (lower = quieter)');
-ylabel('max |\alpha| after 20 mN\cdotm tap [deg]');
+set(gca, 'XScale', 'log'); grid on; ylim([11 23]); xlim([0.06 6]);
+yline(15, 'r--', 'R6 limit', 'LabelHorizontalAlignment', 'right', 'FontSize', 7);
+xlabel('RMS voltage from noise [V]');
+ylabel('max |\alpha| after tap [deg]');
 legend('Kalman, increasing Q', 'pole placement', 'Location', 'northeast');
-title('Observer trade-off  ([n] = unstable plants out of 200 with \pm20% parameters)');
-exportgraphics(gcf, fullfile(figdir, 'w11_kalman_tradeoff.png'));
+title('Observer trade-off ([n] = unstable of 200 plants)');
+furuta_savefig(gcf, 'w11_kalman_tradeoff', 3.5, 2.8);
 
 function [L, X] = kgain(Ad, C, Gd, Qw, R)
 % Steady-state predictor-form Kalman gain from the filter Riccati equation (docs/09 K8-K9)

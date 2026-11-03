@@ -13,11 +13,13 @@ s = sin(al); co = cos(al);
 
 tau = P.km*(Vm - P.km*thd)/P.Rm;          % motor torque
 
-M = [P.Jr + P.mp*P.Lr^2 + 0.25*P.mp*P.Lp^2*s^2,  -0.5*P.mp*P.Lp*P.Lr*co;
-     -0.5*P.mp*P.Lp*P.Lr*co,                      P.Jp + 0.25*P.mp*P.Lp^2];
+c = P.Jp + 0.25*P.mp*P.Lp^2;                % pendulum inertia about its pivot
 
-f = [tau - P.Dr*thd - 0.5*P.mp*P.Lp^2*s*co*thd*ald - 0.5*P.mp*P.Lp*P.Lr*s*ald^2 + tau_d;
-     -P.Dp*ald + 0.25*P.mp*P.Lp^2*co*s*thd^2 + 0.5*P.mp*P.g*P.Lp*s + tau_p];
+M = [P.Jr + P.mp*P.Lr^2 + c*s^2,  -0.5*P.mp*P.Lp*P.Lr*co;
+     -0.5*P.mp*P.Lp*P.Lr*co,      c];
+
+f = [tau - P.Dr*thd - 2*c*s*co*thd*ald - 0.5*P.mp*P.Lp*P.Lr*s*ald^2 + tau_d;
+     -P.Dp*ald + c*co*s*thd^2 + 0.5*P.mp*P.g*P.Lp*s + tau_p];
 
 dx = [thd; ald; M\f];
 end

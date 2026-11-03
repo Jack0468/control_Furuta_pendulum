@@ -6,7 +6,6 @@ P = furuta_params();
 [A, B, C, D] = furuta_linmodel(P);
 sys = ss(A, B, C, D, 'StateName', {'theta','alpha','theta_dot','alpha_dot'}, ...
          'InputName', 'Vm', 'OutputName', {'theta','alpha'});
-figdir = fullfile('..', 'figures'); if ~exist(figdir, 'dir'), mkdir(figdir); end
 
 %% 1. Model properties
 disp('A ='); disp(A); disp('B ='); disp(B);
@@ -28,7 +27,7 @@ tf_ = 0.6; t = linspace(0, tf_, 601).';
 figure; plot(t, rad2deg(xl(:,2)), tn, rad2deg(xn(:,2)), '--'); grid on;
 ylim([-10 200]); xlabel('t [s]'); ylabel('\alpha [deg]');
 legend('linear', 'nonlinear'); title('Open loop, released at \alpha_0 = 2^\circ');
-exportgraphics(gcf, fullfile(figdir, 'w9_openloop_release.png'));
+furuta_savefig(gcf, 'w9_openloop_release', 3.5, 2.1);
 idx = find(abs(xn(:,2)) > deg2rad(15), 1);
 fprintf('Nonlinear: pendulum passes 15 deg after %.2f s\n', tn(idx));
 
@@ -41,7 +40,7 @@ figure; subplot(2,1,1); plot(tl, rad2deg(yl(:,1)), tn2, rad2deg(xn2(:,1)), '--')
 ylabel('\theta [deg]'); legend('linear','nonlinear'); title('1 V, 50 ms pulse');
 subplot(2,1,2); plot(tl, rad2deg(yl(:,2)), tn2, rad2deg(xn2(:,2)), '--'); grid on;
 ylim([-60 60]); ylabel('\alpha [deg]'); xlabel('t [s]');
-exportgraphics(gcf, fullfile(figdir, 'w9_pulse_response.png'));
+furuta_savefig(gcf, 'w9_pulse_response', 3.5, 2.6);
 
 %% 4. Parameter uncertainty: how far does the unstable pole move?
 fprintf('\nUnstable pole under +/-20%% parameter changes:\n');
@@ -49,7 +48,7 @@ names = {'mp','Lp','Lr','Rm','km','Dr','Dp'};
 for k = 1:numel(names)
     for s = [0.8 1.2]
         Pk = P; Pk.(names{k}) = s*P.(names{k});
-        Pk.Jp = Pk.mp*Pk.Lp^2/12;  Pk.Jr = Pk.mr*Pk.Lr^2/12;
+        Pk.Jp = Pk.mp*Pk.Lp^2/12;  Pk.Jr = Pk.mr*Pk.Lr^2/3;
         Ak = furuta_linmodel(Pk);
         fprintf('  %-3s x%.1f : %.2f rad/s\n', names{k}, s, max(real(eig(Ak))));
     end

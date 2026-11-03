@@ -109,9 +109,9 @@ $$
 
 | Velocity estimate (V5-type test) | RMS error of α̇ |
 | --- | --- |
-| Backward difference of the encoder | 29 deg/s |
-| Observer, poles −100…−130 (chosen) | 2.6 deg/s |
-| Observer, poles −40…−55 | 1.0 deg/s |
+| Backward difference of the encoder | 30 deg/s |
+| Observer, poles −100…−130 (chosen) | 2.8 deg/s |
+| Observer, poles −40…−55 | 0.8 deg/s |
 
 Source: [week11_observer.m](../matlab/week11_observer.m) §4 and §3; figure `figures/w11_velocity_estimate.png`.
 
@@ -123,9 +123,9 @@ The observer uses the model to fill in between counts, which is why it is about 
 
 | Test | Result |
 | --- | --- |
-| V4: 10 arcmin offset on α (typical ΔΘ) | With the integrator, the arm settles 0.04° from target (5.5° without) |
-| V4: 40 arcmin offset on α (maximum ΔΘ) | 0.21° with the integrator (21° without) |
-| V5: quantisation + random torque disturbances | RMS voltage 0.091 V; RMS α 0.08°; RMS θ 0.33° |
+| V4: 10 arcmin offset on α (typical ΔΘ) | With the integrator, the arm settles 0.07° from target (5.3° without) |
+| V4: 40 arcmin offset on α (maximum ΔΘ) | 0.37° with the integrator (19.3° without) |
+| V5: quantisation + random torque disturbances | RMS voltage 0.243 V; RMS α 0.08°; RMS θ 0.29° |
 
 **Why the integrator also fixes a sensor offset:** a biased α makes the controller think the pendulum is leaning. It would keep accelerating the arm, but the integrator on θ settles at whatever value cancels that bias.
 

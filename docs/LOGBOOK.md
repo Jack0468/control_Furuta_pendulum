@@ -4,6 +4,8 @@ ELEC3304 Open Design Project. **Due 11:59 pm, Friday 6 November 2026.**
 
 This logbook records what was done, what was decided and why, and what is still open. The actionable checklist of open work is [TODO.md](TODO.md). Add a new dated entry at the bottom for each work session. When a decision is made or reversed, also update the **Decision register**. When an issue is found or closed, update **Open issues**.
 
+**Note on numbers:** entries dated before 2026-11-03 used J_r = m_rL_r²/12 and are kept as history. Current numbers are in docs 02–09.
+
 AI assistance (Claude) was used throughout for derivations, code and drafting. Every entry notes this so it can be declared in the report as required by the Lecture 1 guidelines.
 
 ---
@@ -23,7 +25,13 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-09 | 2026-10-29 | Controller and observer run in discrete time at 1 kHz; observer in predictor form, driven by the saturated voltage | Matches real hardware; makes quantisation and sampling effects visible | Active |
 | D-10 | 2026-10-29 | Observer poles −100, −110, −120, −130 rad/s (was −40…−55) | The slower observer left 39/500 random ±20% plants unstable; this set leaves 6/500. Noise cost: RMS u 0.09 V instead of 0.05 V | Active; may be replaced by a Kalman gain (D-12) |
 | D-11 | 2026-10-29 | Course PDFs and vendor datasheets kept in `references/` but git-ignored; working scripts in `scratch/`, git-ignored | Copyrighted material must not go on the public repo | Active |
-| D-12 | 2026-10-29 | Investigate a steady-state Kalman filter as the observer | Principled trade-off between noise and disturbance response; may fix I-01 and I-02 | In progress (doc 09) |
+| D-12 | 2026-10-29 | Investigate a steady-state Kalman filter as the observer | Principled trade-off between noise and disturbance response; may fix I-01 and I-02 | Studied (doc 09). Choice still open; Option A suggested |
+| D-13 | 2026-11-03 | **Arm geometry: case A.** Uniform bar with the motor at one end, so J_r = m_rL_r²/3 (was /12) | /12 is inconsistent with L_r being the motor-to-joint distance (doc 02 §4.1). Aleksei's model also uses /3 | Active; closes I-04 |
+| D-14 | 2026-11-03 | **R3 settling limit relaxed to 2.5 s, for now** (was 2.0 s) | The measured 2.40 s includes quantisation ripple; 1.81 s without it. Still a design choice to be justified from the aims (I-10) | Active, provisional |
+| D-15 | 2026-11-03 | Dropped the 6 V voltage target; the limit is ±10 V | With J_r = `/3` the gains are higher and 6 V isn't achievable; 10 V is inside the ±15 V drive range and 18 V motor rating | Active |
+| D-16 | 2026-11-03 | **Published damping: D_r 0.0005, D_p 0.0001** (Jack's decision) | The only damping values with a source (Xu et al. 2023) | Active |
+| D-17 | 2026-11-03 | Restored the pendulum spin term in the nonlinear model | Gäfvert and the QUBE model in Xu et al. keep it; an earlier claim that Quanser drops it was wrong. Linear model unchanged | Active |
+| D-18 | 2026-11-03 | **Application: serving arm carrying a drink on a passive joint** (Jack's bartender idea). Tilt, speed and settling requirements derived from it | Doc 03 §4. Golf, mixer, weather station and ML benchmark considered and rejected | Proposed; awaiting team acceptance |
 
 ---
 
@@ -31,13 +39,18 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 
 | ID | Opened | Issue | Next step |
 | --- | --- | --- | --- |
-| I-01 | 2026-10-29 | R6 not met: a 20 mN·m, 20 ms pendulum tap gives max \|α\| = 18° with the observer (limit 15°; full-state feedback gives 14°) | Kalman / disturbance observer study (doc 09); otherwise report it as a limitation |
-| I-02 | 2026-10-29 | Monte Carlo (±20%, 40 plants): all 40 are linearly stable, but 4/40 fail to recover from 10° on the nonlinear plant and only 23/40 survive the tap | Identify the failing parameter combinations; test the Kalman gain |
-| I-03 | 2026-10-15 | Quanser parameters and workbook citation come from memory and have not been verified | Get the QUBE-Servo 2 manual or workbook from the tutor/Canvas; otherwise cite Cazzolato & Prime and the datasheets only |
-| I-04 | 2026-10-29 | J_r = m_rL_r²/12 assumes the arm pivots at its centre; /3 if it pivots at one end (stable poles −30 → −17.7) | Check the hardware/manual; rerun with the correct value |
-| I-05 | 2026-10-29 | Textbook chapter numbers in the reference lists are from memory | Check against library editions before the report |
-| I-06 | 2026-10-29 | Anti-windup made no difference to the region of attraction (22° both ways) | Expected: saturation episodes are short. State this in the report, or find a test where it matters |
-| I-07 | 2026-10-29 | LaTeX report template not yet supplied | Jack to provide; then start drafting |
+| I-01 | 2026-10-29 | R6 tap limit: 15.0° with our poles (limit 15°), 14.6° with Aleksei's, on the updated model | Closes if Aleksei's poles are adopted (I-09) |
+| I-02 | 2026-10-29 | **Closed 2026-11-03.** Plants that fall have a weaker motor (k_m/R_m factor 0.89 vs 1.01) and shorter arm (0.93 vs 1.00), which lower the loop gain towards its lower stability limit | Report it in Validations |
+| I-03 | 2026-10-15 | Quanser workbook not read directly. Xu et al. support R_m, k_m, L_r, L_p, m_p and damping; a matching motor datasheet supports R_m, k_m. m_r still has no opened source | Find the workbook or another source for m_r |
+| I-04 | 2026-10-29 | **Closed 2026-11-03 by D-13** (J_r = m_rL_r²/3). A published or measured J_r would still be better | — |
+| I-05 | 2026-10-29 | Textbook chapter numbers in docs are from memory. The report draft cites no textbooks | Check only if textbooks are cited |
+| I-06 | 2026-10-29 | **Closed 2026-11-03.** Anti-windup tested on arm-torque pulses to the edge of falling and on large releases: results identical or nearly so, because saturation lasts at most about 0.2 s before recovery or a fall. Kept as a safeguard | State it in the report if there's space |
+| I-07 | 2026-10-29 | **Closed 2026-11-03:** `Template-Latex.zip` (IEEEtran conference template) is in the project folder. Confirm it matches Canvas | — |
+| I-08 | 2026-11-03 | Quantisation limit cycle with the observer. On the updated model: 0.88° arm ripple with our poles (T_s 1.97 s; 1.79 s unquantised), 0.58° with Aleksei's (T_s 1.38 s), which stays inside the ±0.6° band | Record final values after `run_all` |
+| I-09 | 2026-11-03 | Aleksei's Simulink and this repo are not yet aligned on damping, α sign, requirements and poles, and his observer and integrator are unconfirmed | Team check, TODO section 1 |
+| I-10 | 2026-11-03 | **Closed 2026-11-03, pending acceptance of D-18.** Settling limit derived from serving throughput, with stated assumptions (doc 03 §4) | — |
+| I-11 | 2026-11-03 | **Closed 2026-11-03 by D-17** | — |
+| I-12 | 2026-11-03 | **Closed 2026-11-03.** Allied Motion CL40 16705 matches R_m and k_m: 18 V, 0.54 A rated, 2.1 A stall, 22 mN·m. No opened source says the QUBE uses it, so word it as "matching constants" | — |
 
 ---
 
@@ -151,3 +164,61 @@ Commits: `b78618a`, `3c9ed74`, `a9bf321`. AI-assisted: model derivation, scripts
 | Thu 5 – Fri 6 Nov | Proofread and submit (report PDF and MATLAB files) |
 
 AI-assisted today: derivations, sensor research, all new scripts, docs 02 (§2), 07, 08, 09, and this logbook.
+
+---
+
+## 2026-11-03 (Week 13): arm geometry decision and alignment with Aleksei
+
+**Decision D-13: the arm is a uniform bar with the motor at one end, J_r = m_rL_r²/3.** Changed `furuta_params.m` and the sweep in `week9_model_and_openloop.m`, reran everything, and updated docs 01–09 and the README. Poles, damping and requirements were not changed.
+
+**Reviewed Aleksei's Google Doc notes and messages.** He has finished a Simulink model and proposed writing the control design, with Jack covering testing.
+
+- His main A and B equal ours under /3 with α flipped; a second set of his eigenvalues corresponds to D_r = 0.001, D_p = 0.00005.
+- His K cannot be used in our sign convention without flipping k₂ and k₄ (otherwise a pole at +440).
+- His doc contains two settling requirements (1.5 s and 0.4–0.8 s). The 0.8 s design saturates and falls after the tap.
+
+**Effect of /3 on the current design** (same poles):
+
+| Measure | /12 | /3 |
+| --- | --- | --- |
+| Unstable pole | +10.55 | +9.96 |
+| K_x | [−1.86, 20.0, −0.99, 1.24] | [−5.04, 49.1, −2.08, 3.53] |
+| Peak voltage, 10° tilt | 3.5 V | 8.6 V |
+| Tap: max \|α\| / peak voltage | 18.0° / 5.3 V | 15.1° / 9.7 V |
+| RMS voltage from noise | 0.09 V | 0.24 V |
+| Monte Carlo: survive tap | 23/40 | 30/40 |
+
+**New finding (I-08).** The measured T_s of 2.40 s comes from a quantisation limit cycle, not from the poles: T_s is 1.81 s without quantisation. The earlier 1.26 s had the same cause.
+
+**Plan:** align with Aleksei (I-09), settle the requirements (I-10), rerun, then draft the report. See [TODO.md](TODO.md).
+
+AI-assisted today: comparison with Aleksei's notes, code change, reruns, doc updates, this entry.
+
+### Later on 2026-11-03: rubric, research, margins, first report draft
+
+- **Rubric and annotated brief received** (`references/course/`, git-ignored). New requirements: stable ranges of controller parameters, Bode/Nyquist gain margins, closed-loop linear vs nonlinear comparison, modelled disturbances, up to 5 keywords.
+- **R3 relaxed to 2.5 s (D-14).**
+- **Literature research (doc 10).** Citations checked against Crossref; two errors in other sources corrected. Reading the sources overturned two things said earlier: `/12` matches a published QUBE value, and the spin term isn't dropped in the published models.
+- **`week12_margins.m` added.** Gain margins −4.9 / +17.8 dB, phase margin 38°, delay margin 35 ms; stable range of every gain; linear vs nonlinear at 5°, 10° and 20°; design stable on published J_r and damping values.
+- **Report drafted** in `report/` with the IEEE template and `build.py`. Blue prose is AI-drafted and must be rewritten by the team; red numbers depend on the pending pole decision.
+
+AI-assisted: research, margin script, report draft.
+
+### Evening of 2026-11-03: published damping, application, remaining engineering
+
+**Where Aleksei's poles came from.** The same method with different choices: ζ = 0.75 for margin, ω_n = 3.6 from his t_r ≤ 0.5 s and T_s ≤ 1.5 s, fast poles at 4× and 5× σ. See doc 04 §3b.
+
+**Decisions:** D-15 to D-18 above. Jack chose the published damping and proposed the bartender idea, which led to the serving-arm application.
+
+**Preview on the updated model** (full pipeline, written to `scratch/preview/`, not `figures/`):
+
+- Open-loop poles 0, −14.06, −1.75, +12.09 rad/s; zero +10.31 rad/s; 2° release passes 15° in 0.22 s.
+- Our poles: T_s 1.97 s, OS 2.8%, 10° release 7.6 V, tap 15.0°.
+- Aleksei's poles: T_s 1.38 s, OS 1.4%, 10° release 6.6 V, tap 14.6°. Both 0 of 300 plants unstable. **Recommended.**
+
+**Practical note:** a preview stalled for 90 minutes because the computer slept. It wasn't a bug.
+
+**Not done yet, deliberately:** `run_all` to `figures/`, and refreshing result numbers in docs and the report. Those wait for the team's check.
+
+AI-assisted: research, code, previews, docs.
+

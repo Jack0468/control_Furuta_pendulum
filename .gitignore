@@ -10,3 +10,8 @@ references/**
 
 # Working notes and throwaway scripts
 scratch/
+
+# LaTeX build output and generated PDFs
+report/build/
+report/*.pdf
+report/*.zip

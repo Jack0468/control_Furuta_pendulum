@@ -2,7 +2,7 @@
 
 This document derives the state-feedback gain K for design **D2** by hand. Every equation is numbered as (E1), (E2), and so on. Each one says where it comes from: a definition, an earlier equation, a theorem, or a textbook result. Every number is reproduced by [`matlab/week10_pole_placement_derivation.m`](../matlab/week10_pole_placement_derivation.m).
 
-**Result:** K = [k₁, k₂, k₃, k₄] = **[−0.5077, 13.929, −0.6126, 0.7618]**
+**Result:** K = [k₁, k₂, k₃, k₄] = **[−1.3742, 32.577, −1.0743, 2.2305]**
 
 ---
 
@@ -25,7 +25,7 @@ This document derives the state-feedback gain K for design **D2** by hand. Every
 | Symbol | Meaning | Value |
 | --- | --- | --- |
 | m_p, L_p, J_p | Pendulum mass, full length, inertia about its centre of mass | 0.024 kg, 0.129 m, 3.33 × 10⁻⁵ kg·m² |
-| L_r, J_r | Arm length, arm inertia about the motor axis | 0.085 m, 5.72 × 10⁻⁵ kg·m² |
+| L_r, J_r | Arm length, arm inertia about the motor axis | 0.085 m, 2.29 × 10⁻⁴ kg·m² (uniform bar, motor at one end: doc 02 §4.1) |
 | R_m, k_m | Motor resistance, motor torque/back-EMF constant | 8.4 Ω, 0.042 N·m/A |
 | D_r, D_p | Viscous damping at the arm and pendulum joints | 0.0015, 0.0005 N·m·s/rad |
 | g | Gravity | 9.81 m/s² |
@@ -34,11 +34,11 @@ This document derives the state-feedback gain K for design **D2** by hand. Every
 
 | Symbol | Definition | Physical meaning | Value |
 | --- | --- | --- | --- |
-| a | J_r + m_p L_r² | Arm inertia, including the pendulum mass at the arm tip | 2.3060 × 10⁻⁴ kg·m² |
+| a | J_r + m_p L_r² | Arm inertia, including the pendulum mass at the arm tip | 4.0219 × 10⁻⁴ kg·m² |
 | b | ½ m_p L_p L_r | Inertial coupling between arm and pendulum | 1.3158 × 10⁻⁴ kg·m² |
 | c | J_p + ¼ m_p L_p² | Pendulum inertia about its pivot (parallel-axis theorem) | 1.3313 × 10⁻⁴ kg·m² |
 | d | ½ m_p g L_p | Gravity torque per radian of lean | 1.5186 × 10⁻² N·m/rad |
-| Δ | ac − b² | Determinant of the linearised mass matrix (always > 0) | 1.3386 × 10⁻⁸ (kg·m²)² |
+| Δ | ac − b² | Determinant of the linearised mass matrix (always > 0) | 3.6230 × 10⁻⁸ (kg·m²)² |
 | B_eq | D_r + k_m²/R_m | Total arm damping: friction plus motor back-EMF | 1.71 × 10⁻³ N·m·s/rad |
 
 ### Control-design symbols
@@ -93,7 +93,7 @@ $$
 
 **Where it comes from:** the pole-placement theorem (Ogata, *Modern Control Engineering*, Ch. 10; Åström & Murray, *Feedback Systems*, Ch. 7). The eigenvalues of A − BK can be placed **anywhere** if and only if W_c has full rank n (here n = 4).
 
-**Result:** rank(W_c) = 4 and det(W_c) = −7.77 × 10¹⁰ ≠ 0, so the system is reachable and design can proceed.
+**Result:** rank(W_c) = 4 and det(W_c) = −1.45 × 10⁹ ≠ 0, so the system is reachable and design can proceed.
 
 ---
 
@@ -175,15 +175,15 @@ $$
 
 **Where it comes from:** a fundamental limitation of non-minimum-phase systems (Åström & Murray, *Feedback Systems*, Ch. 14; Skogestad & Postlethwaite, *Multivariable Feedback Control*, Ch. 5). The transfer function θ(s)/V_m(s) has a zero at s = +8.97 (doc 02 §5). Making the arm loop much faster than about z/2 causes large undershoot, where the arm first moves the wrong way. With ζ = 0.7, the closed-loop bandwidth is about ωₙ, so this means ωₙ ≲ 4.5 rad/s.
 
-### 1f. Apply the requirements (from doc 03: OS ≤ 5%, T_s ≤ 2.0 s)
+### 1f. Apply the requirements (from doc 03: OS ≤ 5%, T_s ≤ 2.5 s)
 
 | Requirement | Equation used | Calculation | Constraint |
 | --- | --- | --- | --- |
 | OS ≤ 5% | (E10) | ζ = −ln(0.05) / √(π² + ln²(0.05)) = 2.996 / 4.341 | ζ ≥ 0.690 |
-| T_s ≤ 2.0 s | (E11) | σ ≥ 4 / 2.0 | ζωₙ ≥ 2.0 rad/s |
+| T_s ≤ 2.5 s | (E11) | σ ≥ 4 / 2.5 | ζωₙ ≥ 1.6 rad/s |
 | RHP zero | (E13) | 8.97 / 2 | ωₙ ≲ 4.5 rad/s |
 
-**Choose ζ = 0.7** (just above 0.690, for a little margin) **and ωₙ = 4 rad/s**, which satisfies both 0.7 × 4 = 2.8 ≥ 2.0 and 4 ≤ 4.5. Using (E6):
+**Choose ζ = 0.7** (just above 0.690, for a little margin) **and ωₙ = 4 rad/s**, which satisfies both 0.7 × 4 = 2.8 ≥ 1.6 and 4 ≤ 4.5. Using (E6):
 
 $$
 \sigma = 0.7 \times 4 = 2.8,\qquad \omega_d = 4\sqrt{1 - 0.7^2} = 4 \times 0.71414 = 2.8566
@@ -269,14 +269,14 @@ Each entry in terms of the physical constants, and its value:
 
 | Entry | Formula (doc 02 §3) | Physical meaning | Value |
 | --- | --- | --- | --- |
-| a₃₂ | bd/Δ | Gravity on the pendulum accelerating the arm | 149.2751 |
-| a₃₃ | −cB_eq/Δ | Arm damping acting on the arm | −17.0068 |
-| a₃₄ | −bD_p/Δ | Pendulum damping coupled to the arm | −4.9149 |
-| a₄₂ | ad/Δ | Gravity tipping the pendulum (causes the instability) | 261.6091 |
-| a₄₃ | −bB_eq/Δ | Arm damping coupled to the pendulum | −16.8091 |
-| a₄₄ | −aD_p/Δ | Pendulum damping acting on the pendulum | −8.6136 |
-| b₃ | c k_m / (R_m Δ) | Voltage → arm acceleration | 49.7275 |
-| b₄ | b k_m / (R_m Δ) | Voltage → pendulum acceleration | 49.1493 |
+| a₃₂ | bd/Δ | Gravity on the pendulum accelerating the arm | 55.1525 |
+| a₃₃ | −cB_eq/Δ | Arm damping acting on the arm | −6.2835 |
+| a₃₄ | −bD_p/Δ | Pendulum damping coupled to the arm | −1.8159 |
+| a₄₂ | ad/Δ | Gravity tipping the pendulum (causes the instability) | 168.5810 |
+| a₄₃ | −bB_eq/Δ | Arm damping coupled to the pendulum | −6.2104 |
+| a₄₄ | −aD_p/Δ | Pendulum damping acting on the pendulum | −5.5506 |
+| b₃ | c k_m / (R_m Δ) | Voltage → arm acceleration | 18.3728 |
+| b₄ | b k_m / (R_m Δ) | Voltage → pendulum acceleration | 18.1591 |
 
 ### 3c. Form A − BK
 
@@ -374,16 +374,16 @@ Substituting the table formulas from §3b into (E27) and (E28), and using ac −
 
 | Quantity | Simplifies to | Value | Meaning |
 | --- | --- | --- | --- |
-| β₁ | D_p k_m / (R_m Δ) | 186.7659 | Pendulum damping × motor gain |
+| β₁ | D_p k_m / (R_m Δ) | 69.0042 | Pendulum damping × motor gain |
 | β₂ | (−bB_eq·c + cB_eq·b) k_m / (R_m Δ²) = **0** | 0 | Cancels exactly; see below |
-| β₃ | −d k_m / (R_m Δ) | −5672.4083 | Gravity × motor gain; always negative |
-| −(a₃₃ + a₄₄) | (cB_eq + aD_p)/Δ | 25.6204 | Total open-loop damping |
-| a₃₃a₄₄ − a₃₄a₄₃ − a₄₂ | (B_eq D_p − ad)/Δ | −197.735 | Damping product minus gravity stiffness |
-| a₃₃a₄₂ − a₃₂a₄₃ | −d B_eq / Δ | −1939.96 | Gravity × arm damping |
+| β₃ | −d k_m / (R_m Δ) | −2095.7792 | Gravity × motor gain; always negative |
+| −(a₃₃ + a₄₄) | (cB_eq + aD_p)/Δ | 11.8341 | Total open-loop damping |
+| a₃₃a₄₄ − a₃₄a₄₃ − a₄₂ | (B_eq D_p − ad)/Δ | −144.982 | Damping product minus gravity stiffness |
+| a₃₃a₄₂ − a₃₂a₄₃ | −d B_eq / Δ | −716.756 | Gravity × arm damping |
 
 **Why β₂ = 0:** a₄₃b₃ and a₃₃b₄ both equal −bcB_eq k_m/(R_mΔ²). This is a structural property of the Furuta model, not a numerical coincidence. As a result k₂ drops out of c₁ and k₄ drops out of c₂, which makes the hand solution sequential in Step 4.
 
-**Open-loop check:** set K = 0 in (E28). This gives Δ_cl(s) = s⁴ + 25.62s³ − 197.7s² − 1940s + 0. Its roots are 0, −30.05, +10.55 and −6.12, which match the open-loop poles in doc 02 §5. The +10.55 pole confirms that the upright position is unstable without control.
+**Open-loop check:** set K = 0 in (E28). This gives Δ_cl(s) = s⁴ + 11.83s³ − 145.0s² − 716.8s + 0. Its roots are 0, −17.73, +9.96 and −4.06, which match the open-loop poles in doc 02 §5. The +9.96 pole confirms that the upright position is unstable without control.
 
 ---
 
@@ -402,33 +402,33 @@ With β₂ = 0, solve them from the bottom up.
 **s⁰ term** (c₀ = a₀), using (E28):
 
 $$
-\beta_3 k_1 = 2880 \;\Rightarrow\; k_1 = \frac{2880}{-5672.4083} = -0.50772 \tag{E30}
+\beta_3 k_1 = 2880 \;\Rightarrow\; k_1 = \frac{2880}{-2095.7792} = -1.37419 \tag{E30}
 $$
 
 **s¹ term** (c₁ = a₁). With β₂ = 0, k₂ drops out, so only k₃ is unknown:
 
 $$
--1939.96 + \beta_1 k_1 + \beta_3 k_3 = 1440 \;\Rightarrow\; k_3 = \frac{1440 + 1939.96 - 186.7659 \times (-0.50772)}{-5672.4083} = \frac{3474.79}{-5672.4083} = -0.61258 \tag{E31}
+-716.756 + \beta_1 k_1 + \beta_3 k_3 = 1440 \;\Rightarrow\; k_3 = \frac{1440 + 716.756 - 69.0042 \times (-1.37419)}{-2095.7792} = \frac{2251.58}{-2095.7792} = -1.07434 \tag{E31}
 $$
 
 **s² term** (c₂ = a₂). With β₂ = 0, k₄ drops out, so only k₂ is unknown:
 
 $$
--197.735 + b_3k_1 + b_4k_2 + \beta_1k_3 = 347.2 \;\Rightarrow\; k_2 = \frac{347.2 + 197.735 + 25.248 + 114.409}{49.1493} = \frac{684.591}{49.1493} = 13.9288 \tag{E32}
+-144.982 + b_3k_1 + b_4k_2 + \beta_1k_3 = 347.2 \;\Rightarrow\; k_2 = \frac{347.2 + 144.982 + 25.248 + 74.134}{18.1591} = \frac{591.564}{18.1591} = 32.5766 \tag{E32}
 $$
 
-Here −b₃k₁ = −49.7275 × (−0.50772) = +25.248 and −β₁k₃ = −186.7659 × (−0.61258) = +114.409.
+Here −b₃k₁ = −18.3728 × (−1.37419) = +25.248 and −β₁k₃ = −69.0042 × (−1.07434) = +74.134.
 
 **s³ term** (c₃ = a₃):
 
 $$
-25.6204 + b_3k_3 + b_4k_4 = 32.6 \;\Rightarrow\; k_4 = \frac{32.6 - 25.6204 + 30.462}{49.1493} = \frac{37.4416}{49.1493} = 0.76179 \tag{E33}
+11.8341 + b_3k_3 + b_4k_4 = 32.6 \;\Rightarrow\; k_4 = \frac{32.6 - 11.8341 + 19.739}{18.1591} = \frac{40.505}{18.1591} = 2.23054 \tag{E33}
 $$
 
-Here −b₃k₃ = −49.7275 × (−0.61258) = +30.462.
+Here −b₃k₃ = −18.3728 × (−1.07434) = +19.739.
 
 $$
-\boxed{K = \begin{bmatrix} -0.5077 & 13.929 & -0.6126 & 0.7618 \end{bmatrix}} \tag{E34}
+\boxed{K = \begin{bmatrix} -1.3742 & 32.577 & -1.0743 & 2.2305 \end{bmatrix}} \tag{E34}
 $$
 
 The same equations in matrix form, M Kᵀ = rhs, which is what the script solves:
@@ -437,9 +437,9 @@ $$
 \underbrace{\begin{bmatrix} 0 & 0 & b_3 & b_4 \\ b_3 & b_4 & \beta_1 & \beta_2 \\ \beta_1 & \beta_2 & \beta_3 & 0 \\ \beta_3 & 0 & 0 & 0 \end{bmatrix}}_{M}
 \begin{bmatrix} k_1 \\ k_2 \\ k_3 \\ k_4 \end{bmatrix}
 =
-\begin{bmatrix} a_3 - 25.6204 \\ a_2 + 197.735 \\ a_1 + 1939.96 \\ a_0 \end{bmatrix}
+\begin{bmatrix} a_3 - 11.8341 \\ a_2 + 144.982 \\ a_1 + 716.756 \\ a_0 \end{bmatrix}
 =
-\begin{bmatrix} 6.980 \\ 544.935 \\ 3379.96 \\ 2880 \end{bmatrix} \tag{E35}
+\begin{bmatrix} 20.766 \\ 492.182 \\ 2156.76 \\ 2880 \end{bmatrix} \tag{E35}
 $$
 
 **Where it comes from:** (E29) rearranged, with the gain coefficients from (E28) in M and the open-loop constants moved to the right-hand side.
@@ -462,9 +462,9 @@ $$
 
 **Where it comes from:** Ackermann's formula (Ogata §10-2; Franklin, Powell & Emami-Naeini §7.5). It is derived by transforming the system into controllable canonical form and applying the Cayley–Hamilton theorem: every matrix satisfies its own characteristic equation. Δ_d(A) means substituting the matrix A for s in (E18). W_c is the reachability matrix from (E4).
 
-**Result:** K = [−0.507721, 13.9288, −0.612577, 0.761793], identical to (E34).
+**Result:** K = [−1.37419, 32.5766, −1.07434, 2.23053], identical to (E34).
 
-Ackermann needs A⁴ and W_c⁻¹, so it is not practical by hand for a 4×4 system. Use it only as a check. W_c is also poorly conditioned (cond ≈ 5 × 10⁵), so numerically `place` is preferred.
+Ackermann needs A⁴ and W_c⁻¹, so it is not practical by hand for a 4×4 system. Use it only as a check. W_c is also poorly conditioned (cond ≈ 3 × 10⁴), so numerically `place` is preferred.
 
 ---
 
@@ -472,19 +472,19 @@ Ackermann needs A⁴ and W_c⁻¹, so it is not practical by hand for a 4×4 sys
 
 | Method | Equation | k₁ | k₂ | k₃ | k₄ |
 | --- | --- | --- | --- | --- | --- |
-| Coefficient matching | (E30)–(E33) | −0.507721 | 13.9288 | −0.612577 | 0.761793 |
-| Ackermann | (E37) | −0.507721 | 13.9288 | −0.612577 | 0.761793 |
-| MATLAB `place(A, B, p)` | numerical | −0.507721 | 13.9288 | −0.612577 | 0.761793 |
+| Coefficient matching | (E30)–(E33) | −1.37419 | 32.5766 | −1.07434 | 2.23053 |
+| Ackermann | (E37) | −1.37419 | 32.5766 | −1.07434 | 2.23053 |
+| MATLAB `place(A, B, p)` | numerical | −1.37419 | 32.5766 | −1.07434 | 2.23053 |
 
-- **Poles:** eig(A − BK) = {−15, −12, −2.8 ± 2.8566j}, exactly the poles requested in (E14) and (E15). The methods differ by at most 7 × 10⁻¹⁵.
+- **Poles:** eig(A − BK) = {−15, −12, −2.8 ± 2.8566j}, exactly the poles requested in (E14) and (E15). The methods differ by at most 6 × 10⁻¹⁴.
 - **Predicted vs measured response:** on the linear model the step response gives T_s = 1.67 s and OS = 4.7% (doc 04). T_s is slower than the 1.43 s predicted by (E11). The difference comes from two effects that (E5) leaves out: the RHP zero at +8.97 rad/s (E13), and the non-dominant poles in (E15), which are only 4–5× faster. This is why the second-order formulas are a starting point, and the design is always confirmed by simulation.
 
 ---
 
 ## Interpreting the gains
 
-- **k₂ = +13.9 V/rad (pendulum angle).** When the pendulum leans by +α, the controller drives the arm under it, like balancing a broom on a hand. This is the largest gain: a 10° lean gives 13.9 × 0.1745 = 2.4 V.
-- **k₁ = −0.51 V/rad (arm angle).** The sign is negative for every stable design, by (E36), because β₃ < 0. Physically, to move the arm towards r the controller first pushes the arm the *opposite* way. That tips the pendulum towards the target, and the pendulum loop then carries the arm over. This is the non-minimum-phase behaviour from (E13). Do not "fix" this sign.
+- **k₂ = +32.6 V/rad (pendulum angle).** When the pendulum leans by +α, the controller drives the arm under it, like balancing a broom on a hand. This is the largest gain: a 10° lean gives 32.6 × 0.1745 = 5.7 V.
+- **k₁ = −1.37 V/rad (arm angle).** The sign is negative for every stable design, by (E36), because β₃ < 0. Physically, to move the arm towards r the controller first pushes the arm the *opposite* way. That tips the pendulum towards the target, and the pendulum loop then carries the arm over. This is the non-minimum-phase behaviour from (E13). Do not "fix" this sign.
 - **k₃, k₄ (velocity gains)** add damping. They cannot be measured directly, which is why the Week 11 observer is needed.
 
 ---
@@ -507,7 +507,7 @@ $$
 
 **Where it comes from:** (E1) with (E38) appended as a fifth state equation. The extra pole at −5 is chosen near the dominant pair, so the integrator acts within about 1 s without dominating the response.
 
-The same Steps 3–6 apply to this 5×5 system. In practice use `place(Aa, Ba, p)` and verify with eig. The result is K_a = [−1.86, 20.0, −0.985, 1.24, −2.54].
+The same Steps 3–6 apply to this 5×5 system. In practice use `place(Aa, Ba, p)` and verify with eig. The result is K_a = [−5.04, 49.1, −2.08, 3.53, −6.87].
 
 ---
 

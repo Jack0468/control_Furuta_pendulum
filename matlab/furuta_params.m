@@ -13,14 +13,14 @@ P.Vmax = 10;       % actuator saturation limit                 [V]
 % Rotary arm
 P.mr  = 0.095;     % arm mass                                  [kg]
 P.Lr  = 0.085;     % arm length (pivot to pendulum joint)      [m]
-P.Jr  = P.mr*P.Lr^2/12;  % arm inertia about motor axis (Quanser convention) [kg.m^2]
-P.Dr  = 0.0015;    % arm viscous damping (approximate)         [N.m.s/rad]
+P.Jr  = P.mr*P.Lr^2/3;   % uniform bar with the motor at one end, about the motor axis (doc 02 sec 4.1) [kg.m^2]
+P.Dr  = 0.0005;    % arm viscous damping, published QUBE-Servo 2 value (docs/10) [N.m.s/rad]
 
 % Pendulum
 P.mp  = 0.024;     % pendulum mass                             [kg]
 P.Lp  = 0.129;     % pendulum full length                      [m]
 P.Jp  = P.mp*P.Lp^2/12;  % pendulum inertia about its centre of mass [kg.m^2]
-P.Dp  = 0.0005;    % pendulum viscous damping (approximate)    [N.m.s/rad]
+P.Dp  = 0.0001;    % pendulum viscous damping, published QUBE-Servo 2 value (docs/10) [N.m.s/rad]
 
 % Sensors: optical incremental encoders, 512 CPR read in 4x quadrature (docs/08)
 %   e.g. Broadcom HEDS-5540#I (512 CPR) or US Digital E5-512 (datasheets in references/)

@@ -5,7 +5,6 @@
 clear; clc; close all;
 P = furuta_params();
 D = furuta_design(P);
-figdir = fullfile('..', 'figures'); if ~exist(figdir, 'dir'), mkdir(figdir); end
 deg = @rad2deg;
 % Realistic start: the observer is initialised from the first encoder reading
 xh0 = @(x0) [P.enc_res*round(x0(1:2)/P.enc_res); 0; 0];
@@ -63,11 +62,11 @@ names = {'mp','Lp','Lr','Rm','km','Dr','Dp','Jr'};
 x0 = [0; deg2rad(10); 0; 0];
 % (a) recovery from 10 deg only; (b) the same plus the 20 mN.m tap at 2 s
 upA = false(Nmc,1); upB = false(Nmc,1); mu = zeros(Nmc,1); t1 = nan(Nmc,1); amx = zeros(Nmc,1);
-pole_lin = zeros(Nmc,1);
+pole_lin = zeros(Nmc,1); Fmc = zeros(Nmc, numel(names));
 figure('Position', [100 100 800 450]); hold on;
 for n = 1:Nmc
     Pk = P;
-    for j = 1:numel(names), Pk.(names{j}) = P.(names{j})*(0.8 + 0.4*rand); end
+    for j = 1:numel(names), Fmc(n,j) = 0.8 + 0.4*rand; Pk.(names{j}) = P.(names{j})*Fmc(n,j); end
     Pk.Jp = Pk.mp*Pk.Lp^2/12;
     SA = furuta_sim_obs(P, D, x0, 4, struct('Pplant', Pk, 'xhat0', xh0(x0), 'seed', n));
     SB = furuta_sim_obs(P, D, x0, 4, struct('Pplant', Pk, 'xhat0', xh0(x0), 'seed', n, ...
@@ -86,7 +85,7 @@ for n = 1:Nmc
 end
 grid on; xlabel('t [s]'); ylabel('\alpha [deg]'); ylim([-40 40]);
 title(sprintf('Monte Carlo: %d plants with \\pm20%% parameters (tap at 2 s)', Nmc));
-exportgraphics(gcf, fullfile(figdir, 'w12_monte_carlo.png'));
+furuta_savefig(gcf, 'w12_monte_carlo', 3.5, 2.2);
 res.V6 = struct('N', Nmc, 'up_recovery', sum(upA), 'up_with_tap', sum(upB), 'lin_stable', sum(pole_lin < 1), ...
                 'max_u', max(mu), 'n_sat', sum(mu >= P.Vmax), 't1_worst', max(t1), 'n_unsettled', sum(isnan(t1)), ...
                 'alpha_max_median', deg(median(amx)), 'alpha_max_worst', deg(max(amx)));
@@ -94,6 +93,13 @@ fprintf(['V6 Monte Carlo (%d plants): linear loop stable %d, upright after 10 de
          'upright with tap %d; recovery max|u| worst %.2f V (%d saturated), worst t(|alpha|<1) %.2f s, %d not settled in 4 s; ' ...
          'tap max|alpha| median %.1f / worst %.1f deg\n'], Nmc, res.V6.lin_stable, res.V6.up_recovery, ...
         res.V6.up_with_tap, res.V6.max_u, res.V6.n_sat, res.V6.t1_worst, res.V6.n_unsettled, res.V6.alpha_max_median, res.V6.alpha_max_worst);
+
+% Which parameters separate the plants that fell (tap test) from those that stayed up?
+fprintf('V6 mean parameter factor, fell vs stayed up (tap test, %d fell):\n', sum(~upB));
+for j = 1:numel(names)
+    fprintf('   %-3s %.3f vs %.3f\n', names{j}, mean(Fmc(~upB,j)), mean(Fmc(upB,j)));
+end
+fprintf('   motor gain km/Rm factor: %.3f vs %.3f\n', mean(Fmc(~upB,5)./Fmc(~upB,4)), mean(Fmc(upB,5)./Fmc(upB,4)));
 
 %% V7. Region of attraction and anti-windup (observer + saturation)
 fprintf('V7 largest recoverable alpha0:');
@@ -118,11 +124,10 @@ for i = 1:3
     subplot(3,3,6+i); plot(S.t, S.u); grid on; ylabel('V_m [V]'); xlabel('t [s]'); yline([P.Vmax -P.Vmax], 'r--');
 end
 subplot(3,3,1); legend('true', 'estimate');
-exportgraphics(gcf, fullfile(figdir, 'w12_validation_overview.png'));
+furuta_savefig(gcf, 'w12_validation_overview', 7.16, 3.3);
 
 figure; plot(S3p.t, deg(S3p.x(:,1)), S3i.t, deg(S3i.x(:,1))); grid on;
 xlabel('t [s]'); ylabel('\theta [deg]'); legend('no integrator', 'with integrator');
 title('Arm angle: pendulum tap at 0.5 s, 2 mN\cdotm drag from 2.5 s');
-exportgraphics(gcf, fullfile(figdir, 'w12_integrator_drag.png'));
+furuta_savefig(gcf, 'w12_integrator_drag', 3.5, 2.1);
 
-save(fullfile(figdir, 'w12_results.mat'), 'res');

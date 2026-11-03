@@ -33,7 +33,7 @@ Every design is tested on two plants:
 | `w9_pulse_response.png` | T2 | Done |
 | `w10_nonlinear_tests.png` | T4–T6 for D2 (θ, α, V_m) | Done |
 | `w10_integral_action.png` | T6 + T7, with and without the integrator | Done |
-| `w10_pole_map.png` | Open-loop and closed-loop poles for D1/D2/D3/LQR against the ζ ≥ 0.69 and ζω_n ≥ 2 boundaries | Done |
+| `w10_pole_map.png` | Open-loop and closed-loop poles for D1/D2/D3/LQR against the ζ ≥ 0.69 and ζω_n ≥ 1.6 boundaries | Done |
 | `w10_design_comparison.png` | D1/D2/D3/LQR 30° step: θ, α, V_m overlaid | Done |
 | `w11_observer_convergence.png` | T10: true vs estimated states, error norm, V_m vs full state | Done |
 | `w11_observer_poles_noise.png` | T11: steady-state V_m for four observer pole sets | Done |
@@ -43,28 +43,32 @@ Every design is tested on two plants:
 | `w12_integrator_drag.png` | V3: arm angle with and without the integrator under drag | Done |
 | `w12_monte_carlo.png` | V6: α for 40 random ±20% plants (tap at 2 s) | Done |
 
-## Results with the final observer-based design (2026-10-29)
+## Results with the final observer-based design
+
+> **These numbers predate the published damping and spin term (D-16, I-11).** They are refreshed after the next `run_all`.
 
 From [week12_validation.m](../matlab/week12_validation.m): nonlinear plant, 1 kHz, quantised encoders, saturation, observer poles −100…−130, type-1 servo.
 
 | Test | Result | Requirement |
 | --- | --- | --- |
-| V1 recovery from 10° | \|α\| < 1° after 0.96 s; max 3.5 V; max \|θ\| 34.5° | R2 ✔ R5 ✔ R9 ✔ |
-| V2 30° step | T_s 1.26 s, t_r 0.65 s, OS 1.5%, US 2.0%, max 0.46 V | R3 ✔ R4 ✔ |
-| V3 pendulum tap | max \|α\| 18.0°, max \|θ\| 62.8°, max 5.3 V; recovers | **R6 ✘** (limit 15°) |
-| V3 arm drag 2 mN·m | Final θ error 0.12° (−53° without integrator) | R7 ✔ |
-| V4 encoder offset 10 / 40 arcmin | Final θ error 0.04° / 0.21° | ✔ |
-| V5 noise | RMS u 0.091 V; RMS α 0.08°; RMS θ 0.33° | ✔ |
-| V6 Monte Carlo ±20% (40) | 40/40 linearly stable; 36/40 recover from 10°; 23/40 survive the tap | **R8 partial** |
-| V7 region of attraction | 22° (31° with full state); anti-windup makes no difference | — |
+| V1 recovery from 10° | \|α\| < 1° after 0.96 s; max 8.6 V; max \|θ\| 34.2° | R2 ✔, R9 ✔; R5 within 10 V but **over the 6 V target** |
+| V2 30° step | T_s **2.40 s** (1.81 s without quantisation), t_r 0.65 s, OS 2.0%, US 2.2%, max 0.77 V | R3 ✔ (limit 2.5 s, only 0.1 s of margin, see below); R4 ✔ |
+| V3 pendulum tap | max \|α\| 15.1°, max \|θ\| 54.5°, max 9.7 V; \|α\| < 1° after 0.99 s | **R6 ✘ by 0.1°** (limit 15°); R9 ✔; R5 within 10 V but over the 6 V target |
+| V3 arm drag 2 mN·m | Final θ error −0.22° (−23° without integrator) | R7 ✔ |
+| V4 encoder offset 10 / 40 arcmin | Final θ error −0.07° / −0.37° (5.3° / 19.3° without integrator) | ✔ |
+| V5 noise | RMS u 0.243 V; RMS α 0.08°; RMS θ 0.29° | ✔ |
+| V6 Monte Carlo ±20% (40) | 40/40 linearly stable; 36/40 recover from 10°; 30/40 survive the tap; tap max \|α\| median 17.1° | **R8 partial** |
+| V7 region of attraction | 22° (28° for D2 with full state); anti-windup makes no difference | — |
 
-Open issues I-01 (R6) and I-02 (R8) are tracked in the [LOGBOOK](LOGBOOK.md). The Kalman study (doc 09) addresses both.
+**Why T_s is 2.40 s.** With unquantised measurements, or with the true state fed back, T_s is 1.81 s. With the observer on quantised encoders, the loop settles into a small limit cycle: the arm ripples about 1.0° peak to peak (RMS u 0.24 V). That touches the ±0.6° settling band of a 30° step, so the measured T_s depends on where the ripple happens to sit. A faster-looking figure of 1.26 s under the earlier J_r = /12 model had the same cause and should not be trusted.
+
+Open issues I-01 (R6), I-02 (R8) and I-08 (ripple) are tracked in the [LOGBOOK](LOGBOOK.md). The Kalman study (doc 09) addresses both.
 
 ## Lab 10 questions → evidence
 
 | Lab 10 item | Figure | Written answer |
 | --- | --- | --- |
-| A1: Why does it need control? | `w9_openloop_release.png` (falls past 15° in 0.23 s) | doc 03 §1 |
+| A1: Why does it need control? | `w9_openloop_release.png` (falls past 15° in 0.26 s) | doc 03 §1 |
 | A1: Measurements, actuation, constraints | None (text answer; V_m limit shown on `w10_nonlinear_tests.png`) | doc 03 §1 |
 | A1: Design requirements (rise time, settling time, overshoot) | None (table) | doc 03 §2 |
 | A2: Requirements → pole locations | `w10_pole_map.png` | doc 03 §3 |

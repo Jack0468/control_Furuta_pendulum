@@ -9,9 +9,8 @@ function D = furuta_design(P, p_obs)
 %       xhat[k+1] = Ad*xhat[k] + Bd*u[k] + L*(y[k] - C*xhat[k])
 
 if nargin < 2 || isempty(p_obs)
-    % ~7-9x faster than the fastest controller pole (-15). Chosen over a slower
-    % [-40..-55] set because the slower observer made 39/500 random +/-20% plants
-    % unstable (6/500 with this set); its noise cost is small (RMS u ~0.09 V). See LOGBOOK 2026-10-29.
+    % ~7-9x faster than the fastest controller pole (-15). A slower observer leaves more
+    % random +/-20% plants unstable, in exchange for less voltage noise. See LOGBOOK D-10, I-08.
     p_obs = [-100 -110 -120 -130];
 end
 
@@ -19,9 +18,9 @@ end
 D.A = A; D.B = B; D.C = C; D.Ts = P.Ts;
 
 % Controller poles (doc 03 section 3, doc 06)
-zeta = 0.7; wn = 4;
+zeta = 0.7; wn = 4;                       % Aleksei's alternative: zeta = 0.75, wn = 3.6 (docs/04 3b)
 pd = wn*(-zeta + 1i*sqrt(1 - zeta^2)*[1 -1]);
-D.p_ctrl = [pd, -12, -15];
+D.p_ctrl = [pd, -12, -15];                % Aleksei's alternative: [pd, -10.8, -13.5]
 D.K = place(A, B, D.p_ctrl);              % state feedback without integrator (D2)
 
 % Integral action: xa = [x; xi], xi_dot = theta - r

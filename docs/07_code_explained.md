@@ -55,8 +55,10 @@ In SI units k_t = k_m. Both come from the same magnetic flux linkage, and energy
 
   J = ∫ from −L/2 to L/2 of (m/L)·r² dr = mL²/12.
 
+  Rotating about one end instead, J = ∫ from 0 to L of (m/L)·r² dr = mL²/3.
+
   - `P.Jp = mp*Lp^2/12` is the pendulum's inertia about its own centre of mass. The Lagrangian (§3) adds the offset to the pivot separately, using the parallel-axis theorem.
-  - `P.Jr = mr*Lr^2/12` **assumes the arm rotates about its centre** (the Quanser convention). If your arm is pivoted at one end, the same integral from 0 to L gives mL²/3. That changes the open-loop poles from {+10.55, −6.12, −30.05} to {+9.96, −4.06, −17.73}. **Check this against your hardware.**
+  - `P.Jr = mr*Lr^2/3` is the arm's inertia about the motor axis. We assume a uniform bar with the motor at one end (case A in doc 02 §4.1). `/12` would be inconsistent here: it needs a centred bar only L_r long, which never reaches the pendulum joint.
 - **Damping** `Dr`, `Dp` model bearing friction as a torque proportional to speed (−D·ω). Real friction also has a Coulomb (constant) part. These two values are the least certain numbers in the model.
 
 ### Sensors (lines 26–28)
@@ -89,7 +91,7 @@ Lagrange's method avoids having to find the internal reaction forces at the join
 
    T = ½J_rθ̇² + ½m_p|ṗ|² + ½J_pα̇²
 
-   This neglects the pendulum's own spin term ½J_p sin²α·θ̇². Quanser's model makes the same simplification. The term is second-order small near upright, so it does not affect the linear model.
+   The rotational part is ½J_p(α̇² + sin²α·θ̇²), since a slender rod stores no energy spinning about its own axis. The sin²α term is second-order small near upright, so it does not affect the linear model.
 
 4. **Potential energy:** V = m_p g l cos α. It is largest when upright, which is why upright is unstable.
 
@@ -105,7 +107,7 @@ Carrying out step 5 gives exactly the two equations in doc 02 §2. In the α equ
 
 - **Line 14 — motor torque.** τ = k_m(V_m − k_m θ̇)/R_m. Solve the KVL equation for i with L_m = 0, then use τ = k_m·i. Inductance is neglected because the electrical time constant L_m/R_m is well under 1 ms, much faster than the mechanics.
 - **Lines 16–17 — mass matrix M(α).** The two Euler–Lagrange equations always have the form M(α)·[θ̈; α̈] = f. M collects every term multiplied by an acceleration:
-  - M₁₁ = J_r + m_pL_r² + ¼m_pL_p² sin²α: the arm's inertia, plus the pendulum mass carried at the tip, plus the extra inertia when the pendulum leans out.
+  - M₁₁ = J_r + m_pL_r² + (J_p + ¼m_pL_p²) sin²α: the arm's inertia, plus the pendulum mass carried at the tip, plus the extra inertia when the pendulum leans out.
   - M₂₂ = J_p + ¼m_pL_p²: the pendulum's inertia about its pivot (parallel-axis theorem).
   - M₁₂ = M₂₁ = −½m_pL_pL_r cos α: the coupling. Accelerating the arm swings the pendulum, and vice versa.
 - **Lines 19–20 — right-hand side f.** f collects everything else, moved to the right-hand side:
@@ -174,7 +176,7 @@ This file simulates "the real pendulum plus our controller" and returns time, st
 | Lines | What it does | First-principles meaning |
 | --- | --- | --- |
 | 7–8 | Builds a state-space object `ss(A,B,C,D)` | A container so MATLAB's toolbox functions can operate on the model |
-| 13 | `eig(A)` → open-loop poles | Solutions of ẋ = Ax are sums of e^{λt}, where the λ are the eigenvalues of A. Any λ with a positive real part grows, so the system is unstable. Here λ = +10.55 means a lean grows by a factor of e every 95 ms. The λ = 0 pole is the arm, which can rest anywhere |
+| 13 | `eig(A)` → open-loop poles | Solutions of ẋ = Ax are sums of e^{λt}, where the λ are the eigenvalues of A. Any λ with a positive real part grows, so the system is unstable. Here λ = +9.96 means a lean grows by a factor of e every 100 ms. The λ = 0 pole is the arm, which can rest anywhere |
 | 15 | `rank(ctrb(A,B))` | Reachability: can the input steer the state anywhere? This requires rank[B AB A²B A³B] = 4 (doc 06, E4) |
 | 16–18 | `rank(obsv(A,C))` | Observability: can the states be reconstructed from the measured outputs? This requires rank[C; CA; CA²; CA³] = 4. With α alone, rank is only 3: the arm angle cannot be deduced from the pendulum angle, because the physics does not depend on θ |
 | 19–20 | `tzero` → zeros of θ/V_m | Frequencies the system blocks. The zero at +8.97 rad/s (right half plane) means the arm initially moves the wrong way |
@@ -267,6 +269,8 @@ Every Week 11–12 script calls this file, so changing a pole here changes every
   - **Why transposes:** the eigenvalues of Ad − LC equal those of (Ad − LC)′ = Ad′ − C′L′. That is a *controller* placement problem for (Ad′, C′). This is the duality between observers and controllers.
   - **Why exp(p·Ts):** a continuous pole s maps to the discrete pole z = e^{sT_s}.
 
+`furuta_savefig.m` formats every figure for IEEE column widths at 300 dpi. Setting the environment variable `FURUTA_FIGDIR` sends figures to another folder, which allows a full preview without changing `figures/`.
+
 ### `furuta_sim_obs.m`: the realistic loop
 
 Each 1 ms sample does what a real microcontroller would:
@@ -294,10 +298,10 @@ Options switch on offsets, noise, perturbed plants (`Pplant`), a different obser
 
 | Assumption | Where | Effect |
 | --- | --- | --- |
-| Slender uniform rods | `furuta_params`, `furuta_nl` | Inertias from mL²/12; the pendulum's own spin term is neglected |
-| Arm pivots at its centre (J_r = m_rL_r²/12) | `furuta_params` line 16 | **Verify.** End-pivot (/3) moves the stable poles noticeably |
+| Slender uniform rods | `furuta_params`, `furuta_nl` | Inertias from mL²/12 (pendulum, about its centre) and mL²/3 (arm, about its end) |
+| Arm is a uniform bar with the motor at one end (J_r = m_rL_r²/3) | `furuta_params` line 16 | Doc 02 §4.1. Ignores the hub and rotor; J_r is varied ±20% in the uncertainty tests |
 | Viscous friction only | `furuta_nl` | Real bearings also have Coulomb friction (a dead-band) |
-| Motor inductance neglected | `furuta_nl` line 14 | Electrical time constant ≪ mechanical, so this is fine |
+| Motor inductance neglected | `furuta_nl` line 14 | L/R ≈ 1.16 mH / 8.4 Ω = 0.14 ms for the matching motor (doc 10), far faster than the mechanics |
 | Linear model valid for \|α\| ≲ 15° | `furuta_linmodel` | Measured in Week 9 by comparing with the nonlinear model |
 | Full state available | `furuta_sim_cl` only | The final loop (`furuta_sim_obs`) uses the observer |
 | Encoder quantisation modelled exactly; position error as a constant offset | `furuta_sim_obs` | Datasheet-based (doc 08); missed counts are not modelled |

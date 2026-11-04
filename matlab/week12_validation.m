@@ -28,6 +28,12 @@ res.V2 = struct('Ts', tt(k+1), 'tr', t90 - t10, 'OS', (max(th) - r0)/r0*100, ...
                 'US', -min(th)/r0*100, 'max_u', max(abs(S2.u)));
 fprintf('V2 30 deg step: Ts = %.2f s, tr = %.2f s, OS = %.1f %%, US = %.1f %%, max|u| = %.2f V\n', ...
         res.V2.Ts, res.V2.tr, res.V2.OS, res.V2.US, res.V2.max_u);
+% The same step without quantisation, and the arm ripple the quantiser causes
+S2u = furuta_sim_obs(P, D, zeros(4,1), 4.5, struct('r', @(t) r0*(t >= tstep), 'quant', false));
+thu = S2u.x(m,1); k = find(abs(thu - r0) > 0.02*r0, 1, 'last');
+w = S2.t >= 3;
+fprintf('V2 unquantised: Ts = %.2f s; quantised arm ripple (t >= 3 s) = %.2f deg peak to peak, settling band +/-%.1f deg\n', ...
+        tt(k+1), deg(max(S2.x(w,1)) - min(S2.x(w,1))), deg(0.02*r0));
 
 %% V3. Pendulum tap + constant arm drag, with and without integrator (R6, R7)
 op3 = struct('tau_p', @(t) 0.02*(t >= 0.5 & t < 0.52), 'tau_d', @(t) 0.002*(t >= 2.5));
@@ -38,13 +44,20 @@ res.V3 = struct('max_alpha', deg(max(abs(S3i.x(:,2)))), 'theta_end_int', deg(S3i
                 'theta_end_noint', deg(S3p.x(end,1)), 'max_u', max(abs(S3i.u)), 'max_theta', deg(max(abs(S3i.x(:,1)))));
 fprintf('V3 tap + drag: max|alpha| = %.1f deg, max|theta| = %.1f deg, final theta: %.2f deg (integrator) vs %.1f deg (none), max|u| = %.2f V\n', ...
         res.V3.max_alpha, res.V3.max_theta, res.V3.theta_end_int, res.V3.theta_end_noint, res.V3.max_u);
+% Tap recovery (before the drag starts), mean arm error under drag, and the tap with the true state
+w = S3i.t < 2.5; k = find(abs(S3i.x(w,2)) > deg2rad(1), 1, 'last');
+we = S3i.t >= 5;
+S3f = furuta_sim_obs(P, D, zeros(4,1), 2.5, struct('tau_p', op3.tau_p, 'full_state', true));
+fprintf('V3 |alpha|<1 deg %.2f s after the tap; mean theta over the last 1 s: %.2f deg (integrator), %.1f deg (none); true-state tap max|alpha| = %.1f deg\n', ...
+        S3i.t(k+1) - 0.5, deg(mean(S3i.x(we,1))), deg(mean(S3p.x(we,1))), deg(max(abs(S3f.x(:,2)))));
 
 %% V4. Encoder offset on the pendulum (datasheet position error, docs/08)
 for b = [P.enc_pos_err_typ, P.enc_pos_err_max]
     Si = furuta_sim_obs(P, D, zeros(4,1), 8, struct('bias', [0; b]));
     Sp = furuta_sim_obs(P, D, zeros(4,1), 8, struct('bias', [0; b], 'integrator', false));
-    fprintf('V4 alpha offset %.0f arcmin: final theta %.2f deg (integrator), %.1f deg (none); true alpha_end %.3f deg\n', ...
-            deg(b)*60, deg(Si.x(end,1)), deg(Sp.x(end,1)), deg(Si.x(end,2)));
+    we = Si.t >= 6;                                  % mean over the last 2 s, as the arm ripples
+    fprintf('V4 alpha offset %.0f arcmin: mean final theta %.2f deg (integrator), %.1f deg (none); true alpha_end %.3f deg\n', ...
+            deg(b)*60, deg(mean(Si.x(we,1))), deg(mean(Sp.x(we,1))), deg(Si.x(end,2)));
 end
 
 %% V5. Noise: quantisation + random torque disturbances
@@ -113,6 +126,31 @@ for aw = [true false]
     fprintf('  %d deg (anti-windup %s)', amax, mat2str(aw));
 end
 fprintf('\n');
+
+%% V8. Why these poles: the final design against the earlier D2, with the same observer and integrator
+wn2 = 4; pd2 = wn2*(-0.7 + 1i*sqrt(1 - 0.7^2)*[1 -1]);
+cand = {'D2', [pd2, -12, -15]; 'final', D.p_ctrl};
+Aa = [D.A zeros(4,1); 1 0 0 0 0]; Ba = [D.B; 0];
+for i = 1:size(cand,1)
+    Dc = D; Ka = place(Aa, Ba, [cand{i,2}, -5]); Dc.Kx = Ka(1:4); Dc.Ki = Ka(5);
+    x0 = [0; deg2rad(10); 0; 0];
+    Sr = furuta_sim_obs(P, Dc, x0, 4, struct('xhat0', xh0(x0)));
+    Ss = furuta_sim_obs(P, Dc, zeros(4,1), 4.5, struct('r', @(t) r0*(t >= tstep)));
+    St = furuta_sim_obs(P, Dc, zeros(4,1), 3, struct('tau_p', op3.tau_p));
+    Sn = furuta_sim_obs(P, Dc, zeros(4,1), 6, op5);
+    ths = Ss.x(m,1); k = find(abs(ths - r0) > 0.02*r0, 1, 'last'); w = Ss.t >= 3;
+    fprintf('V8 %-5s Kx = %s, Ki = %.2f: step Ts %.2f s, OS %.1f %%, ripple %.2f deg; 10 deg %.1f V; tap %.1f deg, %.1f V; RMS u %.3f V\n', ...
+            cand{i,1}, mat2str(Dc.Kx, 3), Dc.Ki, tt(k+1), (max(ths) - r0)/r0*100, deg(max(Ss.x(w,1)) - min(Ss.x(w,1))), ...
+            max(abs(Sr.u)), deg(max(abs(St.x(:,2)))), max(abs(St.u)), rms(Sn.u(Sn.t >= 1)));
+end
+
+%% V9. How the reference enters: through the integrator only, or also through Kx(1) (linear model)
+Acl = [D.A - D.B*D.Kx, -D.B*D.Ki; 1 0 0 0 0];
+for nr = [0 1]
+    sysr = ss(Acl, [D.B*D.Kx(1)*nr; -1], [1 0 0 0 0], 0);
+    si = stepinfo(sysr, 'SettlingTimeThreshold', 0.02); yr = step(sysr, 0:1e-3:6);
+    fprintf('V9 reference gain %d x Kx(1): Ts %.2f s, OS %.1f %%, US %.1f %%\n', nr, si.SettlingTime, si.Overshoot, -min(yr)*100);
+end
 
 %% Figure: V1-V3 overview
 figure('Position', [100 100 950 700]);

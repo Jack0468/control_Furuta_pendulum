@@ -1,40 +1,41 @@
 # TODO: What Is Still Open
 
-**Due: 11:59 pm Friday 6 November 2026.** Last updated 2026-11-03.
+**Due: 11:59 pm Friday 6 November 2026.** Last updated 2026-11-04.
 
 Tick items off here as they are done. When an item closes a logbook issue (I-xx) or decision (D-xx), also update [LOGBOOK.md](LOGBOOK.md).
 
-**Current state:** the code now has the published damping and the spin term, but `figures/`, the docs' results and the report's numbers are from the previous model. They are refreshed in section 2, after the check in section 1.
+**Current state:** `run_all` is done and the figures, docs and report numbers all match the final design (published damping, Aleksei's poles, observer −100…−130). What's left is mainly the people-only items and rewriting the blue prose. Nothing from this refresh is committed yet.
 
 "Who" is a suggestion: **Jack**, **Aleksei**, **Team** (both), or **Claude** (AI-assisted; declare this in the report).
 
 ---
 
-## 1. Check together before `run_all` (next step)
+## 1. Confirm with Aleksei
 
 | Done | ID | Task | Who | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | I-09 | **Adopt Aleksei's poles?** (−2.7 ± 2.38j, −10.8, −13.5, integrator −5). Recommended: they meet every criterion | Jack + Aleksei | Comparison in [doc 04 §3c](04_controller_and_observer.md). One-line change in `furuta_design.m` |
-| [ ] | I-09 | **Align with Aleksei's Simulink:** same J_r (`/3`), published damping, same α sign, same requirements. Confirm it has the observer and integrator | Team | His K can't be pasted across without flipping k₂ and k₄ |
-| [ ] | D-18 | **Accept the serving-arm application and its requirements**, including settling ≤ 2.5 s | Team | [Doc 03 §4](03_design_requirements.md). Be ready to answer "why is the tray inverted?" |
-| [ ] | D-12 | **Confirm the observer:** pole-placed as the main design, Kalman as the extension | Team | [Doc 09 §6](09_kalman_filter.md). Ask the lecturer only if you want a Kalman gain as the main design |
-| [ ] | — | Look over the preview figures in `scratch/preview/` | Jack | Nothing in `figures/` has changed yet |
+| [ ] | I-09 | **Get Aleksei's design script into the repo,** or confirm his abstract's results aren't used. Check his gain signs against his report's α convention | Aleksei | His `.slx` files need A, B, C and K from a script that isn't committed. Details in the LOGBOOK, 2026-11-04 |
+| [ ] | D-18 | **Aleksei to confirm the serving-arm application and 2.5 s settling limit** | Aleksei | Jack accepted on 2026-11-04. [Doc 03 §4](03_design_requirements.md). Be ready to answer "why is the tray inverted?" |
+| [ ] | D-12 | **Confirm the observer:** pole-placed as the main design, Kalman as the extension. The report is written this way | Team | [Doc 09 §6](09_kalman_filter.md). Ask the lecturer only if you want a Kalman gain as the main design |
+| [ ] | — | Look over the regenerated figures in `figures/` and the draft PDF | Jack | `python report/build.py --open` |
 
-## 2. After the check
+## 2. Refresh and publish
 
 | Done | ID | Task | Who | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | — | Apply the agreed poles, then run `run_all` (about 7 min; keep the computer awake, as sleep pauses it) | Jack or Claude | From inside `matlab/` |
-| [ ] | — | Refresh every result in docs 02–06, 08–10, README and the report (red numbers and black result tables) from the new log | Claude | Includes the hand derivation in doc 06 |
-| [ ] | I-08 | Record the final ripple and settling time. If they still touch the ±0.6° band, say how settling is measured | Claude | Ripple was 0.58° with Aleksei's poles, 0.88° with ours |
-| [ ] | — | Commit and push, so Aleksei can see everything | Jack | `main` is 2 commits ahead, plus uncommitted work. Claude commits only when asked |
+| [x] | — | Run `run_all` (3–7 min; keep the computer awake, as sleep pauses it) | Claude | Done 2026-11-04. Log in `scratch/` |
+| [x] | — | Refresh every result in the docs, README and the report from the new log | Claude | Done 2026-11-04, including the hand derivation in doc 06 |
+| [x] | I-08 | Record the final ripple and settling time | Claude | 0.71° ripple, inside the ±0.6° band; T_s 1.38 s |
+| [ ] | — | Commit and push, so Aleksei can see everything | Jack | `main` matches GitHub, plus uncommitted work. Claude commits only when asked |
 
 ## 3. Things only a person can do
 
 | Done | ID | Task | Who | By | Notes |
 | --- | --- | --- | --- | --- | --- |
 | [ ] | — | Read the sources tagged in the report's reference list, starting with Hamza 2019 and Cazzolato & Prime 2011 | Team | Wed 4 Nov | The brief rejects unverified references; [doc 10 §1](10_literature_review.md) shows what was only an abstract or record |
-| [ ] | — | Check Aleksei's MATEC paper: it's about a *tilted* Furuta pendulum, so does it support what he cites it for? | Aleksei | Wed 4 Nov | The site blocked automated access |
+| [ ] | — | Read Acosta 2010 and confirm the 0.75 rad LQR claim and the methods listed in the Introduction | Aleksei | Wed 4 Nov | Full text blocked for automated access. `--final` hides the orange mark, so fix or remove the sentence first |
+| [ ] | — | Give a source for the rocket-landing claim in the Introduction, or drop it | Aleksei | Wed 4 Nov | No source in either draft |
+| [ ] | — | Check Aleksei's MATEC paper: it's about a *tilted* Furuta pendulum, so does it support what he cites it for? | Aleksei | Wed 4 Nov | Only needed if it's cited: his report draft doesn't cite it. The site blocked automated access |
 | [ ] | I-03 | Find a source for m_r = 0.095 kg, ideally the QUBE-Servo 2 workbook | Jack | Wed 4 Nov | J_r depends on it. The TU Delft sheet was unreachable |
 | [ ] | — | Confirm the arm's ±90° cable limit, or state it as an assumption | Team | Wed 4 Nov | Both of you assumed it |
 | [ ] | — | Get the AI-citation rules from Canvas or your tutor, then write the declaration | Team | Thu 5 Nov | Searched every course PDF: no rule stated, only "ask an LLM, but be critical" (Lecture 1, p. 32) and slides crediting "source: ChatGPT" |
@@ -52,8 +53,9 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 | [ ] | §4 Problem Definition | Team | Wed 4 Nov | Docs 02 §3, 03 §4 |
 | [ ] | §5 Controller Design | Aleksei (proposed) | Thu 5 Nov | Docs 04, 06, 09 |
 | [ ] | §6 Numerical Validations | Jack (proposed) | Thu 5 Nov | Doc 05 |
-| [ ] | Decide whether the Kalman trade-off figure goes in (2 pages are spare, before rewriting) | Team | Thu 5 Nov | `w11_kalman_tradeoff.png` |
-| [ ] | Cut to 8 pages; check notation; every figure is discussed in the text | Team | Thu 5 Nov | |
+| [ ] | Decide whether the Kalman trade-off figure goes in. The `--final` build is 7 pages (8 in draft, because of the marks), so there is room if the rewrite doesn't add length | Team | Thu 5 Nov | `w11_kalman_tradeoff.png` |
+| [ ] | Stay within 8 pages: check with `--final`, as the 7-page build has about one page spare; check notation, including `b` used for both the encoder offset and a model constant; every figure is discussed in the text | Team | Thu 5 Nov | |
+| [ ] | Put the reference list in first-cited order, as IEEE style expects | Team | Thu 5 Nov | `report/main.tex` |
 
 ## 5. Before submission
 
@@ -71,6 +73,10 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 
 Closed items, newest first. Details are in the [LOGBOOK](LOGBOOK.md).
 
+- [x] `run_all` to `figures/`, then the report and docs refreshed from the log; doc 06 redone for D4, 2026-11-04
+- [x] Aleksei's report sections merged into `report/main.tex` (D-20), 2026-11-04
+- [x] Aleksei's Simulink run with our gains: agrees with our code on the shared test, 2026-11-04
+- [x] Aleksei's poles adopted in the code (D-19), 2026-11-03
 - [x] I-10: settling limit derived from the serving-arm application (doc 03 §4), pending your acceptance, 2026-11-03
 - [x] I-02: Monte Carlo failures explained: weak motor and short arm reduce loop gain, 2026-11-03
 - [x] I-06: anti-windup tested at the edge of falling: no practical effect, 2026-11-03

@@ -18,20 +18,22 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-02 | 2026-10-15 | Parameters from the Quanser QUBE-Servo 2 | Realistic lab hardware | Values still to be verified against a primary source (I-03) |
 | D-03 | 2026-10-15 | Requirements: OS ≤ 5%, T_s ≤ 2.0 s, undershoot ≤ 10%, t_r ≥ 0.3 s, \|V\| ≤ 10 V (target ≤ 6 V) | Derived from the RHP zero (8.97 rad/s) and the voltage limit; see doc 03 | Active |
 | D-04 | 2026-10-15 | Rejected a 0.4–0.8 s settling-time requirement | Needs ωₙ ≈ 10 rad/s, beyond the RHP zero: 18–38% undershoot, smaller region of attraction | Closed |
-| D-05 | 2026-10-15 | Controller poles D2: −2.8 ± 2.86j, −12, −15 (ζ = 0.7, ωₙ = 4) | Meets D-03 with the lowest voltage of the candidates (D1, D3, LQR compared) | Active |
+| D-05 | 2026-10-15 | Controller poles D2: −2.8 ± 2.86j, −12, −15 (ζ = 0.7, ωₙ = 4) | Meets D-03 with the lowest voltage of the candidates (D1, D3, LQR compared) | Replaced by D-19 |
 | D-06 | 2026-10-15 | Add integral action on θ (extra pole at −5) | Without it a 2 mN·m arm drag leaves a 45° offset | Active |
 | D-07 | 2026-10-29 | Reference enters **only through the integrator** (type-1 servo: u = −Kₓx̂ − kᵢξ) | The original structure double-counted r: 57% overshoot. Fixed: 1.5% | Active |
 | D-08 | 2026-10-29 | Sensors: 512-CPR optical incremental encoders in 4× quadrature (2048 counts/rev), e.g. Broadcom HEDS-5540 #I or US Digital E5-512 | Datasheet-backed noise model; matches the QUBE-Servo 2 resolution | Active (doc 08) |
 | D-09 | 2026-10-29 | Controller and observer run in discrete time at 1 kHz; observer in predictor form, driven by the saturated voltage | Matches real hardware; makes quantisation and sampling effects visible | Active |
 | D-10 | 2026-10-29 | Observer poles −100, −110, −120, −130 rad/s (was −40…−55) | The slower observer left 39/500 random ±20% plants unstable; this set leaves 6/500. Noise cost: RMS u 0.09 V instead of 0.05 V | Active; may be replaced by a Kalman gain (D-12) |
 | D-11 | 2026-10-29 | Course PDFs and vendor datasheets kept in `references/` but git-ignored; working scripts in `scratch/`, git-ignored | Copyrighted material must not go on the public repo | Active |
-| D-12 | 2026-10-29 | Investigate a steady-state Kalman filter as the observer | Principled trade-off between noise and disturbance response; may fix I-01 and I-02 | Studied (doc 09). Choice still open; Option A suggested |
+| D-12 | 2026-10-29 | Investigate a steady-state Kalman filter as the observer | Principled trade-off between noise and disturbance response; may fix I-01 and I-02 | Studied (doc 09). The report uses option A (pole-placed observer, Kalman as a comparison). Team to confirm |
 | D-13 | 2026-11-03 | **Arm geometry: case A.** Uniform bar with the motor at one end, so J_r = m_rL_r²/3 (was /12) | /12 is inconsistent with L_r being the motor-to-joint distance (doc 02 §4.1). Aleksei's model also uses /3 | Active; closes I-04 |
 | D-14 | 2026-11-03 | **R3 settling limit relaxed to 2.5 s, for now** (was 2.0 s) | The measured 2.40 s includes quantisation ripple; 1.81 s without it. Still a design choice to be justified from the aims (I-10) | Active, provisional |
 | D-15 | 2026-11-03 | Dropped the 6 V voltage target; the limit is ±10 V | With J_r = `/3` the gains are higher and 6 V isn't achievable; 10 V is inside the ±15 V drive range and 18 V motor rating | Active |
 | D-16 | 2026-11-03 | **Published damping: D_r 0.0005, D_p 0.0001** (Jack's decision) | The only damping values with a source (Xu et al. 2023) | Active |
 | D-17 | 2026-11-03 | Restored the pendulum spin term in the nonlinear model | Gäfvert and the QUBE model in Xu et al. keep it; an earlier claim that Quanser drops it was wrong. Linear model unchanged | Active |
-| D-18 | 2026-11-03 | **Application: serving arm carrying a drink on a passive joint** (Jack's bartender idea). Tilt, speed and settling requirements derived from it | Doc 03 §4. Golf, mixer, weather station and ML benchmark considered and rejected | Proposed; awaiting team acceptance |
+| D-18 | 2026-11-03 | **Application: serving arm carrying a drink on a passive joint** (Jack's bartender idea). Tilt, speed and settling requirements derived from it | Doc 03 §4. Golf, mixer, weather station and ML benchmark considered and rejected | Accepted by Jack 2026-11-04; Aleksei still to confirm |
+| D-19 | 2026-11-03 | **Final controller poles: Aleksei's,** −2.7 ± 2.38j, −10.8, −13.5, plus our integrator pole at −5 (Jack's decision) | On the updated model they meet the tap limit (14.6°) with less voltage and ripple than D2 (doc 04 §3c). Replaces D-05 | Active |
+| D-20 | 2026-11-04 | **One report: ours as the base, with Aleksei's prose merged in.** Our α sign, 2.5 s settling limit, integrator and observer poles −100…−130 are kept (Jack's decision) | Our draft covers all seven sections. His observer −40…−55 gives a 20.4° tap and 10/200 unstable plants on the current model, against 14.6° and 3/200 | Active |
 
 ---
 
@@ -39,15 +41,15 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 
 | ID | Opened | Issue | Next step |
 | --- | --- | --- | --- |
-| I-01 | 2026-10-29 | R6 tap limit: 15.0° with our poles (limit 15°), 14.6° with Aleksei's, on the updated model | Closes if Aleksei's poles are adopted (I-09) |
-| I-02 | 2026-10-29 | **Closed 2026-11-03.** Plants that fall have a weaker motor (k_m/R_m factor 0.89 vs 1.01) and shorter arm (0.93 vs 1.00), which lower the loop gain towards its lower stability limit | Report it in Validations |
+| I-01 | 2026-10-29 | **Closed 2026-11-04 by D-19**, confirmed by `run_all`: tap 14.6° (limit 15°) | — |
+| I-02 | 2026-10-29 | **Closed 2026-11-03.** Plants that fall have a weaker motor (k_m/R_m factor 0.84 vs 1.02) and shorter arm (0.91 vs 1.01), which lower the loop gain towards its lower stability limit | In the report's Validations |
 | I-03 | 2026-10-15 | Quanser workbook not read directly. Xu et al. support R_m, k_m, L_r, L_p, m_p and damping; a matching motor datasheet supports R_m, k_m. m_r still has no opened source | Find the workbook or another source for m_r |
 | I-04 | 2026-10-29 | **Closed 2026-11-03 by D-13** (J_r = m_rL_r²/3). A published or measured J_r would still be better | — |
 | I-05 | 2026-10-29 | Textbook chapter numbers in docs are from memory. The report draft cites no textbooks | Check only if textbooks are cited |
 | I-06 | 2026-10-29 | **Closed 2026-11-03.** Anti-windup tested on arm-torque pulses to the edge of falling and on large releases: results identical or nearly so, because saturation lasts at most about 0.2 s before recovery or a fall. Kept as a safeguard | State it in the report if there's space |
 | I-07 | 2026-10-29 | **Closed 2026-11-03:** `Template-Latex.zip` (IEEEtran conference template) is in the project folder. Confirm it matches Canvas | — |
-| I-08 | 2026-11-03 | Quantisation limit cycle with the observer. On the updated model: 0.88° arm ripple with our poles (T_s 1.97 s; 1.79 s unquantised), 0.58° with Aleksei's (T_s 1.38 s), which stays inside the ±0.6° band | Record final values after `run_all` |
-| I-09 | 2026-11-03 | Aleksei's Simulink and this repo are not yet aligned on damping, α sign, requirements and poles, and his observer and integrator are unconfirmed | Team check, TODO section 1 |
+| I-08 | 2026-11-03 | **Closed 2026-11-04.** Final values from `run_all`: 0.71° arm ripple, inside the ±0.6° band; T_s 1.38 s (1.43 s unquantised). D2 had 0.81° and T_s 1.97 s. Stated in the report | — |
+| I-09 | 2026-11-03 | Poles agreed (D-19) and Simulink checked (2026-11-04 entry). Still open: his design script isn't in the repo, so his gain signs and his abstract's results can't be reproduced | Aleksei to add the script, or confirm those results aren't used |
 | I-10 | 2026-11-03 | **Closed 2026-11-03, pending acceptance of D-18.** Settling limit derived from serving throughput, with stated assumptions (doc 03 §4) | — |
 | I-11 | 2026-11-03 | **Closed 2026-11-03 by D-17** | — |
 | I-12 | 2026-11-03 | **Closed 2026-11-03.** Allied Motion CL40 16705 matches R_m and k_m: 18 V, 0.54 A rated, 2.1 A stall, 22 mN·m. No opened source says the QUBE uses it, so word it as "matching constants" | — |
@@ -222,3 +224,36 @@ AI-assisted: research, margin script, report draft.
 
 AI-assisted: research, code, previews, docs.
 
+---
+
+## 2026-11-04 (Week 13): Aleksei's report and Simulink merged and checked
+
+**Report merge (D-20).** Aleksei's intro wording, energy and Euler–Lagrange steps, motor text and M, D, K linearisation are now in `report/main.tex` as black text. They were converted to our α sign and symbols. The generalised coordinate became η, because q is already the encoder step, and D and K became D_η and K_η to avoid clashing with the damping and gain symbols. His Baltazar reference was left out: it was never cited in his text and hasn't been read.
+
+**Simulink check** (`Simulink/`, run with our A, B and K; nothing saved):
+
+- Both models use a **linear** State-Space plant, a 4-gain K and a 1 V voltage tap. Neither has an integrator, disturbance model, reference input or encoder quantisation.
+- His abstract describes a nonlinear simulation, a disturbance model and integral action, with a 1.08 s step settling time. These models can't produce those results, so those numbers were not merged.
+- His observer loop agrees with ours for a 10° release and 1 V tap: peak voltage 8.45 vs 8.60 V, peak θ 23.5° vs 24.3°, peak α after the tap 4.40° vs 4.47°, RMS α difference 0.10°. The small gap is expected, as his plant is linear and sampled at no fixed rate, while ours is nonlinear at 1 kHz.
+- His observer poles are −40, −45, −50, −55. In our full loop they give a 20.4° tap and 27/500 unstable plants, against 14.6° and 5/500 for −100…−130 (one set of random plants, scratch run). The `run_all` count on 200 plants is 10 against 3.
+
+**Sources.** Barrios Valero read (§5.1): pole placement in simulation, three poles with torque as the input, plot starts just above 0.1 rad. Acosta's full text was blocked on every mirror tried, so its claims stay marked for a person to check.
+
+AI-assisted: merge, Simulink comparison, source checks, this entry.
+
+### Later on 2026-11-04: `run_all`, and everything refreshed
+
+- **`run_all` run to `figures/`** with the agreed poles, then re-run after adding metrics to `week12_validation.m` (V2 ripple and unquantised T_s, V3 tap recovery and true-state tap, V4 means over 2 s, new V8 and V9), `week11_kalman.m` (true-state count) and `week10_state_feedback.m` (LQR poles), so every number in the report comes from the scripts. Log: `scratch/run_all_2026-11-04.log`.
+- **Report:** all numbers refreshed; Controller Design rewritten for D4; red marks removed. It is 8 pages in draft and 7 with `--final`, because the draft marks take space.
+- **Docs 01–07, 09, 10 and the README refreshed.** Doc 06's hand derivation is redone for D4 and agrees with the script's output.
+
+**Final results:** T_s 1.38 s, OS 1.4%, t_r 0.75 s; 10° recovery 0.97 s at 6.6 V; tap 14.6° at 9.0 V; PM 36°, GM ×0.59 / ×6.74; region of attraction 24°.
+
+**Things to be honest about in the viva or report:**
+
+- The tap passes by only 0.4°.
+- R8 is partial: 38/40 recover, 31/40 survive the tap, and 3/200 plants are linearly unstable (1/200 even with the true state).
+- At higher damping (0.0015, 0.0005) the loop is close to marginal, with a slow wobble of about 1 V RMS.
+- Earlier "0 of 300 unstable" was one random sample. Quote counts with their sample size.
+
+AI-assisted: script additions, reruns, report and doc refresh, this entry.

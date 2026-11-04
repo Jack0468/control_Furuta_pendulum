@@ -1,8 +1,8 @@
 # 06: Pole Placement, Worked Step by Step (Lab 10 A2)
 
-This document derives the state-feedback gain K for design **D2** by hand. Every equation is numbered as (E1), (E2), and so on. Each one says where it comes from: a definition, an earlier equation, a theorem, or a textbook result. Every number is reproduced by [`matlab/week10_pole_placement_derivation.m`](../matlab/week10_pole_placement_derivation.m).
+This document derives the state-feedback gain K for the final design, **D4** (Aleksei's poles, D-19), by hand. Every equation is numbered as (E1), (E2), and so on. Each one says where it comes from: a definition, an earlier equation, a theorem, or a textbook result. Every number is reproduced by [`matlab/week10_pole_placement_derivation.m`](../matlab/week10_pole_placement_derivation.m).
 
-**Result:** K = [k₁, k₂, k₃, k₄] = **[−1.3742, 32.577, −1.0743, 2.2305]**
+**Result:** K = [k₁, k₂, k₃, k₄] = **[−0.9016, 26.569, −0.6739, 2.1125]**
 
 ---
 
@@ -27,7 +27,7 @@ This document derives the state-feedback gain K for design **D2** by hand. Every
 | m_p, L_p, J_p | Pendulum mass, full length, inertia about its centre of mass | 0.024 kg, 0.129 m, 3.33 × 10⁻⁵ kg·m² |
 | L_r, J_r | Arm length, arm inertia about the motor axis | 0.085 m, 2.29 × 10⁻⁴ kg·m² (uniform bar, motor at one end: doc 02 §4.1) |
 | R_m, k_m | Motor resistance, motor torque/back-EMF constant | 8.4 Ω, 0.042 N·m/A |
-| D_r, D_p | Viscous damping at the arm and pendulum joints | 0.0015, 0.0005 N·m·s/rad |
+| D_r, D_p | Viscous damping at the arm and pendulum joints | 0.0005, 0.0001 N·m·s/rad |
 | g | Gravity | 9.81 m/s² |
 
 ### Lumped constants (from the linearisation, doc 02 §3)
@@ -39,7 +39,7 @@ This document derives the state-feedback gain K for design **D2** by hand. Every
 | c | J_p + ¼ m_p L_p² | Pendulum inertia about its pivot (parallel-axis theorem) | 1.3313 × 10⁻⁴ kg·m² |
 | d | ½ m_p g L_p | Gravity torque per radian of lean | 1.5186 × 10⁻² N·m/rad |
 | Δ | ac − b² | Determinant of the linearised mass matrix (always > 0) | 3.6230 × 10⁻⁸ (kg·m²)² |
-| B_eq | D_r + k_m²/R_m | Total arm damping: friction plus motor back-EMF | 1.71 × 10⁻³ N·m·s/rad |
+| B_eq | D_r + k_m²/R_m | Total arm damping: friction plus motor back-EMF | 7.10 × 10⁻⁴ N·m·s/rad |
 
 ### Control-design symbols
 
@@ -170,10 +170,10 @@ $$
 ### 1e. Upper limit from the right-half-plane zero
 
 $$
-\omega_{bw} \lesssim \frac{z}{2},\qquad z = +8.97\ \text{rad/s} \tag{E13}
+\omega_{bw} \lesssim \frac{z}{2},\qquad z = +10.31\ \text{rad/s} \tag{E13}
 $$
 
-**Where it comes from:** a fundamental limitation of non-minimum-phase systems (Åström & Murray, *Feedback Systems*, Ch. 14; Skogestad & Postlethwaite, *Multivariable Feedback Control*, Ch. 5). The transfer function θ(s)/V_m(s) has a zero at s = +8.97 (doc 02 §5). Making the arm loop much faster than about z/2 causes large undershoot, where the arm first moves the wrong way. With ζ = 0.7, the closed-loop bandwidth is about ωₙ, so this means ωₙ ≲ 4.5 rad/s.
+**Where it comes from:** a fundamental limitation of non-minimum-phase systems (Åström & Murray, *Feedback Systems*, Ch. 14; Skogestad & Postlethwaite, *Multivariable Feedback Control*, Ch. 5). The transfer function θ(s)/V_m(s) has a zero at s = +10.31 (doc 02 §5). Making the arm loop much faster than about z/2 causes large undershoot, where the arm first moves the wrong way. With ζ near 0.7, the closed-loop bandwidth is about ωₙ, so this means ωₙ ≲ 5.2 rad/s. The tighter cap ωₙ ≲ 4.5 rad/s comes from avoiding liquid slosh (doc 03 §4).
 
 ### 1f. Apply the requirements (from doc 03: OS ≤ 5%, T_s ≤ 2.5 s)
 
@@ -181,29 +181,30 @@ $$
 | --- | --- | --- | --- |
 | OS ≤ 5% | (E10) | ζ = −ln(0.05) / √(π² + ln²(0.05)) = 2.996 / 4.341 | ζ ≥ 0.690 |
 | T_s ≤ 2.5 s | (E11) | σ ≥ 4 / 2.5 | ζωₙ ≥ 1.6 rad/s |
-| RHP zero | (E13) | 8.97 / 2 | ωₙ ≲ 4.5 rad/s |
+| RHP zero | (E13) | 10.31 / 2 | ωₙ ≲ 5.2 rad/s |
+| Slosh | Doc 03 §4 | 22.7 / 5 | ωₙ ≲ 4.5 rad/s |
 
-**Choose ζ = 0.7** (just above 0.690, for a little margin) **and ωₙ = 4 rad/s**, which satisfies both 0.7 × 4 = 2.8 ≥ 1.6 and 4 ≤ 4.5. Using (E6):
-
-$$
-\sigma = 0.7 \times 4 = 2.8,\qquad \omega_d = 4\sqrt{1 - 0.7^2} = 4 \times 0.71414 = 2.8566
-$$
+**Choose ζ = 0.75** (above 0.690, for margin) **and ωₙ = 3.6 rad/s**, which satisfies both 0.75 × 3.6 = 2.7 ≥ 1.6 and 3.6 ≤ 4.5. These are Aleksei's choices (doc 04 §3b). Using (E6):
 
 $$
-s_{1,2} = -2.8 \pm 2.8566j \tag{E14}
+\sigma = 0.75 \times 3.6 = 2.7,\qquad \omega_d = 3.6\sqrt{1 - 0.75^2} = 3.6 \times 0.66144 = 2.3812
 $$
 
-The predicted performance, from (E9), (E11) and (E12), is OS = 4.60%, T_s = 1.43 s and t_r = 0.45 s.
+$$
+s_{1,2} = -2.7 \pm 2.3812j \tag{E14}
+$$
+
+The predicted performance, from (E9), (E11) and (E12), is OS = 2.84%, T_s = 1.48 s and t_r = 0.50 s.
 
 ### 1g. The other two poles
 
 The system has 4 states, so 4 poles must be chosen. The other two are placed on the real axis, well to the left of the dominant pair:
 
 $$
-s_3 = -12,\qquad s_4 = -15 \tag{E15}
+s_3 = -4\sigma = -10.8,\qquad s_4 = -5\sigma = -13.5 \tag{E15}
 $$
 
-**Where they come from:** this is a design choice, using the dominant-pole rule of thumb that non-dominant poles should be at least 3–5× further left than σ. Here 12/2.8 = 4.3 and 15/2.8 = 5.4. Pushing them further left (e.g. −30 and −40 in design D1) makes the response more ideal, but it needs much larger gains and more voltage (doc 04 §2). The two values differ slightly so that `place` does not have to handle repeated poles.
+**Where they come from:** this is a design choice, using the dominant-pole rule of thumb that non-dominant poles should be at least 3–5× further left than σ. Here they are exactly 4× and 5×. Pushing them further left (e.g. −30 and −40 in design D1) makes the response more ideal, but it needs much larger gains and more voltage (doc 04 §2). The two values differ slightly so that `place` does not have to handle repeated poles.
 
 ---
 
@@ -225,17 +226,17 @@ $$
 
 **Where it comes from:** the difference of squares, (p − jq)(p + jq) = p² + q². Note that σ² + ω_d² = ζ²ωₙ² + ωₙ²(1−ζ²) = ωₙ², so (E17) is exactly the denominator of (E5): s² + 2ζωₙs + ωₙ².
 
-With the numbers: 2σ = 5.6 and σ² + ω_d² = 7.84 + 8.16 = 16 = ωₙ². The real poles give (s + 12)(s + 15) = s² + 27s + 180. Multiplying the two quadratics term by term:
+With the numbers: 2σ = 5.4 and σ² + ω_d² = 7.29 + 5.67 = 12.96 = ωₙ². The real poles give (s + 10.8)(s + 13.5) = s² + 24.3s + 145.8. Multiplying the two quadratics term by term:
 
 $$
 \begin{aligned}
-\Delta_d(s) &= (s^2 + 5.6s + 16)(s^2 + 27s + 180) \\
-&= s^4 + (27 + 5.6)\,s^3 + (180 + 5.6\cdot27 + 16)\,s^2 + (5.6\cdot180 + 16\cdot27)\,s + 16\cdot180 \\
-&= s^4 + 32.6\,s^3 + 347.2\,s^2 + 1440\,s + 2880
+\Delta_d(s) &= (s^2 + 5.4s + 12.96)(s^2 + 24.3s + 145.8) \\
+&= s^4 + (24.3 + 5.4)\,s^3 + (145.8 + 5.4\cdot24.3 + 12.96)\,s^2 + (5.4\cdot145.8 + 12.96\cdot24.3)\,s + 12.96\cdot145.8 \\
+&= s^4 + 29.7\,s^3 + 289.98\,s^2 + 1102.25\,s + 1889.57
 \end{aligned} \tag{E18}
 $$
 
-**Targets:** a₃ = 32.6, a₂ = 347.2, a₁ = 1440, a₀ = 2880.
+**Targets:** a₃ = 29.7, a₂ = 289.98, a₁ = 1102.25, a₀ = 1889.57.
 
 ---
 
@@ -270,11 +271,11 @@ Each entry in terms of the physical constants, and its value:
 | Entry | Formula (doc 02 §3) | Physical meaning | Value |
 | --- | --- | --- | --- |
 | a₃₂ | bd/Δ | Gravity on the pendulum accelerating the arm | 55.1525 |
-| a₃₃ | −cB_eq/Δ | Arm damping acting on the arm | −6.2835 |
-| a₃₄ | −bD_p/Δ | Pendulum damping coupled to the arm | −1.8159 |
+| a₃₃ | −cB_eq/Δ | Arm damping acting on the arm | −2.6089 |
+| a₃₄ | −bD_p/Δ | Pendulum damping coupled to the arm | −0.3632 |
 | a₄₂ | ad/Δ | Gravity tipping the pendulum (causes the instability) | 168.5810 |
-| a₄₃ | −bB_eq/Δ | Arm damping coupled to the pendulum | −6.2104 |
-| a₄₄ | −aD_p/Δ | Pendulum damping acting on the pendulum | −5.5506 |
+| a₄₃ | −bB_eq/Δ | Arm damping coupled to the pendulum | −2.5786 |
+| a₄₄ | −aD_p/Δ | Pendulum damping acting on the pendulum | −1.1101 |
 | b₃ | c k_m / (R_m Δ) | Voltage → arm acceleration | 18.3728 |
 | b₄ | b k_m / (R_m Δ) | Voltage → pendulum acceleration | 18.1591 |
 
@@ -374,16 +375,16 @@ Substituting the table formulas from §3b into (E27) and (E28), and using ac −
 
 | Quantity | Simplifies to | Value | Meaning |
 | --- | --- | --- | --- |
-| β₁ | D_p k_m / (R_m Δ) | 69.0042 | Pendulum damping × motor gain |
+| β₁ | D_p k_m / (R_m Δ) | 13.8008 | Pendulum damping × motor gain |
 | β₂ | (−bB_eq·c + cB_eq·b) k_m / (R_m Δ²) = **0** | 0 | Cancels exactly; see below |
 | β₃ | −d k_m / (R_m Δ) | −2095.7792 | Gravity × motor gain; always negative |
-| −(a₃₃ + a₄₄) | (cB_eq + aD_p)/Δ | 11.8341 | Total open-loop damping |
-| a₃₃a₄₄ − a₃₄a₄₃ − a₄₂ | (B_eq D_p − ad)/Δ | −144.982 | Damping product minus gravity stiffness |
-| a₃₃a₄₂ − a₃₂a₄₃ | −d B_eq / Δ | −716.756 | Gravity × arm damping |
+| −(a₃₃ + a₄₄) | (cB_eq + aD_p)/Δ | 3.7190 | Total open-loop damping |
+| a₃₃a₄₄ − a₃₄a₄₃ − a₄₂ | (B_eq D_p − ad)/Δ | −166.621 | Damping product minus gravity stiffness |
+| a₃₃a₄₂ − a₃₂a₄₃ | −d B_eq / Δ | −297.601 | Gravity × arm damping |
 
 **Why β₂ = 0:** a₄₃b₃ and a₃₃b₄ both equal −bcB_eq k_m/(R_mΔ²). This is a structural property of the Furuta model, not a numerical coincidence. As a result k₂ drops out of c₁ and k₄ drops out of c₂, which makes the hand solution sequential in Step 4.
 
-**Open-loop check:** set K = 0 in (E28). This gives Δ_cl(s) = s⁴ + 11.83s³ − 145.0s² − 716.8s + 0. Its roots are 0, −17.73, +9.96 and −4.06, which match the open-loop poles in doc 02 §5. The +9.96 pole confirms that the upright position is unstable without control.
+**Open-loop check:** set K = 0 in (E28). This gives Δ_cl(s) = s⁴ + 3.72s³ − 166.6s² − 297.6s + 0. Its roots are 0, −14.06, +12.09 and −1.75, which match the open-loop poles in doc 02 §5. The +12.09 pole confirms that the upright position is unstable without control.
 
 ---
 
@@ -402,33 +403,33 @@ With β₂ = 0, solve them from the bottom up.
 **s⁰ term** (c₀ = a₀), using (E28):
 
 $$
-\beta_3 k_1 = 2880 \;\Rightarrow\; k_1 = \frac{2880}{-2095.7792} = -1.37419 \tag{E30}
+\beta_3 k_1 = 1889.57 \;\Rightarrow\; k_1 = \frac{1889.57}{-2095.7792} = -0.901606 \tag{E30}
 $$
 
 **s¹ term** (c₁ = a₁). With β₂ = 0, k₂ drops out, so only k₃ is unknown:
 
 $$
--716.756 + \beta_1 k_1 + \beta_3 k_3 = 1440 \;\Rightarrow\; k_3 = \frac{1440 + 716.756 - 69.0042 \times (-1.37419)}{-2095.7792} = \frac{2251.58}{-2095.7792} = -1.07434 \tag{E31}
+-297.601 + \beta_1 k_1 + \beta_3 k_3 = 1102.25 \;\Rightarrow\; k_3 = \frac{1102.25 + 297.601 - 13.8008 \times (-0.901606)}{-2095.7792} = \frac{1412.29}{-2095.7792} = -0.673874 \tag{E31}
 $$
 
 **s² term** (c₂ = a₂). With β₂ = 0, k₄ drops out, so only k₂ is unknown:
 
 $$
--144.982 + b_3k_1 + b_4k_2 + \beta_1k_3 = 347.2 \;\Rightarrow\; k_2 = \frac{347.2 + 144.982 + 25.248 + 74.134}{18.1591} = \frac{591.564}{18.1591} = 32.5766 \tag{E32}
+-166.621 + b_3k_1 + b_4k_2 + \beta_1k_3 = 289.98 \;\Rightarrow\; k_2 = \frac{289.98 + 166.621 + 16.565 + 9.300}{18.1591} = \frac{482.466}{18.1591} = 26.5688 \tag{E32}
 $$
 
-Here −b₃k₁ = −18.3728 × (−1.37419) = +25.248 and −β₁k₃ = −69.0042 × (−1.07434) = +74.134.
+Here −b₃k₁ = −18.3728 × (−0.901606) = +16.565 and −β₁k₃ = −13.8008 × (−0.673874) = +9.300.
 
 **s³ term** (c₃ = a₃):
 
 $$
-11.8341 + b_3k_3 + b_4k_4 = 32.6 \;\Rightarrow\; k_4 = \frac{32.6 - 11.8341 + 19.739}{18.1591} = \frac{40.505}{18.1591} = 2.23054 \tag{E33}
+3.7190 + b_3k_3 + b_4k_4 = 29.7 \;\Rightarrow\; k_4 = \frac{29.7 - 3.7190 + 12.381}{18.1591} = \frac{38.362}{18.1591} = 2.11254 \tag{E33}
 $$
 
-Here −b₃k₃ = −18.3728 × (−1.07434) = +19.739.
+Here −b₃k₃ = −18.3728 × (−0.673874) = +12.381.
 
 $$
-\boxed{K = \begin{bmatrix} -1.3742 & 32.577 & -1.0743 & 2.2305 \end{bmatrix}} \tag{E34}
+\boxed{K = \begin{bmatrix} -0.9016 & 26.569 & -0.6739 & 2.1125 \end{bmatrix}} \tag{E34}
 $$
 
 The same equations in matrix form, M Kᵀ = rhs, which is what the script solves:
@@ -437,9 +438,9 @@ $$
 \underbrace{\begin{bmatrix} 0 & 0 & b_3 & b_4 \\ b_3 & b_4 & \beta_1 & \beta_2 \\ \beta_1 & \beta_2 & \beta_3 & 0 \\ \beta_3 & 0 & 0 & 0 \end{bmatrix}}_{M}
 \begin{bmatrix} k_1 \\ k_2 \\ k_3 \\ k_4 \end{bmatrix}
 =
-\begin{bmatrix} a_3 - 11.8341 \\ a_2 + 144.982 \\ a_1 + 716.756 \\ a_0 \end{bmatrix}
+\begin{bmatrix} a_3 - 3.7190 \\ a_2 + 166.621 \\ a_1 + 297.601 \\ a_0 \end{bmatrix}
 =
-\begin{bmatrix} 20.766 \\ 492.182 \\ 2156.76 \\ 2880 \end{bmatrix} \tag{E35}
+\begin{bmatrix} 25.981 \\ 456.601 \\ 1399.85 \\ 1889.57 \end{bmatrix} \tag{E35}
 $$
 
 **Where it comes from:** (E29) rearranged, with the gain coefficients from (E28) in M and the open-loop constants moved to the right-hand side.
@@ -450,21 +451,21 @@ $$
 k_1 = -\frac{a_0 R_m \Delta}{d\,k_m} = -\frac{\omega_n^2\, s_3 s_4\, R_m \Delta}{d\,k_m} \tag{E36}
 $$
 
-**Where it comes from:** a₀ is the product of all four desired poles, ωₙ² × 12 × 15. So the arm-angle gain is always negative, and it grows with ωₙ² and with how fast the extra poles are placed.
+**Where it comes from:** a₀ is the product of all four desired poles, ωₙ² × 10.8 × 13.5. So the arm-angle gain is always negative, and it grows with ωₙ² and with how fast the extra poles are placed.
 
 ---
 
 ## Step 5: Cross-check with Ackermann's formula
 
 $$
-K = \begin{bmatrix} 0 & 0 & 0 & 1 \end{bmatrix} W_c^{-1}\, \Delta_d(A),\qquad \Delta_d(A) = A^4 + 32.6A^3 + 347.2A^2 + 1440A + 2880I \tag{E37}
+K = \begin{bmatrix} 0 & 0 & 0 & 1 \end{bmatrix} W_c^{-1}\, \Delta_d(A),\qquad \Delta_d(A) = A^4 + 29.7A^3 + 289.98A^2 + 1102.25A + 1889.57I \tag{E37}
 $$
 
 **Where it comes from:** Ackermann's formula (Ogata §10-2; Franklin, Powell & Emami-Naeini §7.5). It is derived by transforming the system into controllable canonical form and applying the Cayley–Hamilton theorem: every matrix satisfies its own characteristic equation. Δ_d(A) means substituting the matrix A for s in (E18). W_c is the reachability matrix from (E4).
 
-**Result:** K = [−1.37419, 32.5766, −1.07434, 2.23053], identical to (E34).
+**Result:** K = [−0.901606, 26.5688, −0.673874, 2.11254], identical to (E34).
 
-Ackermann needs A⁴ and W_c⁻¹, so it is not practical by hand for a 4×4 system. Use it only as a check. W_c is also poorly conditioned (cond ≈ 3 × 10⁴), so numerically `place` is preferred.
+Ackermann needs A⁴ and W_c⁻¹, so it is not practical by hand for a 4×4 system. Use it only as a check. W_c is also poorly conditioned (cond ≈ 3.7 × 10³), so numerically `place` is preferred.
 
 ---
 
@@ -472,19 +473,19 @@ Ackermann needs A⁴ and W_c⁻¹, so it is not practical by hand for a 4×4 sys
 
 | Method | Equation | k₁ | k₂ | k₃ | k₄ |
 | --- | --- | --- | --- | --- | --- |
-| Coefficient matching | (E30)–(E33) | −1.37419 | 32.5766 | −1.07434 | 2.23053 |
-| Ackermann | (E37) | −1.37419 | 32.5766 | −1.07434 | 2.23053 |
-| MATLAB `place(A, B, p)` | numerical | −1.37419 | 32.5766 | −1.07434 | 2.23053 |
+| Coefficient matching | (E30)–(E33) | −0.901606 | 26.5688 | −0.673874 | 2.11254 |
+| Ackermann | (E37) | −0.901606 | 26.5688 | −0.673874 | 2.11254 |
+| MATLAB `place(A, B, p)` | numerical | −0.901606 | 26.5688 | −0.673874 | 2.11254 |
 
-- **Poles:** eig(A − BK) = {−15, −12, −2.8 ± 2.8566j}, exactly the poles requested in (E14) and (E15). The methods differ by at most 6 × 10⁻¹⁴.
-- **Predicted vs measured response:** on the linear model the step response gives T_s = 1.67 s and OS = 4.7% (doc 04). T_s is slower than the 1.43 s predicted by (E11). The difference comes from two effects that (E5) leaves out: the RHP zero at +8.97 rad/s (E13), and the non-dominant poles in (E15), which are only 4–5× faster. This is why the second-order formulas are a starting point, and the design is always confirmed by simulation.
+- **Poles:** eig(A − BK) = {−13.5, −10.8, −2.7 ± 2.3812j}, exactly the poles requested in (E14) and (E15). The methods differ by at most 7 × 10⁻¹⁴.
+- **Predicted vs measured response:** on the linear model the step response gives T_s = 1.76 s and OS = 2.8% (doc 04). T_s is slower than the 1.48 s predicted by (E11). The difference comes from two effects that (E5) leaves out: the RHP zero at +10.31 rad/s (E13), and the non-dominant poles in (E15), which are only 4–5× faster. This is why the second-order formulas are a starting point, and the design is always confirmed by simulation.
 
 ---
 
 ## Interpreting the gains
 
-- **k₂ = +32.6 V/rad (pendulum angle).** When the pendulum leans by +α, the controller drives the arm under it, like balancing a broom on a hand. This is the largest gain: a 10° lean gives 32.6 × 0.1745 = 5.7 V.
-- **k₁ = −1.37 V/rad (arm angle).** The sign is negative for every stable design, by (E36), because β₃ < 0. Physically, to move the arm towards r the controller first pushes the arm the *opposite* way. That tips the pendulum towards the target, and the pendulum loop then carries the arm over. This is the non-minimum-phase behaviour from (E13). Do not "fix" this sign.
+- **k₂ = +26.6 V/rad (pendulum angle).** When the pendulum leans by +α, the controller drives the arm under it, like balancing a broom on a hand. This is the largest gain: a 10° lean gives 26.57 × 0.1745 = 4.6 V.
+- **k₁ = −0.90 V/rad (arm angle).** The sign is negative for every stable design, by (E36), because β₃ < 0. Physically, to move the arm towards r the controller first pushes the arm the *opposite* way. That tips the pendulum towards the target, and the pendulum loop then carries the arm over. This is the non-minimum-phase behaviour from (E13). Do not "fix" this sign.
 - **k₃, k₄ (velocity gains)** add damping. They cannot be measured directly, which is why the Week 11 observer is needed.
 
 ---
@@ -502,12 +503,12 @@ $$
 The augmented system and desired polynomial are
 
 $$
-A_a = \begin{bmatrix} A & 0 \\ [1\;0\;0\;0] & 0 \end{bmatrix},\quad B_a = \begin{bmatrix} B \\ 0 \end{bmatrix},\quad \Delta_d(s) = (s^2 + 5.6s + 16)(s + 12)(s + 15)(s + 5) \tag{E39}
+A_a = \begin{bmatrix} A & 0 \\ [1\;0\;0\;0] & 0 \end{bmatrix},\quad B_a = \begin{bmatrix} B \\ 0 \end{bmatrix},\quad \Delta_d(s) = (s^2 + 5.4s + 12.96)(s + 10.8)(s + 13.5)(s + 5) \tag{E39}
 $$
 
 **Where it comes from:** (E1) with (E38) appended as a fifth state equation. The extra pole at −5 is chosen near the dominant pair, so the integrator acts within about 1 s without dominating the response.
 
-The same Steps 3–6 apply to this 5×5 system. In practice use `place(Aa, Ba, p)` and verify with eig. The result is K_a = [−5.04, 49.1, −2.08, 3.53, −6.87].
+The same Steps 3–6 apply to this 5×5 system. In practice use `place(Aa, Ba, p)` and verify with eig. The result is K_a = [−3.56, 38.0, −1.42, 3.15, −4.51].
 
 ---
 

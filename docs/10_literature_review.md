@@ -16,7 +16,7 @@ The brief says AI-generated references that have not been independently verified
 | 1 | K. Furuta, M. Yamakita, S. Kobayashi, "Swing-up control of inverted pendulum using pseudo-state feedback," *Proc. IMechE Part I*, vol. 206, no. 4, pp. 263–269, 1992. [doi:10.1243/PIME_PROC_1992_206_341_02](https://doi.org/10.1243/PIME_PROC_1992_206_341_02) | Record | Origin of the rotary pendulum work |
 | 2 | M. Gäfvert, "Modelling the Furuta Pendulum," Tech. Rep. TFRT-7574, Lund Inst. of Technology, 1998. [PDF](https://lucris.lub.lu.se/ws/files/4453844/8727127.pdf) | **Read** | Euler–Lagrange derivation; arm inertia; friction models; "parameters must be measured or identified" |
 | 3 | B. S. Cazzolato, Z. Prime, "On the Dynamics of the Furuta Pendulum," *J. Control Sci. Eng.*, vol. 2011, Art. 528341. [doi:10.1155/2011/528341](https://doi.org/10.1155/2011/528341) | Record (publisher blocked automated access; open access for you) | Full-inertia model; what simplified models neglect |
-| 4 | J. Á. Acosta, "Furuta's Pendulum: A Conservative Nonlinear Model for Theory and Practise," *Math. Probl. Eng.*, vol. 2010, Art. 742894. [doi:10.1155/2010/742894](https://doi.org/10.1155/2010/742894) | Record | Modelling approaches |
+| 4 | J. Á. Acosta, "Furuta's Pendulum: A Conservative Nonlinear Model for Theory and Practise," *Math. Probl. Eng.*, vol. 2010, Art. 742894. [doi:10.1155/2010/742894](https://doi.org/10.1155/2010/742894) | Record + abstract (**Aleksei's source**; full text blocked for automated access) | Modelling approaches; his LQR and 0.75 rad claim, once a person has read it |
 | 5 | A. Wadi, J.-H. Lee, L. Romdhane, "Dynamic Analysis of the Tilted Furuta Pendulum," *MATEC Web Conf.*, vol. 104, Art. 02011, 2017. [doi:10.1051/matecconf/201710402011](https://doi.org/10.1051/matecconf/201710402011) | Record (**Aleksei's source**; site blocked access) | Equations of motion, if Aleksei confirms it fits: its subject is a *tilted* variant |
 | 6 | M. F. Hamza et al., "Current development on using Rotary Inverted Pendulum as a benchmark for testing linear and nonlinear control algorithms," *Mech. Syst. Signal Process.*, vol. 116, pp. 347–369, 2019. [doi:10.1016/j.ymssp.2018.06.054](https://doi.org/10.1016/j.ymssp.2018.06.054) | Record + abstract | **Main survey**: control objectives and controller classes |
 | 7 | O. Boubaker, "The Inverted Pendulum Benchmark in Nonlinear Control Theory: A Survey," *Int. J. Adv. Robot. Syst.*, vol. 10, no. 5, 2013. [doi:10.5772/55058](https://doi.org/10.5772/55058) | Record | Benchmark context |
@@ -40,6 +40,8 @@ The brief says AI-generated references that have not been independently verified
 | 25 | Makr Shakr, [Toni product page](https://www.makrshakr.com/toni) | **Read** | "80+ drinks/hour". A company claim: press figures vary |
 | 26 | Allied Motion, [CL Series datasheet](https://www.alliedmotion.com/wp-content/uploads/documents/Allied_Motion_Datasheet-CLSeries_20171002.pdf), 2017, CL40 model 16705 | **Read** | Rated current and torque, inductance |
 | 27 | Quanser, [QUBE-Servo 2 USB documentation](https://docs.quanser.com/quarc/documentation/qube_servo2_usb.html) | **Read** | ±15 V drive range, ±3 A current sense |
+| 28 | S. Barrios Valero, "Design and Implementation of a Furuta Pendulum Device for Benchmarking Non-Linear Control Methods," Bachelor's thesis, Univ. Zaragoza, 2016. [Record](https://zaguan.unizar.es/record/61249) | **Read** (§5.1) (**Aleksei's source**) | Pole placement in simulation: three poles, torque input, plot starts just above 0.1 rad. The 6° comes from that plot, not the text |
+| 29 | C. Baltazar, R. Gonzales, E. Manzano, "Furuta Pendulum Prototype Control: PID and State Feedback," *IEEE URUCON*, pp. 1–5, 2024. [doi:10.1109/URUCON63440.2024.10850206](https://doi.org/10.1109/URUCON63440.2024.10850206) | Record (**Aleksei's source**) | Not cited in the report |
 
 **Citation errors found while checking.** Crossref settles these, so use the versions above:
 
@@ -57,13 +59,13 @@ The rubric gives one point each for: context, why control is needed, a literatur
 
 **Context.** The rotary inverted pendulum is under-actuated, nonlinear and unstable, and has long been used to test control algorithms [6]. Under-actuated systems have more degrees of freedom than inputs, as with spacecraft, underwater vehicles and mobile robots, and new stabilisation methods are often validated on benchmarks like this one [9]. The Segway is a commercial relative of the same balancing problem [9]. Your annotation fits here: the device is small and can be built in a lab [10], so it is a practical test-bed.
 
-**Why control is needed.** Upright is an unstable equilibrium. Our model has a pole at +9.96 rad/s, and a pendulum released at 2° passes 15° in 0.26 s.
+**Why control is needed.** Upright is an unstable equilibrium. Our model has a pole at +12.09 rad/s, and a pendulum released at 2° passes 15° in 0.22 s.
 
 > **A correction to your annotation.** You wrote that the pendulum will never reach its upward equilibrium "if it does not have constant control effort". Two different things are mixed there:
 > - **Reaching** upright from hanging needs energy put in: that's the swing-up problem [8].
 > - **Staying** upright needs continuous *feedback*, not constant *effort*. At exact equilibrium the required voltage is zero (ū = 0), because gravity exerts no torque. The voltage only responds to deviations, but any deviation grows if left alone.
 
-**Your second annotation makes a strong framing.** The system is highly nonlinear, yet an LTI approximation can control it within a region. That is a good thesis for the report: it shows how linear design solves a useful region of a harder problem, and it gives a reason to report the region of attraction (22°).
+**Your second annotation makes a strong framing.** The system is highly nonlinear, yet an LTI approximation can control it within a region. That is a good thesis for the report: it shows how linear design solves a useful region of a harder problem, and it gives a reason to report the region of attraction (24°).
 
 **Existing control approaches** (the survey in [6] groups the objectives as swing-up, stabilisation, switching and tracking):
 
@@ -107,12 +109,12 @@ The rubric gives one point each for: context, why control is needed, a literatur
 
 | Plant | Stable? | 10° release | Tap, max \|α\| |
 | --- | --- | --- | --- |
-| Nominal (J_r `/3`, D 0.0015 / 0.0005) | Yes | Recovers | 15.1° |
-| J_r `/12` | Yes | Recovers | 9.5° |
-| D_r 0.0005, D_p 0.0001 [11] | Yes | Recovers | 19.3° |
-| D_r 0.001, D_p 0.00005 (Aleksei) | Yes | Recovers | 17.7° |
+| Nominal (J_r `/3`, D_r 0.0005, D_p 0.0001 [11]) | Yes | Recovers | 14.6° |
+| J_r `/12` [11] | Yes | Recovers | 8.3° |
+| D_r 0.001, D_p 0.00005 (Aleksei's earlier values) | Yes | Recovers | 13.4° |
+| D_r 0.0015, D_p 0.0005 | Yes, near marginal (max \|z\| 0.9996) | Slow wobble: 0.92° at the end, 1.0 V RMS | 12.7° |
 
-(These figures predate the switch to published damping and are refreshed at the next run.) So the design is robust, but **the tap result depends strongly on damping**, which is the least certain parameter. Gäfvert also notes significant real friction and that physically sound parameters come from measurement or identification [2].
+So the design stays stable on all of them, but **higher damping pushes it close to marginal**, and damping is the least certain parameter. Gäfvert also notes significant real friction and that physically sound parameters come from measurement or identification [2].
 
 **Limitations to discuss** (rubric: "limitations with respect to the real-world system"):
 

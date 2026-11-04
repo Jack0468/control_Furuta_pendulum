@@ -33,7 +33,7 @@ Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGB
 
 | File | Purpose |
 | --- | --- |
-| `run_all.m` | **Reproduces every result and figure** (about 7 min) |
+| `run_all.m` | **Reproduces every result and figure** (3–7 min) |
 | `furuta_params.m` | Physical, motor and encoder parameters |
 | `furuta_linmodel.m` | Linearised A, B, C, D about upright |
 | `furuta_nl.m` | Full nonlinear dynamics (truth model), with disturbance torques |
@@ -58,14 +58,15 @@ Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `fig
 
 ## Key numbers
 
-- **Open-loop poles:** 0, −17.73, **+9.96**, −4.06 rad/s. Released at 2°, the pendulum passes 15° in 0.26 s.
-- **Structure:** reachable (rank 4); observable from both encoders (rank 4). θ/V_m has a right-half-plane zero at **+8.97 rad/s** (non-minimum phase).
+- **Open-loop poles:** 0, −14.06, **+12.09**, −1.75 rad/s. Released at 2°, the pendulum passes 15° in 0.22 s.
+- **Structure:** reachable (rank 4); observable from both encoders (rank 4). θ/V_m has a right-half-plane zero at **+10.31 rad/s** (non-minimum phase).
 - **Sensors:** 512-CPR optical encoders in 4× quadrature. Resolution q = 3.07 mrad; quantisation noise σ = 0.886 mrad.
 - **Final design:**
-  - Controller poles −2.8 ± 2.86j, −12, −15, −5 (integrator).
+  - Controller poles −2.7 ± 2.38j, −10.8, −13.5, −5 (integrator).
   - Observer poles −100 … −130.
-  - 30° step: T_s 1.81 s without quantisation, 2.40 s with it (encoder ripple, see doc 05); overshoot 2.0%.
-  - Recovers from a 10° tilt in 0.96 s, using at most 8.6 V.
+  - 30° step: T_s 1.38 s, overshoot 1.4%, rise time 0.75 s (doc 05).
+  - Recovers from a 10° tilt in 0.97 s, using at most 6.6 V. A firm tap peaks at 14.6° (limit 15°).
+  - Phase margin 36°, gain margins ×0.59 and ×6.7. Stays upright on 31 of 40 random ±20% plants under a tap.
 
 ## Repository layout
 

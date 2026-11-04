@@ -2,7 +2,7 @@
 """Compile the LaTeX report to a PDF and check it against the submission rules.
 
 Usage (from anywhere):
-    python report/build.py            draft: blue/red/orange marks visible
+    python report/build.py            draft: blue/orange marks visible
     python report/build.py --final    submission version: all marks hidden
     python report/build.py --open     also open the PDF when done
     python report/build.py --package  also zip the MATLAB code for Canvas
@@ -42,13 +42,12 @@ def check_source(tex):
     no_comments = re.sub(r"(?m)(?<!\\)%.*$", "", tex)
     issues = {
         "AI-drafted blocks still to rewrite (blue)": no_comments.count(r"\begin{rw}"),
-        "numbers pending the pole decision (red)": no_comments.count(r"\pend{") - 1,
-        "items to verify (orange)": no_comments.count(r"\vfy{") - 1,
+        "items to verify (orange)": no_comments.count(r"\vfy{"),
     }
     abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", no_comments, re.S)
     words = None
     if abstract:
-        text = re.sub(r"\\(begin|end)\{rw\}|\\pend\{|\\[a-zA-Z]+\{\}|\\[a-zA-Z]+|[{}$]", " ", abstract.group(1))
+        text = re.sub(r"\\(begin|end)\{rw\}|\\[a-zA-Z]+\{\}|\\[a-zA-Z]+|[{}$]", " ", abstract.group(1))
         words = len(text.split())
     keywords = re.search(r"\\begin\{IEEEkeywords\}(.*?)\\end\{IEEEkeywords\}", no_comments, re.S)
     n_keywords = len(keywords.group(1).split(",")) if keywords else 0

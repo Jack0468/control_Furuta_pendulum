@@ -14,52 +14,53 @@ The gains are computed with `K = place(A, B, p)`. The system is reachable (rank 
 
 ## 2. Candidate designs: results from `week10_state_feedback.m`
 
-All designs use ζ = 0.7 for the dominant pair. The columns are measured on the linear model, except "Max α₀", which comes from the nonlinear plant with ±10 V saturation.
+The columns are measured on the linear model, except "Max α₀", which comes from the nonlinear plant with ±10 V saturation. D1–D3 use ζ = 0.7 for the dominant pair; D4 uses ζ = 0.75.
 
 | Design | Poles | K = [k_θ, k_α, k_θ̇, k_α̇] | t_r (s) | T_s (s) | OS (%) | Undershoot (%) | \|V\| at α₀ = 10° | Max α₀ recovered |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| D1 aggressive | −2.8 ± 2.86j, −30, −40 | [−9.16, 122, −4.38, 7.95] | 0.48 | 1.57 | 5.2 | 8.8 | 21.4 V | 27° |
-| **D2 moderate** | −2.8 ± 2.86j, −12, −15 | [−1.37, 32.6, −1.07, 2.23] | 0.52 | 1.67 | 4.7 | 4.9 | 5.7 V | 28° |
-| D3 slow | −2.1 ± 2.14j, −12, −15 | [−0.773, 28.6, −0.844, 1.92] | 0.70 | 2.17 | 4.7 | 3.0 | 5.0 V | 29° |
-| LQR, Q = diag(5,1,0,0), R = 1 | −4.29 ± 2.87j, −9.99, −17.6 | [−2.24, 40.1, −1.49, 2.85] | 0.51 | 0.97 | 0.8 | 6.6 | 7.0 V | 27° |
+| D1 aggressive | −2.8 ± 2.86j, −30, −40 | [−9.16, 110, −3.94, 7.95] | 0.48 | 1.55 | 5.2 | 7.6 | 19.2 V | 27° |
+| D2 moderate | −2.8 ± 2.86j, −12, −15 | [−1.37, 30.3, −0.838, 2.44] | 0.52 | 1.65 | 4.7 | 4.0 | 5.3 V | 30° |
+| D3 slow | −2.1 ± 2.14j, −12, −15 | [−0.773, 27.1, −0.624, 2.14] | 0.70 | 2.15 | 4.7 | 2.4 | 4.7 V | 30° |
+| **D4 final** | −2.7 ± 2.38j, −10.8, −13.5 | [−0.902, 26.6, −0.674, 2.11] | 0.64 | 1.76 | 2.8 | 2.9 | 4.6 V | 30° |
+| LQR, Q = diag(5,1,0,0), R = 1 | −3.96 ± 3.46j, −12.6, −13.5 | [−2.24, 34.5, −1.14, 2.82] | 0.43 | 1.24 | 2.8 | 5.8 | 6.0 V | 28° |
 
 ### Interpretation
 
-- **D1** nearly meets the timing requirement, but it demands 21.4 V for a 10° offset, far above the 10 V limit, so it saturates immediately.
-- **D3** meets the 2.5 s limit (T_s = 2.17 s), but with no margin to spare once encoder ripple is added.
-- **D2** meets the timing requirements and uses 5.7 V at a 10° offset, inside the 6 V target. It is the recommended baseline.
-- **LQR** is the fastest (0.97 s) with 6.6% undershoot, but uses 7.0 V, just over the 6 V target. It is a good comparison to discuss pole placement versus optimal control.
-- The region of attraction (27–29°) is much larger than the linear validity range (15°). The nonlinear plant is more forgiving than the linear model suggests.
+- **D1** demands 19.2 V for a 10° offset, far above the 10 V limit, misses the 5% overshoot limit, and recovers from a smaller angle than the others.
+- **D3** meets the 2.5 s limit (T_s = 2.15 s), with the least margin.
+- **D2 and D4** both meet the criteria. D4 has less overshoot and voltage, and it does better than D2 once the integrator and observer are in the loop (§3c), so it is the final design (D-19).
+- **LQR** is the fastest (1.24 s), with 5.8% undershoot and 6.0 V. It is a good comparison to discuss pole placement versus optimal control.
+- The region of attraction (27–30°) is much larger than the linear validity range (15°). The nonlinear plant is more forgiving than the linear model suggests.
 
-## 3. D2 on the nonlinear plant
+## 3. D4 on the nonlinear plant (true state, no integrator)
 
 See `figures/w10_nonlinear_tests.png`.
 
 | Test | Result | Requirement |
 | --- | --- | --- |
-| α₀ = 10° recovery | max \|V\| = 5.7 V; arm swings to −43°; α within ±1° after 1.05 s | R2 met, R5 met, R9 met |
-| 30° arm step | max \|V\| = 0.7 V; small undershoot, then 4.6% overshoot | R3 met |
-| Pendulum tap (20 mN·m, 20 ms) | max \|α\| = 8.4°; arm swings to ±61°; max \|V\| = 7.5 V | R6 met, R9 met |
-| Constant arm drag (2 mN·m) | **Arm settles 16.7° off target** | **R7 fails** |
-| ±20% parameter sweep (linear) | All closed-loop poles stay in the LHP (slowest −2.17 rad/s, for D_r × 1.2) | R8 met for stability |
+| α₀ = 10° recovery | max \|V\| = 4.6 V | R5 met |
+| 30° arm step | max \|V\| = 0.5 V | R5 met |
+| Pendulum tap (20 mN·m, 20 ms) | max \|α\| = 8.0°; max \|V\| = 7.3 V | R5, R6 met |
+| Constant arm drag (2 mN·m) | **Arm settles 25.7° off target** | **R7 fails** |
+| ±20% parameter sweep (linear) | All closed-loop poles stay in the LHP (slowest −2.23 rad/s, for k_m × 1.2) | R8 met for stability |
 
-**Why R7 fails:** the steady-state arm offset is τ_d / (k_θ k_m / R_m). With D2's k_θ = 1.37 V/rad, a 2 mN·m drag gives 0.29 rad (16.7°). There are two possible fixes:
+**Why R7 fails:** the steady-state arm offset is τ_d / (k_θ k_m / R_m). With k_θ = 0.90 V/rad, a 2 mN·m drag gives about 0.44 rad (25°). There are two possible fixes:
 
-1. **Integral action (recommended).** Augment the state with x_i = ∫(θ − r) dt and place 5 poles. Result with poles [D2, −5]: K_a = [−5.04, 49.1, −2.08, 3.53, −6.87]. Under the tap and drag test the **steady-state θ error is 0.00°**, with max \|α\| = 12.4°, max \|θ\| = 45.6°, and max \|V\| = 10.0 V (brief saturation). See `figures/w10_integral_action.png`.
+1. **Integral action (chosen).** Augment the state with x_i = ∫(θ − r) dt and place 5 poles. Result with poles [D4, −5]: K_a = [−3.56, 38.0, −1.42, 3.15, −4.51]. Under the tap and drag test the final θ error is 0.00° with the true state, with max \|α\| = 11.3°, max \|θ\| = 45.3° and max \|V\| = 9.8 V. See `figures/w10_integral_action.png`.
 2. A faster θ loop (larger k_θ). This reduces the offset but never removes it, and it costs voltage.
 
 ```matlab
 Aa = [A zeros(4,1); 1 0 0 0 0];   % xi_dot = theta - r
 Ba = [B; 0];
-Ka = place(Aa, Ba, [-2.8+2.86i, -2.8-2.86i, -12, -15, -5]);
+Ka = place(Aa, Ba, [-2.7+2.38i, -2.7-2.38i, -10.8, -13.5, -5]);
 % Final control law (type-1 servo): u = -Ka(1:4)*x - Ka(5)*xi
 ```
 
-**Recommended Week 10 design: D2 + integrator.**
+**Final design: D4 + integrator.**
 
-### 3a. How the reference enters: type-1 servo (fixed 2026-10-29)
+### 3a. How the reference enters: type-1 servo
 
-The first version fed the reference twice: through u = −K_a[x − x_r; ξ] *and* through the integrator ξ̇ = θ − r. On a 30° step this gave **57% overshoot**. The disturbance tests above did not show it, because they use r = 0.
+The first version fed the reference twice: through u = −K_a[x − x_r; ξ] *and* through the integrator ξ̇ = θ − r. On a 30° step this gave very large overshoot (57% with the gains of the time). The disturbance tests above did not show it, because they use r = 0.
 
 The fix is the standard type-1 servo structure (Ogata, *Modern Control Engineering*, "servo system with integrator"), where r enters **only** through the integrator:
 
@@ -67,18 +68,14 @@ $$
 u = -K_x x - k_i\xi,\qquad \dot\xi = \theta - r
 $$
 
-With the same gains, the linear step response becomes T_s 1.80 s, OS 2.5%, US 2.2%, with about one-seventh of the initial voltage. On the nonlinear plant with the observer, OS is 2.0% and T_s is 1.81 s without quantisation, or 2.40 s with it (doc 05, V2).
+With the final gains on the linear model (`week12_validation.m`, V9):
 
-Feeding a fraction N_r·K_x(1) of the reference forward trades speed for overshoot:
-
-| N_r | T_s | OS | US |
+| Reference path | T_s | OS | US |
 | --- | --- | --- | --- |
-| 1 (original) | 2.04 s | 57.5% | 14.4% |
-| 0.5 | 1.64 s | 14.7% | 7.8% |
-| 0.25 | 1.67 s | 4.2% | 4.6% |
-| **0 (chosen)** | 1.80 s | 2.5% | 2.2% |
+| Integrator and K_x(1) | 1.82 s | 50.7% | 9.5% |
+| **Integrator only (chosen)** | 1.43 s | 1.7% | 1.3% |
 
-Produced by `scratch/ref_structure.m`, which is not part of the public repo.
+On the nonlinear plant with the observer, OS is 1.4% and T_s is 1.43 s without quantisation, or 1.38 s with it (doc 05, V2).
 
 ### 3b. Where Aleksei's poles come from
 
@@ -98,22 +95,22 @@ His published K = [−0.90, 26.37, −0.77, 2.14] can't be compared directly wit
 
 ### 3c. Comparing the two pole sets on the updated model
 
-Same integrator (−5), published damping, spin term included, quantised encoders.
+Same integrator (−5), published damping, spin term included, quantised encoders, observer −100…−130 (`week12_validation.m`, V8).
 
-| Observer −100…−130 | Ours (D2) | Aleksei's |
+| | Ours (D2) | Aleksei's (D4) |
 | --- | --- | --- |
 | K_x | [−4.85, 43.5, −1.75, 3.64] | [−3.56, 38.0, −1.42, 3.15] |
 | k_i | −6.87 | −4.51 |
-| Step: T_s, quantised / unquantised | 1.97 / 1.79 s | **1.38 / 1.43 s** |
-| Step: rise, overshoot, undershoot | 0.65 s, 2.8%, 1.5% | 0.75 s, 1.4%, 1.3% |
-| 10° release: time to \|α\| < 1°, peak voltage | 0.94 s, 7.6 V | 0.97 s, **6.6 V** |
-| Tap: max \|α\|, peak voltage | 15.0°, 9.7 V | **14.6°**, 9.0 V |
-| Arm drag: final error | 0.14° | 0.21° |
-| Noise: RMS voltage, arm ripple | 0.25 V, 0.88° | **0.22 V, 0.58°** |
-| Unstable of 300 ±20% plants | 0 | 0 |
-| Phase margin; gain margins | 37°; ×0.57, ×6.4 | 36°; ×0.59, ×6.7 |
+| Step: T_s | 1.97 s | **1.38 s** |
+| Step: overshoot | 2.8% | **1.4%** |
+| Step: arm ripple, peak to peak | 0.81° | **0.71°** |
+| 10° release: peak voltage | 7.6 V | **6.6 V** |
+| Tap: max \|α\|, peak voltage | 15.0°, 9.7 V | **14.6°, 9.0 V** |
+| Noise: RMS voltage | 0.249 V | **0.216 V** |
 
-**Recommendation: adopt Aleksei's poles.** They clear the tap limit with less voltage and less ripple. Their ripple stays inside the ±0.6° settling band, so the settling time isn't inflated. His rise-time target of ≤ 0.5 s isn't met with the integrator-only reference path (0.75 s), so that target shouldn't be used. The switch is one line in `furuta_design.m`, and it awaits the team's decision (I-09).
+**Decision (D-19): Aleksei's poles adopted.** They clear the tap limit with less voltage and less ripple, and they settle sooner. His rise-time target of ≤ 0.5 s isn't met with the integrator-only reference path (0.75 s), so that target isn't used. They are set in `furuta_design.m`.
+
+**His observer (checked 2026-11-04).** His Simulink uses observer poles −40, −45, −50, −55 with no integrator or disturbance model. In our full loop, those poles give a 20.4° tap (limit 15°) and 10/200 unstable plants, against 14.6° and 3/200 for −100…−130 (`week11_kalman.m`). We keep −100…−130 (LOGBOOK D-20).
 
 ## 4. Observer (Week 11): design and results
 
@@ -131,33 +128,34 @@ $$
 
 **Final gains:**
 
-- K_x = [−5.036, 49.09, −2.083, 3.527] and k_i = −6.871, from controller poles −2.8 ± 2.86j, −12, −15, −5.
-- Observer poles −100, −110, −120, −130 rad/s.
+- K_x = [−3.561, 38.01, −1.423, 3.146] and k_i = −4.508, from controller poles −2.7 ± 2.38j, −10.8, −13.5, −5.
+- Observer poles −100, −110, −120, −130 rad/s, 7.4–9.6× the fastest controller pole.
 
-**Separation principle (verified).** The eigenvalues of the full sampled closed loop, with states [x; ξ; x̂], equal those of the controller plus those of the observer to 2.8 × 10⁻¹³. Largest |z| = 0.9972, so the loop is stable.
+**Separation principle (verified).** The eigenvalues of the full sampled closed loop, with states [x; ξ; x̂], equal those of the controller plus those of the observer to 1.5 × 10⁻¹³. Largest |z| = 0.9973, so the loop is stable.
 
 ### Choosing the observer poles
 
-Test: start at α₀ = 5° with x̂₀ = 0; quantised encoders; small random torques. The robustness column is the linear sampled loop on 500 plants with all parameters ±20%.
+Test: start at α₀ = 5° with x̂₀ = 0; quantised encoders; small random torques (`week11_observer.m`). The tap and robustness columns come from `week11_kalman.m`: the robustness count is the linear sampled loop on 200 plants with all parameters ±20%.
 
-| Observer poles | Error < 2% after | RMS u (V) | RMS α̇ error (deg/s) | Unstable / 500 |
-| --- | --- | --- | --- | --- |
-| −15…−18 | 0.56 s | 0.048 | 0.46 | 114 |
-| −40…−55 | 0.22 s | 0.098 | 0.83 | 27 |
-| **−100…−130 (chosen)** | 0.98 s (noise floor) | 0.244 | 2.79 | **6** |
-| −250…−280 | 1.89 s (noise floor) | 0.541 | 7.33 | not run |
+| Observer poles | Error < 2% after | RMS u (V) | RMS α̇ error (deg/s) | Tap: max \|α\| | Unstable / 200 |
+| --- | --- | --- | --- | --- | --- |
+| −15…−18 | 0.53 s | 0.046 | 0.57 | falls | 52 |
+| −40…−55 | 0.22 s | 0.095 | 1.09 | 20.4° | 10 |
+| **−100…−130 (chosen)** | 0.37 s (noise floor) | 0.210 | 2.93 | 14.6° | **3** |
+| −250…−280 | 0.40 s (noise floor) | 0.494 | 7.83 | 12.7° | 2 |
+| True state | — | — | — | 11.4° | 1 |
 
-**Why fast poles were chosen (LOGBOOK D-10).** A slow observer gives smooth estimates but badly erodes robustness. The plants it fails on have a weaker motor than modelled (k_m low, R_m high). With full-state feedback 0 of the 500 plants are unstable. This is the known result that observer-based feedback has no guaranteed robustness margins (Doyle, 1978). −100…−130 recovers most of the robustness, at a cost of 0.24 V RMS of noise and about 1° peak-to-peak of arm ripple from quantisation. With x̂₀ = 0 it also hits the 10 V limit briefly at start-up in this test, because of the large initial estimation error. This choice should be reviewed against −40…−55 (27/500 unstable, 0.10 V RMS); see LOGBOOK I-08.
+**Why fast poles were chosen (LOGBOOK D-10, D-20).** A slow observer gives smooth estimates, but it reacts too late to a tap and badly erodes robustness. The plants it fails on have a weaker motor than modelled (k_m low, R_m high). This is the known result that observer-based feedback has no guaranteed robustness margins (Doyle, 1978). −100…−130 is the slowest set tested that meets the tap limit, at a cost of 0.22 V RMS of noise and about 0.7° peak-to-peak of arm ripple from quantisation. With x̂₀ = 0 it also hits the 10 V limit briefly at start-up, because of the large initial estimation error.
 
-**Velocity estimates vs differentiation.** Differentiating the encoder gives a 30 deg/s RMS error in α̇, because one count per sample is 176 deg/s. The observer gives 2.8 deg/s (`figures/w11_velocity_estimate.png`).
+**Velocity estimates vs differentiation.** Differentiating the encoder gives a 29 deg/s RMS error in α̇, because one count per sample is 176 deg/s. The observer gives 2.9 deg/s (`figures/w11_velocity_estimate.png`).
 
-**Cost of the observer.** It reacts later than full-state feedback to a sudden disturbance. A 20 mN·m, 20 ms tap gives max |α| = 15.1° with the observer, against 12.4° with the true state. The region of attraction is 22°, against 28° for D2 with the true state.
+**Cost of the observer.** It reacts later than full-state feedback to a sudden disturbance. A 20 mN·m, 20 ms tap gives max |α| = 14.6° with the observer, against 11.4° with the true state. The region of attraction is 24°, against 30° for the same poles with the true state. The phase margin is 36°, against 59° (`week12_margins.m`).
 
-**A Kalman filter offers a different trade-off.** It is modestly quieter for a similar tap response, but not clearly better overall: see [doc 09](09_kalman_filter.md). The choice between them is open decision D-12.
+**A Kalman filter offers a different trade-off.** It is modestly quieter for a similar tap response, but not clearly better overall: see [doc 09](09_kalman_filter.md). The report uses the pole-placed observer (D-12, option A).
 
 ## 5. Discussion points for Assessment 2
 
-- **Fundamental limitations:** the RHP pole p = 9.96 sets a minimum bandwidth for stabilisation, and the RHP zero z = 8.97 in θ/V_m sets a maximum bandwidth for θ tracking. Because z < p for the θ channel, the second measurement α is essential.
-- **Saturation versus aggressiveness:** compare D1 and D2. Faster poles give no gain in recovery angle (27° versus 28°) for 3.8× the voltage.
-- **Model validity:** the controller recovers from 28° even though the linearisation is accurate only to about 15°.
+- **Fundamental limitations:** the RHP pole p = 12.09 sets a minimum bandwidth for stabilisation, and the RHP zero z = 10.31 in θ/V_m sets a maximum bandwidth for θ tracking. Because z < p for the θ channel, the second measurement α is essential.
+- **Saturation versus aggressiveness:** compare D1 and D4. Faster poles give no gain in recovery angle (27° versus 30°) for 4.2× the voltage.
+- **Model validity:** with the true state the controller recovers from 30° (24° with the observer) even though the linearisation is accurate only to about 15°.
 - **Uncertainty:** D_r and D_p are the least certain parameters. Show stability margins under ±50% changes to them.

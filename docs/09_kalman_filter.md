@@ -135,8 +135,8 @@ $$
 
 **Checks in the code:**
 
-- L from (K11) matches MATLAB's `kalman()` to 3 × 10⁻¹⁴.
-- With the matched Q_w, the predicted steady-state error standard deviations are: θ: 0.16 mrad; α: 0.17 mrad; θ̇: 4.3 mrad/s; α̇: 5.1 mrad/s.
+- L from (K11) matches MATLAB's `kalman()` to 2 × 10⁻¹⁴.
+- With the matched Q_w, the predicted steady-state error standard deviations are: θ: 0.16 mrad; α: 0.18 mrad; θ̇: 4.7 mrad/s; α̇: 5.8 mrad/s.
 
   The angle errors are **smaller than the sensor's own σ_v = 0.89 mrad**. The filter averages the model and the measurements, which is the point of using it.
 
@@ -144,7 +144,7 @@ $$
 
 ## 5. Results: Kalman vs pole placement
 
-Each observer was tested with the same controller (D2 + integrator, type-1 servo) on the nonlinear plant with quantised encoders:
+Each observer was tested with the same controller (final poles + integrator, type-1 servo) on the nonlinear plant with quantised encoders:
 
 - **Noise test:** random torques σ = [0.2, 0.05] mN·m for 5 s. Measures RMS voltage and RMS α̇-estimate error.
 - **Tap test:** 20 mN·m for 20 ms on the pendulum. Measures max |α|.
@@ -154,33 +154,34 @@ Kalman rows scale Q_w by s², i.e. σ scaled by s.
 
 | Observer | Slowest observer pole (rad/s) | RMS u (V) | RMS α̇ error (deg/s) | Tap: max \|α\| | Tap: max \|u\| (V) | Unstable / 200 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Kalman, Q × 0.09 | −8.5 | 0.048 | 0.52 | **falls** (177°) | 10.0 | 43 |
-| Kalman, Q × 1 (matched) | −12.7 ± 10.8j | 0.058 | 0.60 | **falls** (278°) | 10.0 | 22 |
-| **Kalman, Q × 100** (σ_d = 2 mN·m) | −36.9 | **0.144** | 2.31 | 16.0° | 9.48 | **4** |
-| **Kalman, Q × 10⁴** (σ_d = 20 mN·m) | −115.8 | 0.507 | 9.30 | **13.5°** | 10.0 | **2** |
-| Kalman, Q × 10⁶ | −364.1 | 1.613 | 29.7 | 12.9° | 10.0 | 1 |
-| Kalman, Q × 10⁸ | −667.2 | 3.546 | 84.6 | 13.6° | 10.0 | 1 |
-| Poles −15…−18 | −15 | 0.048 | 0.47 | falls (286°) | 10.0 | 55 |
-| Poles −40…−55 | −40 | 0.100 | 0.85 | 19.3° | 8.74 | 10 |
-| **Poles −100…−130 (current design)** | −100 | 0.248 | 2.75 | 15.1° | 9.71 | 2 |
-| Poles −250…−280 | −250 | 0.568 | 7.55 | 13.7° | 10.0 | 2 |
+| Kalman, Q × 0.09 | −8.4 | 0.043 | 0.56 | **falls** (318°) | 10.0 | 43 |
+| Kalman, Q × 1 (matched) | −12.6 ± 10.9j | 0.053 | 0.74 | **falls** (323°) | 10.0 | 23 |
+| **Kalman, Q × 100** (σ_d = 2 mN·m) | −36.9 | **0.148** | 2.69 | 15.4° | 8.87 | **3** |
+| **Kalman, Q × 10⁴** (σ_d = 20 mN·m) | −115.8 | 0.483 | 9.68 | **12.5°** | 9.85 | **2** |
+| Kalman, Q × 10⁶ | −364.1 | 1.531 | 30.6 | 11.8° | 10.0 | 2 |
+| Kalman, Q × 10⁸ | −667.2 | 3.832 | 90.6 | 12.7° | 10.0 | 1 |
+| Poles −15…−18 | −15 | 0.045 | 0.53 | falls (320°) | 10.0 | 52 |
+| Poles −40…−55 | −40 | 0.095 | 1.05 | 20.4° | 8.08 | 10 |
+| **Poles −100…−130 (final design)** | −100 | 0.216 | 2.94 | 14.6° | 8.97 | 3 |
+| Poles −250…−280 | −250 | 0.498 | 7.84 | 12.7° | 9.76 | 2 |
+| True state, no observer | — | — | — | 11.4° | — | 1 |
 
 ![Observer trade-off](../figures/w11_kalman_tradeoff.png)
 
 ### What the results show
 
 1. **Kalman and pole placement are close; Kalman is modestly quieter.** Compare neighbours on the plot.
-   - Kalman Q×100 vs poles −100: 42% less voltage noise (0.144 vs 0.248 V), but a slightly larger tap response (16.0° vs 15.1°) and 4 unstable plants against 2.
-   - Kalman Q×10⁴ vs poles −250: slightly better noise and tap (0.507 vs 0.568 V, 13.5° vs 13.7°), with the same 2 unstable plants.
+   - Kalman Q×100 vs poles −100: 31% less voltage noise (0.148 vs 0.216 V), but a larger tap response (15.4° vs 14.6°), which misses the 15° limit. Both leave 3 plants unstable.
+   - Kalman Q×10⁴ vs poles −250: slightly better noise and tap (0.483 vs 0.498 V, 12.5° vs 12.7°), with the same 2 unstable plants.
 
-   The Kalman gain weights each measurement channel according to how noise actually enters (through G), which helps a little. With 200 plants, a difference of 2 unstable plants is too small to rank them on robustness.
+   The Kalman gain weights each measurement channel according to how noise actually enters (through G), which helps a little. With 200 plants, a difference of 1 or 2 unstable plants is too small to rank them on robustness.
 2. **"Optimal" is only optimal for the stated noise.** The matched filter (Q×1) assumes torques of about 0.2 mN·m. A 20 mN·m tap is 100× larger, so the filter treats the measured angle change as sensor noise and reacts too late; the pendulum falls. **Q has to cover everything unmodelled**: taps, friction, and parameter error.
 3. **A physically sensible Q exists.** Q×10⁴ means "expect unknown torques of about 20 mN·m on the arm and 5 mN·m on the pendulum", the size of the tap we test with. It gives:
-   - tap response 13.5°, inside the R6 limit;
+   - tap response 12.5°, inside the R6 limit;
    - 2 unstable plants out of 200;
-   - voltage noise 0.51 V RMS (about 5% of the 10 V range), which is a real cost for a motor.
-4. **Meeting R6 costs noise with either method.** Poles −100…−130 miss it by 0.1° at 0.25 V RMS; Q×10⁴ and poles −250 meet it at 0.5–0.6 V RMS. Full-state feedback in the same sampled test gives 12.4°.
-5. **Matched Q does not minimise the α̇ error in simulation.** The slow pole-placed observer gets 0.47 deg/s against 0.60 deg/s. The Kalman filter minimises the total error variance *under its assumptions*, and two of those are broken here: quantisation near rest is not white, and the plant is nonlinear and in closed loop. This is worth one sentence in the report as an honest limitation.
+   - voltage noise 0.48 V RMS (about 5% of the 10 V range), which is a real cost for a motor.
+4. **The final pole-placed observer meets R6 for less noise than that.** Poles −100…−130 reach 14.6° at 0.22 V RMS. Kalman Q×100 misses by 0.4° at 0.15 V RMS. Full-state feedback in the same sampled test gives 11.4°.
+5. **Matched Q does not minimise the α̇ error in simulation.** The slow pole-placed observer gets 0.53 deg/s against 0.74 deg/s. The Kalman filter minimises the total error variance *under its assumptions*, and two of those are broken here: quantisation near rest is not white, and the plant is nonlinear and in closed loop. This is worth one sentence in the report as an honest limitation.
 
 ---
 
@@ -188,11 +189,11 @@ Kalman rows scale Q_w by s², i.e. σ scaled by s.
 
 | Option | Observer | For | Against |
 | --- | --- | --- | --- |
-| **A** | Keep a pole-placed observer as the assessed design; present Kalman as an extension / innovation section | "Observer-based state feedback as learned in this unit" is unambiguously met; the Kalman section shows initiative | — |
-| **B** | Adopt Kalman Q×100 | 42% less voltage noise than poles −100…−130 | Slightly larger tap response; uses a method that may be outside the unit |
-| **C** | Adopt Kalman Q×10⁴ | Meets R6 | 2× the voltage noise of the current design |
+| **A (used in the report)** | Keep a pole-placed observer as the assessed design; present Kalman as an extension / innovation section | "Observer-based state feedback as learned in this unit" is unambiguously met, and it meets R6; the Kalman section shows initiative | — |
+| **B** | Adopt Kalman Q×100 | 31% less voltage noise than poles −100…−130 | Misses R6 by 0.4°; uses a method that may be outside the unit |
+| **C** | Adopt Kalman Q×10⁴ | Meets R6 with more margin | 2.2× the voltage noise of the final design |
 
-**Suggested:** Option A. On these numbers the Kalman filter gives no decisive advantage that would justify replacing the unit's own method, but the comparison is good "innovation" content. Recording the choice in the LOGBOOK closes D-12.
+**Used:** option A. On these numbers the Kalman filter gives no decisive advantage that would justify replacing the unit's own method, but the comparison is good "innovation" content.
 
 ---
 
@@ -201,7 +202,7 @@ Kalman rows scale Q_w by s², i.e. σ scaled by s.
 - **Quantisation is not white near rest.** R from (K6) understates its correlation. The simulations use exact rounding, so the *results* are honest; only the filter's assumptions are approximate.
 - **Model mismatch.** The Kalman filter offers no guaranteed robustness margins; LQG-type designs can have arbitrarily small ones [4]. Robustness has to be checked, as done in §5. The counts use the linear sampled loop; a nonlinear Monte Carlo like V6 should be rerun for whichever observer is chosen.
 - **Q was tuned with one scale factor.** The arm-to-pendulum noise ratio stayed fixed (4:1). A 2-D sweep might do better.
-- **Disturbance-estimating Kalman filter (next step for R6).** Add the pendulum torque as a fifth state (a random walk) so the filter *estimates* the tap and the controller can cancel it. This is the most promising route to R6 without the noise of Q×10⁶.
+- **Disturbance-estimating Kalman filter (future work).** Add the pendulum torque as a fifth state (a random walk) so the filter *estimates* the tap and the controller can cancel it. This could widen the small 0.4° margin on R6 without the noise of Q×10⁶.
 - **Current-form filter.** Using y_k to update x̂_k before computing u_k would remove the one-sample delay of the predictor form.
 
 ## References

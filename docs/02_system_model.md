@@ -300,7 +300,7 @@ $$
 Numerical values with the nominal parameters (from `furuta_linmodel.m`):
 
 $$
-A = \begin{bmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 55.153 & -6.2835 & -1.8159 \\ 0 & 168.58 & -6.2104 & -5.5506 \end{bmatrix},\qquad
+A = \begin{bmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 55.153 & -2.6089 & -0.36318 \\ 0 & 168.58 & -2.5786 & -1.1101 \end{bmatrix},\qquad
 B = \begin{bmatrix} 0 \\ 0 \\ 18.373 \\ 18.159 \end{bmatrix}
 $$
 
@@ -350,27 +350,27 @@ For a uniform bar reaching the joint with the motor anywhere between cases A and
 
 | Property | Result | Meaning |
 | --- | --- | --- |
-| Open-loop poles | 0, −17.73, **+9.96**, −4.06 rad/s | Unstable. The time constant is 100 ms; from 2° the pendulum passes 15° in 0.26 s |
+| Open-loop poles | 0, −14.06, **+12.09**, −1.75 rad/s | Unstable. The time constant is 83 ms; from 2° the pendulum passes 15° in 0.22 s |
 | Reachability | rank 4 / 4 | All poles can be placed with V_m |
 | Observability (θ, α) | rank 4 / 4 | An observer can estimate θ̇ and α̇ |
 | Observability (θ only) | rank 4 / 4 | θ alone is enough in theory; α improves conditioning |
 | Observability (α only) | rank 3 / 4 | θ cannot be recovered from α (θ is a free integrator) |
-| Zeros of θ / V_m | **+8.97**, −12.72 rad/s | Non-minimum phase: the arm initially moves the wrong way, which limits θ tracking bandwidth |
-| cond(ctrb) | ≈ 3 × 10⁴ | Use `place`/`lqr`, not Ackermann by hand |
+| Zeros of θ / V_m | **+10.31**, −11.06 rad/s | Non-minimum phase: the arm initially moves the wrong way, which limits θ tracking bandwidth |
+| cond(ctrb) | ≈ 3.7 × 10³ | Use `place`/`lqr`, not Ackermann by hand |
 
 ### Sensitivity of the unstable pole to ±20% parameter error
 
 | Parameter | × 0.8 | × 1.2 |
 | --- | --- | --- |
-| m_p | 9.31 | 10.48 |
-| L_p | 10.32 | 9.51 |
-| L_r | 9.79 | 10.08 |
-| R_m | 9.95 | 9.96 |
-| k_m | 9.97 | 9.94 |
-| D_r | 10.02 | 9.90 |
-| D_p | 10.37 | 9.56 |
+| m_p | 11.67 | 12.46 |
+| L_p | 13.33 | 11.13 |
+| L_r | 11.94 | 12.19 |
+| R_m | 12.07 | 12.11 |
+| k_m | 12.13 | 12.06 |
+| D_r | 12.14 | 12.05 |
+| D_p | 12.20 | 11.99 |
 
-The unstable pole stays between 9.3 and 10.5 rad/s, so the model is structurally robust. The pendulum mass and the damping coefficients matter most.
+The unstable pole stays between 11.1 and 13.3 rad/s, so the model is structurally robust. The pendulum length and mass matter most.
 
 ## 6. Open-loop simulations (Lab 9 A2)
 

@@ -17,7 +17,7 @@
 1. **Similarity to lecture examples: resolved.** The tutor confirmed the Furuta pendulum is allowed (2026-10-29).
    Original concern: The cart–pole inverted pendulum is a common lecture or tutorial example. The Furuta pendulum is a different plant: it is rotary, the arm and pendulum are coupled through Coriolis and centripetal terms, and the motor's back-EMF enters the model. Even so, get explicit approval. If the tutor says no, fall-back plants that reuse most of this work are a reaction-wheel pendulum or a ball-and-beam.
 2. **The linear model is local.** It is valid for roughly |α| < 15°. The scope is therefore *balance plus arm positioning, starting near upright*. Swing-up from hanging is a stretch goal and is not needed for the assessment.
-3. **The unstable pole is fast** (+9.96 rad/s), and the input saturates at ±10 V. This limits how large a disturbance can be recovered. That is a feature for the Assessment 2 discussion, not a blocker.
+3. **The unstable pole is fast** (+12.09 rad/s), and the input saturates at ±10 V. This limits how large a disturbance can be recovered. That is a feature for the Assessment 2 discussion, not a blocker.
 
 ## 2. Scope
 
@@ -76,7 +76,7 @@ Suggested split for a group of two:
 | Tutor rules the plant too close to a lecture example | Must change plant | Ask in Week 9; have a reaction-wheel pendulum ready as fall-back |
 | Parameters (D_r, D_p) are uncertain | Model mismatch | Treat as uncertain (±20–50%) and show robustness |
 | Aggressive gains saturate the motor | Loss of balance | Compare pole sets; report the recoverable α₀ for each |
-| RHP zero (+8.97 rad/s) limits θ tracking | Undershoot, slower tracking | Keep dominant θ bandwidth ≈ 4 rad/s; discuss as a fundamental limitation |
+| RHP zero (+10.31 rad/s) limits θ tracking | Undershoot, slower tracking | Keep dominant θ bandwidth ≈ 4 rad/s; discuss as a fundamental limitation |
 | Constant arm torque (cable drag) causes θ offset | Fails tracking requirement | Add an integrator on θ (augmented 5-state design) |
 | Observer amplifies encoder quantisation | Noisy V_m, chatter | Observer poles 2–5× faster than the controller, not 20×; test with quantised y |
 

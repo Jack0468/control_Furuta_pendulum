@@ -20,6 +20,8 @@ designs(end+1) = struct('name', 'D1 aggressive', 'p', [pd, -30, -40]);
 designs(end+1) = struct('name', 'D2 moderate',   'p', [pd, -12, -15]);
 wn = 3; pd = wn*(-zeta + 1i*sqrt(1 - zeta^2)*[1 -1]);
 designs(end+1) = struct('name', 'D3 slow',       'p', [pd, -12, -15]);
+zeta4 = 0.75; wn = 3.6; pd = wn*(-zeta4 + 1i*sqrt(1 - zeta4^2)*[1 -1]);
+designs(end+1) = struct('name', 'D4 final',      'p', [pd, -10.8, -13.5]);   % Aleksei's design, docs/04 3b
 % LQR for comparison
 Q = diag([5 1 0 0]); R = 1;
 Klqr = lqr(A, B, Q, R);
@@ -44,9 +46,10 @@ for k = 1:numel(designs) + 1
             S.RiseTime, S.SettlingTime, S.Overshoot, US, u10, ustep);
     designs_K{k} = K; names{k} = name; %#ok<SAGROW>
 end
+fprintf('LQR closed-loop poles: %s\n', mat2str(eig(A - B*Klqr).', 4));
 
-%% 3. Nonlinear evaluation of the chosen design (D2 by default)
-K = designs_K{2};
+%% 3. Nonlinear evaluation of the final design (D4)
+K = designs_K{4};
 % (a) recovery from alpha0 = 10 deg
 [t1, x1, u1] = furuta_sim_cl(K, P, [0; alpha0; 0; 0], @(t) 0, 3);
 % (b) 30 deg arm step
@@ -65,7 +68,7 @@ for i = 1:3
     yline([P.Vmax -P.Vmax], 'r--');
 end
 furuta_savefig(gcf, 'w10_nonlinear_tests', 7.16, 4.2);
-fprintf('\nNonlinear (D2): max|u| = %.1f / %.1f / %.1f V; max|alpha| tap = %.1f deg; theta offset from drag = %.1f deg\n', ...
+fprintf('\nNonlinear (D4): max|u| = %.1f / %.1f / %.1f V; max|alpha| tap = %.1f deg; theta offset from drag = %.1f deg\n', ...
         max(abs(u1)), max(abs(u2)), max(abs(u3)), rad2deg(max(abs(x3(:,2)))), rad2deg(x3(end,1)));
 
 %% 4. Largest recoverable initial angle (nonlinear + saturation), each design
@@ -80,7 +83,7 @@ for k = 1:numel(designs_K)
 end
 
 %% 5. Robustness: nominal K on perturbed plants (+/-20%)
-fprintf('\nRobustness of D2 (max real closed-loop pole, perturbed linear model):\n');
+fprintf('\nRobustness of D4 (max real closed-loop pole, perturbed linear model):\n');
 for nm = {'mp','Lp','Rm','km','Dr','Dp'}
     for s = [0.8 1.2]
         Pk = P; Pk.(nm{1}) = s*P.(nm{1}); Pk.Jp = Pk.mp*Pk.Lp^2/12;
@@ -93,7 +96,7 @@ end
 % Augmented state xa = [x; xi], xi_dot = theta - r.  u = -[K Ki]*xa
 Aa = [A zeros(4,1); 1 0 0 0 0];
 Ba = [B; 0];
-pa = [designs(2).p, -5];               % D2 poles + one integrator pole
+pa = [designs(4).p, -5];               % D4 poles + one integrator pole
 Ka = place(Aa, Ba, pa);
 fprintf('\nIntegral design Ka = %s\n', mat2str(Ka, 3));
 % nonlinear simulation with the integrator state appended
@@ -106,7 +109,7 @@ ui = arrayfun(@(k) ctrl(ti(k), zi(k,:).'), (1:numel(ti)).');
 fprintf('Integral (nonlinear, tap + drag): final theta = %.2f deg, max|theta| = %.1f deg, max|alpha| = %.1f deg, max|u| = %.1f V\n', ...
         rad2deg(zi(end,1)), rad2deg(max(abs(zi(:,1)))), rad2deg(max(abs(zi(:,2)))), max(abs(ui)));
 figure; subplot(3,1,1); plot(t3, rad2deg(x3(:,1)), ti, rad2deg(zi(:,1))); grid on; ylabel('\theta [deg]');
-legend('D2 (no integrator)', 'D2 + integrator'); title('Pendulum tap at 0.5 s, constant arm drag from 2 s');
+legend('D4 (no integrator)', 'D4 + integrator'); title('Pendulum tap at 0.5 s, constant arm drag from 2 s');
 subplot(3,1,2); plot(t3, rad2deg(x3(:,2)), ti, rad2deg(zi(:,2))); grid on; ylabel('\alpha [deg]');
 subplot(3,1,3); plot(t3, u3, ti, ui); grid on; ylabel('V_m [V]'); xlabel('t [s]');
 furuta_savefig(gcf, 'w10_integral_action', 3.5, 3.2);
@@ -114,7 +117,7 @@ furuta_savefig(gcf, 'w10_integral_action', 3.5, 3.2);
 %% 7. Figures: pole map (A2) and design comparison (A3)
 figure; hold on; grid on;
 plot(real(eig(A)), imag(eig(A)), 'kx', 'MarkerSize', 10, 'LineWidth', 1.5);
-mk = {'o','s','d','^'};
+mk = {'o','s','d','p','^'};
 for k = 1:numel(designs_K)
     pc = eig(A - B*designs_K{k});
     plot(real(pc), imag(pc), mk{k}, 'MarkerSize', 7, 'LineWidth', 1.2);

@@ -74,6 +74,14 @@ for i = 1:numel(cfg)
     fprintf('%-22s %16.1f %10.3f %12.2f %12.1f %10.2f %7d/%d\n', cfg(i).name, sl, M(i,1:4), nu, Nr);
 end
 
+nf = 0;                                   % the same plants with the true state fed back
+for n = 1:Nr
+    sk = plants{n};
+    Acl = [sk.A - sk.B*D.Kx, -sk.B*D.Ki; Ts*[1 0 0 0], 1];
+    nf = nf + (max(abs(eig(Acl))) >= 1);
+end
+fprintf('%-22s %73d/%d\n', 'true state', nf, Nr);
+
 %% 4. Trade-off figure: noise vs disturbance response, coloured by robustness
 % Only observers that survive the tap are plotted (the others fall, max|alpha| > 90 deg).
 figure('Position', [100 100 760 480]); hold on;

@@ -3,7 +3,7 @@
 ## 1. Answers to the Lab 10 questions
 
 **Why does the system need to be controlled?**
-The upright equilibrium is unstable, with an open-loop pole at +9.96 rad/s (time constant 100 ms). Released at 2°, the pendulum passes 15° in 0.26 s, which is faster than a human can react. Without feedback the upright position cannot be held at all.
+The upright equilibrium is unstable, with an open-loop pole at +12.09 rad/s (time constant 83 ms). Released at 2°, the pendulum passes 15° in 0.22 s, which is faster than a human can react. Without feedback the upright position cannot be held at all.
 
 **Which signals can we measure?**
 θ (motor encoder) and α (pendulum encoder), each with 2048 counts/rev (3.07 mrad resolution). The velocities θ̇ and α̇ are not measured, so 2 sensors cover 4 states. This motivates the observer.
@@ -50,16 +50,18 @@ T_s(2\%) \approx \frac{4}{\zeta\omega_n},\qquad
 t_r \approx \frac{1.8}{\omega_n}
 $$
 
-- OS ≤ 5% gives ζ ≥ 0.69. Choose **ζ = 0.7**.
+- OS ≤ 5% gives ζ ≥ 0.69. Choose **ζ = 0.75** for margin.
 - T_s ≤ 2.5 s gives ζω_n ≥ 1.6 rad/s.
-- The RHP-zero limit (R4) gives ω_n ≲ 4.5 rad/s.
-- Choose **ω_n = 4 rad/s**: s = −2.8 ± 2.86j. The predicted T_s is 1.43 s, which leaves margin for the zero and the extra poles.
-- Place the remaining two poles 4–10× faster than the dominant pair, real, on the negative axis. Faster poles mean higher gains and more voltage (see the comparison in doc 04).
+- The slosh cap and the RHP-zero limit (R4, §4) give ω_n ≲ 4.5 rad/s.
+- Choose **ω_n = 3.6 rad/s**: s = −2.7 ± 2.38j. The predicted T_s is 1.48 s, which leaves margin for the zero and the extra poles.
+- Place the remaining two poles at 4× and 5× the real part of the dominant pair: −10.8 and −13.5. Faster poles mean higher gains and more voltage (see the comparison in doc 04).
 
-Desired characteristic polynomial (design D2):
+These are Aleksei's choices, adopted as the final design (D-19; doc 04 §3b).
+
+Desired characteristic polynomial (design D4):
 
 $$
-\Delta_d(s) = (s^2 + 5.6s + 16)(s + 12)(s + 15)
+\Delta_d(s) = (s^2 + 5.4s + 12.96)(s + 10.8)(s + 13.5)
 $$
 
 **Caveat:** the plant has a RHP zero, and the "fast" poles are not very far away. The 2nd-order formulas are therefore only a starting point. Always check the result with `stepinfo` and the nonlinear simulation, then iterate.

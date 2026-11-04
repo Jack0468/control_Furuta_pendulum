@@ -14,11 +14,11 @@ fmt = @(v) mat2str(v, 6);
 OS = 5; Ts = 2.5;
 zeta_min = -log(OS/100)/sqrt(pi^2 + log(OS/100)^2);
 fprintf('Step 1: zeta_min = %.4f, sigma_min = 4/Ts = %.4f\n', zeta_min, 4/Ts);
-zeta = 0.7; wn = 4;
+zeta = 0.75; wn = 3.6;
 sig = zeta*wn; wd = wn*sqrt(1 - zeta^2);
 fprintf('        sigma = %.4f, wd = %.4f, predicted Ts = %.3f s, OS = %.2f %%, tr = %.3f s\n', ...
         sig, wd, 4/sig, 100*exp(-pi*zeta/sqrt(1-zeta^2)), 1.8/wn);
-p = [-sig + 1i*wd, -sig - 1i*wd, -12, -15];
+p = [-sig + 1i*wd, -sig - 1i*wd, -10.8, -13.5];
 
 %% Step 2: desired characteristic polynomial
 dd = poly(p);

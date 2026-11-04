@@ -3,13 +3,13 @@ function D = furuta_design(P, p_obs)
 %   D = furuta_design(P)          uses the default observer poles
 %   D = furuta_design(P, p_obs)   uses the given continuous-time observer poles
 %
-%   Controller: D2 poles + integrator on theta (docs 04 and 06)
+%   Controller: Aleksei's poles + integrator on theta (docs 04 section 3b, LOGBOOK D-19)
 %       u = -Kx*xhat - Ki*xi,   xi_dot = theta_meas - r   (type-1 servo)
 %   Observer (discrete, predictor form, runs at P.Ts):
 %       xhat[k+1] = Ad*xhat[k] + Bd*u[k] + L*(y[k] - C*xhat[k])
 
 if nargin < 2 || isempty(p_obs)
-    % ~7-9x faster than the fastest controller pole (-15). A slower observer leaves more
+    % ~7-10x faster than the fastest controller pole (-13.5). A slower observer leaves more
     % random +/-20% plants unstable, in exchange for less voltage noise. See LOGBOOK D-10, I-08.
     p_obs = [-100 -110 -120 -130];
 end
@@ -18,10 +18,11 @@ end
 D.A = A; D.B = B; D.C = C; D.Ts = P.Ts;
 
 % Controller poles (doc 03 section 3, doc 06)
-zeta = 0.7; wn = 4;                       % Aleksei's alternative: zeta = 0.75, wn = 3.6 (docs/04 3b)
+zeta = 0.75; wn = 3.6;
 pd = wn*(-zeta + 1i*sqrt(1 - zeta^2)*[1 -1]);
-D.p_ctrl = [pd, -12, -15];                % Aleksei's alternative: [pd, -10.8, -13.5]
-D.K = place(A, B, D.p_ctrl);              % state feedback without integrator (D2)
+sigma = zeta*wn;
+D.p_ctrl = [pd, -4*sigma, -5*sigma];      % -2.7 +/- 2.38j, -10.8, -13.5
+D.K = place(A, B, D.p_ctrl);              % state feedback without integrator
 
 % Integral action: xa = [x; xi], xi_dot = theta - r
 Aa = [A zeros(4,1); 1 0 0 0 0];

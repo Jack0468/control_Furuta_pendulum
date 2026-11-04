@@ -176,10 +176,10 @@ This file simulates "the real pendulum plus our controller" and returns time, st
 | Lines | What it does | First-principles meaning |
 | --- | --- | --- |
 | 7–8 | Builds a state-space object `ss(A,B,C,D)` | A container so MATLAB's toolbox functions can operate on the model |
-| 13 | `eig(A)` → open-loop poles | Solutions of ẋ = Ax are sums of e^{λt}, where the λ are the eigenvalues of A. Any λ with a positive real part grows, so the system is unstable. Here λ = +9.96 means a lean grows by a factor of e every 100 ms. The λ = 0 pole is the arm, which can rest anywhere |
+| 13 | `eig(A)` → open-loop poles | Solutions of ẋ = Ax are sums of e^{λt}, where the λ are the eigenvalues of A. Any λ with a positive real part grows, so the system is unstable. Here λ = +12.09 means a lean grows by a factor of e every 83 ms. The λ = 0 pole is the arm, which can rest anywhere |
 | 15 | `rank(ctrb(A,B))` | Reachability: can the input steer the state anywhere? This requires rank[B AB A²B A³B] = 4 (doc 06, E4) |
 | 16–18 | `rank(obsv(A,C))` | Observability: can the states be reconstructed from the measured outputs? This requires rank[C; CA; CA²; CA³] = 4. With α alone, rank is only 3: the arm angle cannot be deduced from the pendulum angle, because the physics does not depend on θ |
-| 19–20 | `tzero` → zeros of θ/V_m | Frequencies the system blocks. The zero at +8.97 rad/s (right half plane) means the arm initially moves the wrong way |
+| 19–20 | `tzero` → zeros of θ/V_m | Frequencies the system blocks. The zero at +10.31 rad/s (right half plane) means the arm initially moves the wrong way |
 | 24–33 | Release from 2°: `initial` (linear) vs `ode45` on `furuta_nl` | Tests how far the linearisation can be trusted. The two agree to about 15°, then diverge: the real pendulum falls and swings to hanging |
 | 35–44 | 1 V, 50 ms pulse: `lsim` vs `ode45` | The response to an input instead of an initial condition |
 | 46–56 | Scales each parameter ×0.8 and ×1.2, recomputes the unstable pole | Sensitivity to model uncertainty. J_p and J_r are recomputed, because they depend on the masses and lengths |
@@ -262,7 +262,7 @@ This file reproduces doc 06 numerically, step by step:
 
 Every Week 11–12 script calls this file, so changing a pole here changes everything consistently. It returns:
 
-- `K`: the D2 gain without an integrator.
+- `K`: the final design's gain without an integrator.
 - `Kx`, `Ki`: the 5-pole integral design, used in the type-1 servo law u = −Kₓx̂ − kᵢξ.
 - `Ad`, `Bd`: the plant sampled at 1 ms with a zero-order hold (`c2d`). The real controller only updates u once per sample and holds it constant in between, so the observer must use the sampled model.
 - `L`: the observer gain, from `place(Ad', C', exp(p_obs*Ts))'`.

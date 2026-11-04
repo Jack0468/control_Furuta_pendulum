@@ -72,7 +72,7 @@ end
 %% 4. Observer: stability of the estimation error
 z = eig(Ad - L*C);
 fprintf('\nEstimation error e[k+1] = (Ad - L*C) e[k]: |z| = %s (all < 1), s = %s\n', mat2str(abs(z).', 4), mat2str(sort(log(z)/Ts).', 4));
-fprintf('Ratio to the fastest controller pole (-15): %s\n', mat2str(sort(abs(log(z)/Ts)/15).', 3));
+fprintf('Ratio to the fastest controller pole (%.1f): %s\n', min(real(D.p_int)), mat2str(sort(abs(log(z)/Ts)/abs(min(real(D.p_int)))).', 3));
 
 %% 5. Linear vs nonlinear closed loop (same K and L, no quantisation)
 Acl = [Ad, -Bd*Ki, -Bd*Kx; Ts*Ct, 1, zeros(1,4); L*C, -Bd*Ki, Ad - Bd*Kx - L*C];

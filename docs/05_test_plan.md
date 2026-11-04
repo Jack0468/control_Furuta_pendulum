@@ -31,10 +31,10 @@ Every design is tested on two plants:
 | --- | --- | --- |
 | `w9_openloop_release.png` | T1 | Done |
 | `w9_pulse_response.png` | T2 | Done |
-| `w10_nonlinear_tests.png` | T4–T6 for D2 (θ, α, V_m) | Done |
+| `w10_nonlinear_tests.png` | T4–T6 for the final poles (θ, α, V_m) | Done |
 | `w10_integral_action.png` | T6 + T7, with and without the integrator | Done |
-| `w10_pole_map.png` | Open-loop and closed-loop poles for D1/D2/D3/LQR against the ζ ≥ 0.69 and ζω_n ≥ 1.6 boundaries | Done |
-| `w10_design_comparison.png` | D1/D2/D3/LQR 30° step: θ, α, V_m overlaid | Done |
+| `w10_pole_map.png` | Open-loop and closed-loop poles for D1–D4 and LQR against the ζ ≥ 0.69 and ζω_n ≥ 1.6 boundaries | Done |
+| `w10_design_comparison.png` | D1–D4 and LQR 30° step: θ, α, V_m overlaid | Done |
 | `w11_observer_convergence.png` | T10: true vs estimated states, error norm, V_m vs full state | Done |
 | `w11_observer_poles_noise.png` | T11: steady-state V_m for four observer pole sets | Done |
 | `w11_velocity_estimate.png` | α̇: finite difference vs observer vs true | Done |
@@ -45,30 +45,30 @@ Every design is tested on two plants:
 
 ## Results with the final observer-based design
 
-> **These numbers predate the published damping and spin term (D-16, I-11).** They are refreshed after the next `run_all`.
-
-From [week12_validation.m](../matlab/week12_validation.m): nonlinear plant, 1 kHz, quantised encoders, saturation, observer poles −100…−130, type-1 servo.
+From [week12_validation.m](../matlab/week12_validation.m): nonlinear plant, 1 kHz, quantised encoders, saturation, controller poles −2.7 ± 2.38j, −10.8, −13.5, −5, observer poles −100…−130, type-1 servo.
 
 | Test | Result | Requirement |
 | --- | --- | --- |
-| V1 recovery from 10° | \|α\| < 1° after 0.96 s; max 8.6 V; max \|θ\| 34.2° | R2 ✔, R9 ✔; R5 within 10 V but **over the 6 V target** |
-| V2 30° step | T_s **2.40 s** (1.81 s without quantisation), t_r 0.65 s, OS 2.0%, US 2.2%, max 0.77 V | R3 ✔ (limit 2.5 s, only 0.1 s of margin, see below); R4 ✔ |
-| V3 pendulum tap | max \|α\| 15.1°, max \|θ\| 54.5°, max 9.7 V; \|α\| < 1° after 0.99 s | **R6 ✘ by 0.1°** (limit 15°); R9 ✔; R5 within 10 V but over the 6 V target |
-| V3 arm drag 2 mN·m | Final θ error −0.22° (−23° without integrator) | R7 ✔ |
-| V4 encoder offset 10 / 40 arcmin | Final θ error −0.07° / −0.37° (5.3° / 19.3° without integrator) | ✔ |
-| V5 noise | RMS u 0.243 V; RMS α 0.08°; RMS θ 0.29° | ✔ |
-| V6 Monte Carlo ±20% (40) | 40/40 linearly stable; 36/40 recover from 10°; 30/40 survive the tap; tap max \|α\| median 17.1° | **R8 partial** |
-| V7 region of attraction | 22° (28° for D2 with full state); anti-windup makes no difference | — |
+| V1 recovery from 10° | \|α\| < 1° after 0.97 s; max 6.6 V; max \|θ\| 29.1° | R2 ✔, R5 ✔, R9 ✔ |
+| V2 30° step | T_s **1.38 s** (1.43 s without quantisation), t_r 0.75 s, OS 1.4%, US 1.3%, max 0.63 V | R3 ✔, R4 ✔ |
+| V3 pendulum tap | max \|α\| 14.6° (11.4° with the true state), max \|θ\| 57.0°, max 8.97 V; \|α\| < 1° after 1.05 s | **R6 ✔ by 0.4°**; R5 ✔; R9 ✔ |
+| V3 arm drag 2 mN·m | Mean θ error over the last 1 s: 0.25° (−38.7° without integrator) | R7 ✔ |
+| V4 encoder offset 10 / 40 arcmin | Mean final θ −0.03° / −0.05° (5.9° / 24.1° without integrator) | ✔ |
+| V5 noise | RMS u 0.216 V; RMS α 0.088°; RMS θ 0.36°; RMS α̇ error 2.97 deg/s | ✔ |
+| V6 Monte Carlo ±20% (40) | 39/40 linearly stable; 38/40 recover from 10°; 31/40 survive the tap; tap max \|α\| median 17.0° | **R8 partial** |
+| V7 region of attraction | 24° (30° for the same poles with the true state); anti-windup makes no difference | — |
+| V8 D2 vs final poles | Final settles sooner and clears the tap limit: see doc 04 §3c | — |
+| V9 reference path | Through the integrator only: OS 1.7%. Also through K_x(1): OS 50.7% (linear model) | — |
 
-**Why T_s is 2.40 s.** With unquantised measurements, or with the true state fed back, T_s is 1.81 s. With the observer on quantised encoders, the loop settles into a small limit cycle: the arm ripples about 1.0° peak to peak (RMS u 0.24 V). That touches the ±0.6° settling band of a 30° step, so the measured T_s depends on where the ripple happens to sit. A faster-looking figure of 1.26 s under the earlier J_r = /12 model had the same cause and should not be trusted.
+**Settling and ripple.** With the observer on quantised encoders, the loop settles into a small limit cycle: the arm ripples about 0.71° peak to peak (RMS u 0.22 V). That fits inside the ±0.6° settling band of a 30° step, so the final design's T_s is not inflated by it, unlike D2's. The quantised T_s (1.38 s) is slightly below the unquantised one (1.43 s), because the measured value depends on where the ripple sits as the response enters the band. Differences of this size should not be over-read.
 
-Open issues I-01 (R6), I-02 (R8) and I-08 (ripple) are tracked in the [LOGBOOK](LOGBOOK.md). The Kalman study (doc 09) addresses both.
+**Which plants fall (V6).** The 9 that fall in the tap test have a weaker motor (mean k_m/R_m factor 0.84, against 1.02 for those that stay up) and a shorter arm (0.91 against 1.01). Both lower the loop gain towards its lower stability limit (×0.59, doc 04). R8 stays partial, and the report says so.
 
 ## Lab 10 questions → evidence
 
 | Lab 10 item | Figure | Written answer |
 | --- | --- | --- |
-| A1: Why does it need control? | `w9_openloop_release.png` (falls past 15° in 0.26 s) | doc 03 §1 |
+| A1: Why does it need control? | `w9_openloop_release.png` (falls past 15° in 0.22 s) | doc 03 §1 |
 | A1: Measurements, actuation, constraints | None (text answer; V_m limit shown on `w10_nonlinear_tests.png`) | doc 03 §1 |
 | A1: Design requirements (rise time, settling time, overshoot) | None (table) | doc 03 §2 |
 | A2: Requirements → pole locations | `w10_pole_map.png` | doc 03 §3 |

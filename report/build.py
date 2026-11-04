@@ -20,7 +20,7 @@ import sys
 import zipfile
 from pathlib import Path
 
-PAGE_LIMIT = 8
+PAGE_LIMIT = 6         # not counting references and the appendix
 ABSTRACT_TARGET = 200   # words, from the assignment criteria
 KEYWORD_LIMIT = 5
 
@@ -99,7 +99,12 @@ def main():
     issues, words, n_keywords = check_source((here / "main.tex").read_text(encoding="utf-8"))
 
     print(f"\nPDF: {target}")
-    print(f"Pages: {pages} (limit {PAGE_LIMIT}) {'OK' if 0 < pages <= PAGE_LIMIT else '<-- OVER LIMIT'}")
+    # The body ends at the Conclusions (labelled in main.tex) or its last figure, whichever is later.
+    aux = (out / "main.aux").read_text(errors="replace")
+    body = max((int(n) for label in ("report:bodyend", "fig:overview", "fig:mc")
+                for n in re.findall(r"\\newlabel\{" + label + r"\}\{\{[^}]*\}\{(\d+)\}", aux)), default=-1)
+    print(f"Body pages: {body} (limit {PAGE_LIMIT}, not counting acknowledgment, references and appendix) "
+          f"{'OK' if 0 < body <= PAGE_LIMIT else '<-- OVER LIMIT'}. Total PDF pages: {pages}")
     print(f"Abstract: about {words} words (target about {ABSTRACT_TARGET})")
     print(f"Keywords: {n_keywords} (limit {KEYWORD_LIMIT}) {'OK' if n_keywords <= KEYWORD_LIMIT else '<-- TOO MANY'}")
     undefined = len(re.findall(r"(?:Reference|Citation) `[^']*'.*?undefined", log, re.S))
@@ -113,7 +118,8 @@ def main():
 
     if args.package:
         archive = here / "Furuta_matlab_submission.zip"
-        files = sorted((here.parent / "matlab").glob("*.m"))
+        # The Kalman study is background (doc 09): the report doesn't use it.
+        files = sorted(f for f in (here.parent / "matlab").glob("*.m") if f.name != "week11_kalman.m")
         with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
             for f in files:
                 z.write(f, Path("matlab") / f.name)

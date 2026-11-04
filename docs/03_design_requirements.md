@@ -86,13 +86,13 @@ The lab rig is a scale model of the motion, not a working bartender. The numbers
 | **Settling ≤ 2.5 s** | A commercial robot bar makes 80+ drinks per hour [Makr Shakr], i.e. 45 s per drink. Suppose settling takes about a quarter of that (11 s) over 4 arm moves per drink: 2.8 s per move. Rounded down to 2.5 s | 4 moves and the 25% share are assumptions |
 | **Overshoot ≤ 5%** | Don't swing past the serving position towards the customer | Design choice |
 | **Disturbance: tap** | A customer bumping the tray or taking a glass | Size chosen as a firm bump |
-| **±20% parameters** | Taking a glass changes the payload mass, and hence m_p | — |
+| **±20% parameters** | Parameter error. This is about ±5 g on the pendulum, so it doesn't cover a glass being added or removed | — |
 
 ### Limitations of this framing
 
 - **Effective tilt:** the liquid responds to the tilt and to acceleration, tan(tilt) ≈ a/g. Only α is used here, so the spill limit is approximate.
 - **Scale:** the rig is small. By dynamic similarity, time scales with √(length), so a taller real tray would be slower by that factor. The 2.5 s is applied directly at rig scale, so it is a target for the demonstrator, not a scaled-up specification.
-- **Payload:** the pendulum is a uniform rod; a real tray and glass would be top-heavy.
+- **Payload:** the pendulum is a uniform rod, with no tray or glass modelled. A real tray and glass would be top-heavy. In a scratch study, the final gains stay up with up to 20 g at the tip and fall at 30 g (LOGBOOK, 2026-11-04). An Australian schooner glass weighs 300–330 g empty (Jack's figure; source still needed), more than twice the 141 g at the tip at which gravity at 15° reaches the motor's stall torque. The glass figures therefore describe the application, not a payload on the rig. The report states this in Section II-C.
 
 ### Other applications considered
 

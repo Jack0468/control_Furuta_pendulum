@@ -23,7 +23,7 @@ Every design is tested on two plants:
 | T12 | Observer + uncertainty | Perturbed plant, nominal observer | NL + sat | R1, R2 still met | 12 | `week12_validation` V6 |
 | T13 | Sampling | Controller and observer at T_s = 1 ms | NL + sat | Matches continuous-time performance | 11 | built into `furuta_sim_obs` |
 | T14 | Encoder offset | α offset of 10 and 40 arcmin (datasheet position error) | NL + sat | Arm still settles at r | 12 | `week12_validation` V4 |
-| T15 | Observer choice | Pole sets vs Kalman gains: noise, tap, robustness | NL + Lin | Pick an observer (D-12) | 11 | `week11_kalman` |
+| T15 | Observer choice | Pole sets vs Kalman gains: noise, tap, robustness | NL + Lin | Background only, not in the report (D-12) | 11 | `week11_kalman` (run directly) |
 
 ## Figures for the report
 
@@ -38,7 +38,7 @@ Every design is tested on two plants:
 | `w11_observer_convergence.png` | T10: true vs estimated states, error norm, V_m vs full state | Done |
 | `w11_observer_poles_noise.png` | T11: steady-state V_m for four observer pole sets | Done |
 | `w11_velocity_estimate.png` | α̇: finite difference vs observer vs true | Done |
-| `w11_kalman_tradeoff.png` | T15: noise vs tap response for Kalman and pole-placed observers | Done |
+| `w11_kalman_tradeoff.png` | T15: noise vs tap response for Kalman and pole-placed observers. Not in the report | Background |
 | `w12_validation_overview.png` | V1–V3 with the observer: θ, α (true and estimated), V_m | Done |
 | `w12_integrator_drag.png` | V3: arm angle with and without the integrator under drag | Done |
 | `w12_monte_carlo.png` | V6: α for 40 random ±20% plants (tap at 2 s) | Done |

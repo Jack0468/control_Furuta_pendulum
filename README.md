@@ -25,7 +25,7 @@ Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGB
 | [docs/06_pole_placement_derivation.md](docs/06_pole_placement_derivation.md) | Hand derivation of K (coefficient matching), with Ackermann and `place` cross-checks | Controller Design |
 | [docs/07_code_explained.md](docs/07_code_explained.md) | The MATLAB code explained from first principles | — |
 | [docs/08_sensors_and_noise.md](docs/08_sensors_and_noise.md) | Encoder selection and noise model from the Broadcom/US Digital datasheets | System Model |
-| [docs/09_kalman_filter.md](docs/09_kalman_filter.md) | Kalman filter derivation and comparison with pole-placed observers | Controller Design (extension) |
+| [docs/09_kalman_filter.md](docs/09_kalman_filter.md) | Kalman filter derivation and comparison with pole-placed observers | Background, not in the report |
 | [docs/10_literature_review.md](docs/10_literature_review.md) | Sources and how far each was verified; material for the Introduction and System Model; rubric coverage | Introduction, System Model |
 | [references/README.md](references/README.md) | Sources for the local reference PDFs (the PDFs themselves are not in the public repo) | — |
 
@@ -44,10 +44,11 @@ Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGB
 | `week9_model_and_openloop.m` | Model checks, linear vs nonlinear open loop, uncertainty sweep |
 | `week10_state_feedback.m` | Requirements → poles, `place`/`lqr`, nonlinear evaluation, robustness |
 | `week10_pole_placement_derivation.m` | Reproduces every number in doc 06 |
-| `week11_observer.m` | Observer design, separation-principle check, pole choice, velocity estimate |
-| `week11_kalman.m` | Steady-state Kalman filter and the observer trade-off study |
-| `week12_validation.m` | Validation tests V1–V7 on the nonlinear plant |
+| `week11_observer.m` | Observer design, analytical gain, separation-principle check, pole choice, velocity estimate |
+| `week11_kalman.m` | Steady-state Kalman filter study (background; `run_all` skips it) |
+| `week12_validation.m` | Validation tests V1–V9 on the nonlinear plant |
 | `week12_margins.m` | Bode/Nyquist margins, stable gain ranges, linear vs nonlinear, published parameter values |
+| `week12_tray_mass.m` | Effect of a tray and drink at the pendulum tip (run directly; `run_all` skips it) |
 
 ```matlab
 cd matlab

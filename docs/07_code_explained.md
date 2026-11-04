@@ -289,7 +289,7 @@ Options switch on offsets, noise, perturbed plants (`Pplant`), a different obser
 | --- | --- | --- |
 | `week11_observer.m` §1 | eig of the full loop [x; ξ; x̂] = eig(controller) ∪ eig(observer) | **Separation principle:** in coordinates [x; ξ; e = x − x̂] the closed-loop matrix is block-triangular, so its eigenvalues are those of the diagonal blocks |
 | `week11_observer.m` §3–4 | Observer speed vs noise; finite difference vs observer | Faster poles mean a larger L, which amplifies the quantisation noise |
-| `week11_kalman.m` | L from the Riccati equation instead of chosen poles | Doc 09 |
+| `week11_kalman.m` | L from the Riccati equation instead of chosen poles. Background only: `run_all` skips it | Doc 09 |
 | `week12_validation.m` | V1–V7 against requirements R1–R9 | Doc 05 results table |
 
 ---
@@ -307,4 +307,4 @@ Options switch on offsets, noise, perturbed plants (`Pplant`), a different obser
 | Encoder quantisation modelled exactly; position error as a constant offset | `furuta_sim_obs` | Datasheet-based (doc 08); missed counts are not modelled |
 | Random torque noise σ = [0.2, 0.05] mN·m | `week12_validation` V5 | **Assumed**, not measured; it only sets the noise level in V5 |
 | Simple conditional-integration anti-windup | `furuta_sim_obs` | Made no difference in the tests (saturation is brief) |
-| Robustness counts use the linear sampled loop | `week11_kalman`, `scratch` | The nonlinear Monte Carlo (V6) covers 40 plants only |
+| Robustness counts use the linear sampled loop | `week11_observer`, `scratch` | The nonlinear Monte Carlo (V6) covers 40 plants only |

@@ -30,7 +30,7 @@ The brief says AI-generated references that have not been independently verified
 | 15 | T. F. Tang, S. H. Chong, K. K. Pang, "Stabilisation of a rotary inverted pendulum system with double-PID and LQR control: experimental verification," *Int. J. Automation and Control*, vol. 14, no. 1, 2020. | Record (title and venue) | Linear stabilisation in experiment |
 | 16 | M. Gäfvert, J. Svensson, K. J. Åström, "Friction and friction compensation in the Furuta pendulum," *Proc. European Control Conf.*, pp. 3154–3159, 1999. [doi:10.23919/ECC.1999.7099812](https://doi.org/10.23919/ECC.1999.7099812) | Record | Friction as a limitation |
 | 17 | J. C. Doyle, "Guaranteed margins for LQG regulators," *IEEE Trans. Autom. Control*, vol. 23, no. 4, pp. 756–757, 1978. [doi:10.1109/TAC.1978.1101812](https://doi.org/10.1109/TAC.1978.1101812) | Record; PDF downloaded (scanned text only partly checked) | Observer-based loops have no guaranteed margins |
-| 18 | D. G. Luenberger, "Observing the State of a Linear System," *IEEE Trans. Mil. Electron.*, vol. 8, no. 2, pp. 74–80, 1964. [doi:10.1109/TME.1964.4323124](https://doi.org/10.1109/TME.1964.4323124) | Record | Origin of the observer |
+| 18 | D. G. Luenberger, "Observing the State of a Linear System," *IEEE Trans. Mil. Electron.*, vol. 8, no. 2, pp. 74–80, 1964. [doi:10.1109/TME.1964.4323124](https://doi.org/10.1109/TME.1964.4323124) | Record | Origin of the observer. No longer cited in the report |
 | 19 | P. R. Bélanger et al., "Estimation of Angular Velocity and Acceleration from Shaft-Encoder Measurements," *Int. J. Robot. Res.*, vol. 17, no. 11, pp. 1225–1233, 1998. [doi:10.1177/027836499801701107](https://doi.org/10.1177/027836499801701107) | Record | Velocity from encoders |
 | 20 | Avago/Broadcom HEDS-5540 and US Digital E5/EM1 datasheets | **Read** | Sensor model (doc 08) |
 | 21 | A. Heins, A. P. Schoellig, "Robotic Nonprehensile Object Transportation with a Hanging Tray," [arXiv:2606.10039](https://arxiv.org/abs/2606.10039), 2026. | **Read** (abstract) | Waiter's problem; a pendulum tray reduces sliding and sloshing with no actuated tray joint |
@@ -42,6 +42,7 @@ The brief says AI-generated references that have not been independently verified
 | 27 | Quanser, [QUBE-Servo 2 USB documentation](https://docs.quanser.com/quarc/documentation/qube_servo2_usb.html) | **Read** | ±15 V drive range, ±3 A current sense |
 | 28 | S. Barrios Valero, "Design and Implementation of a Furuta Pendulum Device for Benchmarking Non-Linear Control Methods," Bachelor's thesis, Univ. Zaragoza, 2016. [Record](https://zaguan.unizar.es/record/61249) | **Read** (§5.1) (**Aleksei's source**) | Pole placement in simulation: three poles, torque input, plot starts just above 0.1 rad. The 6° comes from that plot, not the text |
 | 29 | C. Baltazar, R. Gonzales, E. Manzano, "Furuta Pendulum Prototype Control: PID and State Feedback," *IEEE URUCON*, pp. 1–5, 2024. [doi:10.1109/URUCON63440.2024.10850206](https://doi.org/10.1109/URUCON63440.2024.10850206) | Record (**Aleksei's source**) | Not cited in the report |
+| 30 | T. Räsänen, V.-P. Pyrhönen, "State feedback control of a rotary inverted pendulum," *Proc. Automaatiopäivät 23*, Oulu, 2019, pp. 52–59 | **Not found** in one search (**Aleksei's source**) | Not cited in the report. Aleksei to supply a link if it's needed |
 
 **Citation errors found while checking.** Crossref settles these, so use the versions above:
 
@@ -78,7 +79,7 @@ The rubric gives one point each for: context, why control is needed, a literatur
 | LQR / PID in experiment | [15] | Simple linear stabilisation | Close to our approach; LQR is included as a comparison |
 | Pole placement vs LQR | [12] (reaction wheel) | Found equivalent in hardware on that plant | Supports using pole placement |
 
-**Justifying your choices with this literature.** The brief requires LTI, observer-based state feedback. Since the aim is balance near upright, not swing-up, the linear controllers used in [12, 15] suit the task, and [8] shows stabilisation is a separate stage from swing-up. Encoders give angles but not velocities, which motivates a Luenberger observer [18] over differentiation [19].
+**Justifying your choices with this literature.** The brief requires LTI, observer-based state feedback. Since the aim is balance near upright, not swing-up, the linear controllers used in [12, 15] suit the task, and [8] shows stabilisation is a separate stage from swing-up. Encoders give angles but not velocities, which motivates a state observer over differentiation [19].
 
 **Gap to fill before writing:** [6] is the key survey, and only its abstract has been seen. Read it first. Its reference list should also let you strengthen the table above.
 
@@ -145,10 +146,10 @@ Your note on the brief says the report must document the process in order and ju
 | Controller Design (25) | Reachability, observability | Done |
 | | **Stability ranges of controller parameters** | **New: done** (`week12_margins.m`) |
 | | Gains, how chosen, actuator limits | Done |
-| | **Gain margins with Bode or Nyquist** | **New: done** (−4.9 / +17.8 dB, PM 38°) |
-| | Observer; error stability; eigenvalues vs controller | Done (6.7–8.7× the fastest controller pole) |
+| | **Gain margins with Bode or Nyquist** | **New: done** (−4.6 / +16.6 dB, PM 36°) |
+| | Observer; error stability; eigenvalues vs controller | Done (7.4–9.6× the fastest controller pole), with an analytical derivation of L |
 | Validations (20) | Nominal on nonlinear model; disturbance, uncertainty, noise | Done |
 | | **Linear vs nonlinear differences** (from the criteria text) | **New: done** |
-| | Criteria met or failure discussed; control signals; estimation error | Done; R6 misses by 0.1° and must be discussed |
-| | Figures clearly formatted | **Needs work:** current figures aren't report-quality |
+| | Criteria met or failure discussed; control signals; estimation error | Done; R6 passes by 0.4° and R8 is partial, both discussed |
+| | Figures clearly formatted | Done: `furuta_savefig.m` sizes figures for IEEE columns at 300 dpi |
 | Conclusion (5) | Context, findings, justified future work | Draft in `report/` |

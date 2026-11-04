@@ -25,7 +25,7 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-09 | 2026-10-29 | Controller and observer run in discrete time at 1 kHz; observer in predictor form, driven by the saturated voltage | Matches real hardware; makes quantisation and sampling effects visible | Active |
 | D-10 | 2026-10-29 | Observer poles −100, −110, −120, −130 rad/s (was −40…−55) | The slower observer left 39/500 random ±20% plants unstable; this set leaves 6/500. Noise cost: RMS u 0.09 V instead of 0.05 V | Active; may be replaced by a Kalman gain (D-12) |
 | D-11 | 2026-10-29 | Course PDFs and vendor datasheets kept in `references/` but git-ignored; working scripts in `scratch/`, git-ignored | Copyrighted material must not go on the public repo | Active |
-| D-12 | 2026-10-29 | Investigate a steady-state Kalman filter as the observer | Principled trade-off between noise and disturbance response; may fix I-01 and I-02 | Studied (doc 09). The report uses option A (pole-placed observer, Kalman as a comparison). Team to confirm |
+| D-12 | 2026-10-29 | Investigate a steady-state Kalman filter as the observer | Principled trade-off between noise and disturbance response; may fix I-01 and I-02 | **Closed 2026-11-04 (Jack):** Kalman removed from the report as outside the unit and brief. Doc 09 stays as background |
 | D-13 | 2026-11-03 | **Arm geometry: case A.** Uniform bar with the motor at one end, so J_r = m_rL_r²/3 (was /12) | /12 is inconsistent with L_r being the motor-to-joint distance (doc 02 §4.1). Aleksei's model also uses /3 | Active; closes I-04 |
 | D-14 | 2026-11-03 | **R3 settling limit relaxed to 2.5 s, for now** (was 2.0 s) | The measured 2.40 s includes quantisation ripple; 1.81 s without it. Still a design choice to be justified from the aims (I-10) | Active, provisional |
 | D-15 | 2026-11-03 | Dropped the 6 V voltage target; the limit is ±10 V | With J_r = `/3` the gains are higher and 6 V isn't achievable; 10 V is inside the ±15 V drive range and 18 V motor rating | Active |
@@ -34,6 +34,8 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-18 | 2026-11-03 | **Application: serving arm carrying a drink on a passive joint** (Jack's bartender idea). Tilt, speed and settling requirements derived from it | Doc 03 §4. Golf, mixer, weather station and ML benchmark considered and rejected | Accepted by Jack 2026-11-04; Aleksei still to confirm |
 | D-19 | 2026-11-03 | **Final controller poles: Aleksei's,** −2.7 ± 2.38j, −10.8, −13.5, plus our integrator pole at −5 (Jack's decision) | On the updated model they meet the tap limit (14.6°) with less voltage and ripple than D2 (doc 04 §3c). Replaces D-05 | Active |
 | D-20 | 2026-11-04 | **One report: ours as the base, with Aleksei's prose merged in.** Our α sign, 2.5 s settling limit, integrator and observer poles −100…−130 are kept (Jack's decision) | Our draft covers all seven sections. His observer −40…−55 gives a 20.4° tap and 10/200 unstable plants on the current model, against 14.6° and 3/200 | Active |
+| D-21 | 2026-11-04 | **Report keeps to course content** (Jack's review): LQR removed from the design comparison, Kalman removed, "Luenberger" replaced by "state observer" | The brief asks for observer-based state feedback as learned in the unit. LQR stays only where the literature review discusses existing approaches, which the rubric marks | Active |
+| D-22 | 2026-11-04 | **Page limit: 6 pages, not counting references and the appendix** (Jack). Tray and glass stated as a model limitation, with no redesign | Our copy of the brief says 8, so confirm on Canvas; 6 fits either way. A schooner glass alone is over twice what the motor can hold, so no redesign could make it a rig payload | Active |
 
 ---
 
@@ -257,3 +259,53 @@ AI-assisted: merge, Simulink comparison, source checks, this entry.
 - Earlier "0 of 300 unstable" was one random sample. Quote counts with their sample size.
 
 AI-assisted: script additions, reruns, report and doc refresh, this entry.
+
+### Evening of 2026-11-04: Jack's review notes applied
+
+Jack compared the Overleaf copy with the repo (identical) and listed review notes in `docs/TODO.md`.
+
+- **Report:** LQR and Kalman removed (D-21). Each design D1–D4 now explained. Design criteria expanded, each derived from an aim. Disturbances listed explicitly. The 30° step defined. Figure 5 explained panel by panel. Observer section now has an analytical derivation of L.
+- **Correction:** "error below 2% within 0.11 s" was only the first brief dip. The error norm settles on a noise floor above 2%. The report and doc 04 now give the peak, the floor and the RMS errors.
+- **Code:** `week11_observer.m` now produces the observer-speed table, the analytical L and the Figure 5 numbers, so the report no longer depends on `week11_kalman.m`. `run_all` and the Canvas zip skip that script. Results are unchanged.
+- **Marking criteria** copied to `references/course/marking_criteria.md` (git-ignored).
+
+AI-assisted: all of the above.
+
+### Aleksei's second draft, and a tray-mass check
+
+**Merged in his words, with our symbols:** the stacking step to the block state-space form, the sentence on testing state feedback with the full state in simulation, the three arm-modelling elements, and his grouped parameter table (our `Basis` column kept). Figures were trimmed again to stay at 8 pages.
+
+**Not merged:**
+
+- His statement that all parameters come from Xu et al. It doesn't list m_r, and its arm inertia corresponds to `/12`.
+- Räsänen & Pyrhönen 2019: not cited in his text, and one search found no record of it.
+- His abstract's results, as these still can't be reproduced from the repo (I-09).
+
+**Tray mass check** (`scratch/tray_mass_study.m`, not yet in `run_all`). The model has no tray. A point mass m_t at the pendulum tip can be represented exactly by changing m_p, L_p and J_p to equivalent values.
+
+| m_t | Unchanged gains | Same poles, redesigned for that mass |
+| --- | --- | --- |
+| 0 g | Stays up: tap 14.6° | Tap 14.6°, 10° release 6.6 V, RMS u 0.22 V |
+| 10 g | Stays up: tap 10.9° | Tap 7.4°, 8.3 V, 0.29 V, T_s 2.70 s |
+| 20 g | Stays up: tap 9.3° | Tap 5.2°, 9.2 V, 0.33 V, T_s 2.75 s |
+| 30 g | **Falls** (max \|z\| 0.9995, stable but saturates) | Tap 4.1°, 9.7 V, 0.35 V, T_s 2.69 s |
+| 50 g | **Falls** (linearly unstable) | Tap 3.0°, 10.0 V, 0.37 V, T_s 2.97 s |
+
+The tap shrinks because the same 20 mN·m pulse acts on more inertia, so those tap figures don't show that a real bump would be easier. With a tip mass the arm ripple starts to touch the ±0.6° band, so T_s moves between about 1.4 s and 2.7 s, and at 100 g it never settles in the 4 s test. The 35 mm glass used for the tilt and slosh criteria holds at least 135 mL at H = R, close to the 141 g at which gravity at 15° reaches the motor's stall torque, so the rig couldn't carry that glass.
+
+AI-assisted: merge, tray study, this entry.
+
+### Report restructured to six pages
+
+No simulation was run for this: text and layout only, using the numbers already logged.
+
+- **Appendix:** Bode/Nyquist, linear vs nonlinear, and observer convergence figures moved there, after the references. The overview and Monte Carlo figures stay in the body.
+- **Removed:** the open-loop figure (its 0.22 s result stays in the text; the script still produces it), a repeated block equation, and the sampled gain's matrix display.
+- **`build.py`** now checks the body against 6 pages, counting the references label and the body figures. A first version counted only the text and reported 6 while two figures sat on page 7.
+- **Prose trimmed** across the AI-drafted text, mainly the Introduction, with no numbers changed. Cazzolato & Prime dropped (it was unread), along with the table row repeating the plant-input gain range.
+- **Tray limitation** added to Section II-C. The ±20% section stays, and now says it covers parameter error of about ±5 g on the pendulum, not a glass being added or removed. An earlier line wrongly said taking a glass was covered by that uncertainty.
+- **`matlab/week12_tray_mass.m`** is `scratch/tray_mass_study.m` with only its path setup removed. It hasn't been run from that location yet; the fresh-clone check should run it once.
+
+### Sign convention check
+
+Checked symbolically, with no simulation: the report's energies give its equations of motion, these match `furuta_nl.m`, and its M, D and K give the printed A and B. Aleksei's draft is self-consistent but uses the opposite α direction: substituting α → −α turns his equations into ours. A(3,2), A(3,4), A(4,3) and B(4) change sign, and so would k_α and k_α̇. The α direction is stated in the report only, not in his draft. His Simulink's sign can't be checked, because the script that sets its A, B and K isn't in the repo (I-09).

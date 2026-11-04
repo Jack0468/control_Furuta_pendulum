@@ -4,7 +4,30 @@
 
 Tick items off here as they are done. When an item closes a logbook issue (I-xx) or decision (D-xx), also update [LOGBOOK.md](LOGBOOK.md).
 
-**Current state:** `run_all` is done and the figures, docs and report numbers all match the final design (published damping, Aleksei's poles, observer −100…−130). What's left is mainly the people-only items and rewriting the blue prose. Nothing from this refresh is committed yet.
+## Human ideas to improve this report
+
+Jack's review notes, 2026-11-04, with what was done about each.
+
+- [x] We want to consolidate the information to only use the required content that is specfically from this course. e.g. we do not need to include LQR. and Kalman filters can probably be binned from report because it is not directly in the course and is not part of the assignment spec.
+  **Done:** LQR is out of the design comparison and Kalman is out of the report. LQR stays only in the literature review, which the rubric marks, and in `week10_state_feedback.m`.
+- [x] we need to directly explain our the versions for each design. e.g. what actually is D1 and what design choices did it make specfically.
+  **Done:** Section IV-B has one item per design: the choice it tests, its poles, its gains and the outcome.
+- [x] we need to explain the design criteria more in depth.
+  **Done:** Section III-C has one item per criterion, derived from an aim and converted to a pole region.
+- [x] also make a git ignored doc with the assignment marking criteria which I gave you earlier and should be in the chat memory.
+  **Done:** `references/course/marking_criteria.md`.
+- [x] why do we have Luenberger observer ? is that distinctly different from a regular observer ? is it necessary for the scope of this project ?
+  **Answer:** it's the same thing: the standard state observer, named after its inventor. The course says "observer", so the report does too.
+- [x] for the observer section: we need to include the analystical derivation of the poles for the observer.
+  **Done:** Section IV-C derives L from the characteristic polynomial, and `week11_observer.m` checks it. Full steps are in doc 04 §4.
+- [x] we should explicitly explain the disturbances in which we model responses to in this project.
+  **Done:** Section II-C lists each one with its cause, size and what it tests.
+- [x] what does the 30° arm step (centre) mean explicitly can you mention this in the report.
+  **Done:** Section V-A and the caption of the overview figure.
+- [x] can you explain figure 5 in more detail.
+  **Done:** Section V-C goes through each panel with measured numbers. The figure itself is now in the Appendix.
+
+**Current state:** `run_all` is done and the figures, docs and report numbers all match the final design (published damping, Aleksei's poles, observer −100…−130). What's left is mainly the people-only items and rewriting the blue prose. The refresh is merged to `main` (PR #2). Jack's review notes below are applied in the working copy, not yet committed.
 
 "Who" is a suggestion: **Jack**, **Aleksei**, **Team** (both), or **Claude** (AI-assisted; declare this in the report).
 
@@ -14,9 +37,9 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 
 | Done | ID | Task | Who | Notes |
 | --- | --- | --- | --- | --- |
+| [ ] | — | **Move to one report.** Aleksei is still writing in his own copy, and his abstract, 6-page note and duplicate System Model remain there | Team | His second draft's new content is merged into `report/main.tex`. Further edits should go there, or they'll need merging by hand |
 | [ ] | I-09 | **Get Aleksei's design script into the repo,** or confirm his abstract's results aren't used. Check his gain signs against his report's α convention | Aleksei | His `.slx` files need A, B, C and K from a script that isn't committed. Details in the LOGBOOK, 2026-11-04 |
 | [ ] | D-18 | **Aleksei to confirm the serving-arm application and 2.5 s settling limit** | Aleksei | Jack accepted on 2026-11-04. [Doc 03 §4](03_design_requirements.md). Be ready to answer "why is the tray inverted?" |
-| [ ] | D-12 | **Confirm the observer:** pole-placed as the main design, Kalman as the extension. The report is written this way | Team | [Doc 09 §6](09_kalman_filter.md). Ask the lecturer only if you want a Kalman gain as the main design |
 | [ ] | — | Look over the regenerated figures in `figures/` and the draft PDF | Jack | `python report/build.py --open` |
 
 ## 2. Refresh and publish
@@ -26,23 +49,26 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 | [x] | — | Run `run_all` (3–7 min; keep the computer awake, as sleep pauses it) | Claude | Done 2026-11-04. Log in `scratch/` |
 | [x] | — | Refresh every result in the docs, README and the report from the new log | Claude | Done 2026-11-04, including the hand derivation in doc 06 |
 | [x] | I-08 | Record the final ripple and settling time | Claude | 0.71° ripple, inside the ±0.6° band; T_s 1.38 s |
-| [ ] | — | Commit and push, so Aleksei can see everything | Jack | `main` matches GitHub, plus uncommitted work. Claude commits only when asked |
+| [x] | — | Commit, push and merge the refresh, so Aleksei can see everything | Jack | Merged as PR #2, 2026-11-04 |
+| [ ] | — | Commit Jack's review changes, and bring them into Overleaf | Jack | Overleaf doesn't sync with the repo, so hold off editing the changed sections there until they're copied across |
 
 ## 3. Things only a person can do
 
 | Done | ID | Task | Who | By | Notes |
 | --- | --- | --- | --- | --- | --- |
-| [ ] | — | Read the sources tagged in the report's reference list, starting with Hamza 2019 and Cazzolato & Prime 2011 | Team | Wed 4 Nov | The brief rejects unverified references; [doc 10 §1](10_literature_review.md) shows what was only an abstract or record |
+| [ ] | — | Read the sources tagged in the report's reference list, starting with Hamza 2019 | Team | Wed 4 Nov | The brief rejects unverified references; [doc 10 §1](10_literature_review.md) shows what was only an abstract or record |
 | [ ] | — | Read Acosta 2010 and confirm the 0.75 rad LQR claim and the methods listed in the Introduction | Aleksei | Wed 4 Nov | Full text blocked for automated access. `--final` hides the orange mark, so fix or remove the sentence first |
 | [ ] | — | Give a source for the rocket-landing claim in the Introduction, or drop it | Aleksei | Wed 4 Nov | No source in either draft |
 | [ ] | — | Check Aleksei's MATEC paper: it's about a *tilted* Furuta pendulum, so does it support what he cites it for? | Aleksei | Wed 4 Nov | Only needed if it's cited: his report draft doesn't cite it. The site blocked automated access |
 | [ ] | I-03 | Find a source for m_r = 0.095 kg, ideally the QUBE-Servo 2 workbook | Jack | Wed 4 Nov | J_r depends on it. The TU Delft sheet was unreachable |
+| [ ] | — | Give a source for the schooner glass weight (300–330 g), or reword the sentence in Section II-C | Jack | Wed 4 Nov | Marked orange in the report. The brief rejects unverified references |
+| [ ] | — | Confirm the 6-page limit on Canvas | Jack | Wed 4 Nov | Our copy of the brief says at most 8 pages; the rubric gives no limit. The report is built to 6, which fits either way |
 | [ ] | — | Confirm the arm's ±90° cable limit, or state it as an assumption | Team | Wed 4 Nov | Both of you assumed it |
 | [ ] | — | Get the AI-citation rules from Canvas or your tutor, then write the declaration | Team | Thu 5 Nov | Searched every course PDF: no rule stated, only "ask an LLM, but be critical" (Lecture 1, p. 32) and slides crediting "source: ChatGPT" |
 | [ ] | — | Confirm `Template-Latex.zip` matches the one on Canvas | Jack | Wed 4 Nov | |
 | [ ] | I-05 | Only if you cite textbooks: check chapter numbers against your edition | Team | Thu 5 Nov | The report draft cites none |
 
-## 4. Report (IEEE LaTeX, max 8 pages; build with `python report/build.py`)
+## 4. Report (IEEE LaTeX, max 6 pages not counting references and the appendix; build with `python report/build.py`)
 
 | Done | Task | Who | By | Source material |
 | --- | --- | --- | --- | --- |
@@ -53,8 +79,7 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 | [ ] | §4 Problem Definition | Team | Wed 4 Nov | Docs 02 §3, 03 §4 |
 | [ ] | §5 Controller Design | Aleksei (proposed) | Thu 5 Nov | Docs 04, 06, 09 |
 | [ ] | §6 Numerical Validations | Jack (proposed) | Thu 5 Nov | Doc 05 |
-| [ ] | Decide whether the Kalman trade-off figure goes in. The `--final` build is 7 pages (8 in draft, because of the marks), so there is room if the rewrite doesn't add length | Team | Thu 5 Nov | `w11_kalman_tradeoff.png` |
-| [ ] | Stay within 8 pages: check with `--final`, as the 7-page build has about one page spare; check notation, including `b` used for both the encoder offset and a model constant; every figure is discussed in the text | Team | Thu 5 Nov | |
+| [ ] | Stay within the 6-page body: check with `--final`, which reports it. The body fills page 6 exactly, so the rewrite can't add any length. The AI declaration sits with the references on page 7: ask whether that counts; check notation, including `b` used for both the encoder offset and a model constant; every figure is discussed in the text | Team | Thu 5 Nov | |
 | [ ] | Put the reference list in first-cited order, as IEEE style expects | Team | Thu 5 Nov | `report/main.tex` |
 
 ## 5. Before submission
@@ -63,7 +88,7 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 | --- | --- | --- | --- |
 | [ ] | Clone the repo fresh, run `run_all`, and check the numbers and figures match the report | Team | Thu 5 Nov |
 | [ ] | Build with `python report/build.py --final --package` for the final PDF and MATLAB zip | Jack | Fri 6 Nov |
-| [ ] | Check the PDF: machine-readable, ≤ 8 pages, IEEE format, all seven sections | Team | Fri 6 Nov |
+| [ ] | Check the PDF: machine-readable, body ≤ 6 pages, IEEE format, all seven sections | Team | Fri 6 Nov |
 | [ ] | Proofread | Team | Fri 6 Nov |
 | [ ] | Submit the report PDF and MATLAB files on Canvas | Jack | **Fri 6 Nov** |
 
@@ -73,6 +98,9 @@ Tick items off here as they are done. When an item closes a logbook issue (I-xx)
 
 Closed items, newest first. Details are in the [LOGBOOK](LOGBOOK.md).
 
+- [x] Report restructured to a 6-page body plus references and a 3-figure appendix; tray limitation added (D-22), 2026-11-04
+- [x] Aleksei's second draft merged into the report (stacking step, arm-modelling elements, grouped parameter table), 2026-11-04
+- [x] Jack's review notes applied to the report; `week11_observer.m` extended; marking criteria doc added, 2026-11-04
 - [x] `run_all` to `figures/`, then the report and docs refreshed from the log; doc 06 redone for D4, 2026-11-04
 - [x] Aleksei's report sections merged into `report/main.tex` (D-20), 2026-11-04
 - [x] Aleksei's Simulink run with our gains: agrees with our code on the shared test, 2026-11-04

@@ -110,11 +110,11 @@ Same integrator (−5), published damping, spin term included, quantised encoder
 
 **Decision (D-19): Aleksei's poles adopted.** They clear the tap limit with less voltage and less ripple, and they settle sooner. His rise-time target of ≤ 0.5 s isn't met with the integrator-only reference path (0.75 s), so that target isn't used. They are set in `furuta_design.m`.
 
-**His observer (checked 2026-11-04).** His Simulink uses observer poles −40, −45, −50, −55 with no integrator or disturbance model. In our full loop, those poles give a 20.4° tap (limit 15°) and 10/200 unstable plants, against 14.6° and 3/200 for −100…−130 (`week11_kalman.m`). We keep −100…−130 (LOGBOOK D-20).
+**His observer (checked 2026-11-04).** His Simulink uses observer poles −40, −45, −50, −55 with no integrator or disturbance model. In our full loop, those poles give a 20.4° tap (limit 15°) and 10/200 unstable plants, against 14.6° and 3/200 for −100…−130 (`week11_observer.m`). We keep −100…−130 (LOGBOOK D-20).
 
 ## 4. Observer (Week 11): design and results
 
-Only θ and α are measured (doc 08), so the velocities are estimated by a **discrete-time Luenberger observer** running at 1 kHz, in predictor form:
+Only θ and α are measured (doc 08), so the velocities are estimated by a **discrete-time state observer** running at 1 kHz, in predictor form:
 
 $$
 \hat x_{k+1} = A_d\hat x_k + B_d u_k + L\left(y_k - C\hat x_k\right),\qquad u_k = \operatorname{sat}\!\left(-K_x\hat x_k - k_i\xi_k\right),\qquad \xi_{k+1} = \xi_k + T_s\left(y_{\theta,k} - r_k\right)
@@ -126,6 +126,32 @@ $$
 - The observer is driven by the **saturated** voltage, so its estimate stays right while the motor is saturated.
 - Code: [furuta_design.m](../matlab/furuta_design.m) (gains), [furuta_sim_obs.m](../matlab/furuta_sim_obs.m) (loop), [week11_observer.m](../matlab/week11_observer.m) (design and tests).
 
+**"Luenberger" or just "observer"?** They are the same thing: a Luenberger observer is the standard state observer, named after its inventor. The course PDFs just say "observer", so the report does too.
+
+**Analytical derivation of the observer gain.** This is the observer version of doc 06. In continuous time, with C = [I 0], A = [0 I; A₂₁ A₂₂], L = [L₁; L₂], and e = [e₁; e₂] (angle errors, velocity errors):
+
+$$
+\dot e_1 = -L_1 e_1 + e_2,\qquad \dot e_2 = (A_{21} - L_2)e_1 + A_{22}e_2
+$$
+
+Taking Laplace transforms gives e₂ = (sI + L₁)e₁. Substituting that into the second equation gives (sI − A₂₂)(sI + L₁)e₁ = (A₂₁ − L₂)e₁, so:
+
+$$
+\det(sI - A + LC) = \det\left(s^2I + s(L_1 - A_{22}) + (L_2 - A_{22}L_1 - A_{21})\right)
+$$
+
+There are 8 gains and 4 poles, so L isn't unique. Choosing both coefficient matrices to be diagonal splits this into one quadratic per sensor. Pairing the poles to give (s² + 230s + 13000)(s² + 230s + 13200):
+
+$$
+L_1 = A_{22} + 230I,\qquad L_2 = A_{21} + A_{22}L_1 + \mathrm{diag}(13000, 13200)
+$$
+
+$$
+L_1 = \begin{bmatrix} 227.4 & -0.36 \\ -2.58 & 228.9 \end{bmatrix},\qquad L_2 = \begin{bmatrix} 12408 & -27 \\ -583 & 13115 \end{bmatrix}
+$$
+
+`week11_observer.m` confirms that eig(A − LC) matches the requested poles to 10⁻¹². The simulation runs at 1 kHz, so it uses the sampled gain from `place` with the same poles: L_d = [0.213, −0.009; −0.012, 0.218; 11.00, −0.90; −1.52, 11.89]. That is close to T_s·L, whose diagonal entries are 0.227, 0.229, 12.4 and 13.1. It's smaller because sampling reduces pT_s to 1 − e^{−pT_s}, and it differs elsewhere because the gain isn't unique.
+
 **Final gains:**
 
 - K_x = [−3.561, 38.01, −1.423, 3.146] and k_i = −4.508, from controller poles −2.7 ± 2.38j, −10.8, −13.5, −5.
@@ -135,15 +161,17 @@ $$
 
 ### Choosing the observer poles
 
-Test: start at α₀ = 5° with x̂₀ = 0; quantised encoders; small random torques (`week11_observer.m`). The tap and robustness columns come from `week11_kalman.m`: the robustness count is the linear sampled loop on 200 plants with all parameters ±20%.
+All from `week11_observer.m`. Noise: random torques and quantised encoders. Tap: 20 mN·m for 20 ms. Robustness: the linear sampled loop on 200 plants with all parameters ±20%.
 
-| Observer poles | Error < 2% after | RMS u (V) | RMS α̇ error (deg/s) | Tap: max \|α\| | Unstable / 200 |
-| --- | --- | --- | --- | --- | --- |
-| −15…−18 | 0.53 s | 0.046 | 0.57 | falls | 52 |
-| −40…−55 | 0.22 s | 0.095 | 1.09 | 20.4° | 10 |
-| **−100…−130 (chosen)** | 0.37 s (noise floor) | 0.210 | 2.93 | 14.6° | **3** |
-| −250…−280 | 0.40 s (noise floor) | 0.494 | 7.83 | 12.7° | 2 |
-| True state | — | — | — | 11.4° | 1 |
+| Observer poles | RMS u (V) | RMS α̇ error (deg/s) | Tap: max \|α\| | Unstable / 200 |
+| --- | --- | --- | --- | --- |
+| −15…−18 | 0.045 | 0.53 | falls | 52 |
+| −40…−55 | 0.095 | 1.05 | 20.4° | 10 |
+| **−100…−130 (chosen)** | 0.216 | 2.94 | 14.6° | **3** |
+| −250…−280 | 0.498 | 7.84 | 12.7° | 2 |
+| True state | — | — | 11.4° | 1 |
+
+**Convergence (corrected 2026-11-04).** From α₀ = 10° and x̂₀ = 0, the error norm peaks at 7.2 after 9 ms and falls to a noise floor of about 0.04 by 60 ms. An earlier "below 2% after 0.11 s" was only the first brief dip below that line, as the floor itself sits above 2% of the initial error.
 
 **Why fast poles were chosen (LOGBOOK D-10, D-20).** A slow observer gives smooth estimates, but it reacts too late to a tap and badly erodes robustness. The plants it fails on have a weaker motor than modelled (k_m low, R_m high). This is the known result that observer-based feedback has no guaranteed robustness margins (Doyle, 1978). −100…−130 is the slowest set tested that meets the tap limit, at a cost of 0.22 V RMS of noise and about 0.7° peak-to-peak of arm ripple from quantisation. With x̂₀ = 0 it also hits the 10 V limit briefly at start-up, because of the large initial estimation error.
 
@@ -151,7 +179,7 @@ Test: start at α₀ = 5° with x̂₀ = 0; quantised encoders; small random tor
 
 **Cost of the observer.** It reacts later than full-state feedback to a sudden disturbance. A 20 mN·m, 20 ms tap gives max |α| = 14.6° with the observer, against 11.4° with the true state. The region of attraction is 24°, against 30° for the same poles with the true state. The phase margin is 36°, against 59° (`week12_margins.m`).
 
-**A Kalman filter offers a different trade-off.** It is modestly quieter for a similar tap response, but not clearly better overall: see [doc 09](09_kalman_filter.md). The report uses the pole-placed observer (D-12, option A).
+**Kalman filter:** kept as background in [doc 09](09_kalman_filter.md). It's outside the unit and the brief, so it isn't in the report (D-12).
 
 ## 5. Discussion points for Assessment 2
 

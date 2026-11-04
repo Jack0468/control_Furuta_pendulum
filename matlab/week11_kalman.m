@@ -1,4 +1,5 @@
 %% Week 11 - Steady-state Kalman filter as the observer (docs/09)
+% Background study only: outside the unit and not used in the report, so run_all skips it.
 % Builds the discrete-time noise model (torque disturbances in, encoder quantisation
 % out), computes the steady-state Kalman gain from the Riccati equation, and compares
 % Kalman observers with the pole-placed observers on noise, disturbance response

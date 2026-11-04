@@ -1,5 +1,7 @@
 # 09: Investigation of a Kalman Filter as the Observer
 
+> **Background only.** The team removed this from the report on 2026-11-04 because it's outside the unit and the brief (D-12). `run_all` and the Canvas zip skip `week11_kalman.m`; run it directly to regenerate these numbers.
+
 **Result:** a steady-state Kalman filter performs about as well as the best pole-placed observers for this plant, and is modestly quieter for a similar disturbance response, provided its process-noise covariance Q is set to the size of the torques the model *doesn't* know about, not just the small random noise. It is not a clear overall win (Figure `w11_kalman_tradeoff.png`, table in §5).
 
 A Kalman filter tuned only to the small random noise ("matched") lets the pendulum fall after a firm tap. It trusts the model too much.

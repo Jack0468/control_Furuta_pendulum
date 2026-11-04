@@ -28,7 +28,7 @@
 | LQR as a comparison design | Kalman filter instead of a pole-placed observer |
 | Reference tracking of the arm angle θ | Coulomb friction and encoder-quantisation models |
 | Integral action to reject constant arm torque | Robustness sweep (Monte Carlo over parameters) |
-| Luenberger observer for θ̇, α̇ (Week 11) | |
+| State observer for θ̇, α̇ (Week 11) | |
 | Tests: saturation, disturbances, ±20% parameter error | |
 
 ## 3. Control architecture

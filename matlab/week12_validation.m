@@ -32,8 +32,8 @@ fprintf('V2 30 deg step: Ts = %.2f s, tr = %.2f s, OS = %.1f %%, US = %.1f %%, m
 S2u = furuta_sim_obs(P, D, zeros(4,1), 4.5, struct('r', @(t) r0*(t >= tstep), 'quant', false));
 thu = S2u.x(m,1); k = find(abs(thu - r0) > 0.02*r0, 1, 'last');
 w = S2.t >= 3;
-fprintf('V2 unquantised: Ts = %.2f s; quantised arm ripple (t >= 3 s) = %.2f deg peak to peak, settling band +/-%.1f deg\n', ...
-        tt(k+1), deg(max(S2.x(w,1)) - min(S2.x(w,1))), deg(0.02*r0));
+fprintf('V2 unquantised: Ts = %.2f s; quantised arm ripple (t >= 3 s) = %.2f deg peak to peak, settling band +/-%.1f deg; max|alpha| during the step = %.2f deg\n', ...
+        tt(k+1), deg(max(S2.x(w,1)) - min(S2.x(w,1))), deg(0.02*r0), deg(max(abs(S2.x(:,2)))));
 
 %% V3. Pendulum tap + constant arm drag, with and without integrator (R6, R7)
 op3 = struct('tau_p', @(t) 0.02*(t >= 0.5 & t < 0.52), 'tau_d', @(t) 0.002*(t >= 2.5));

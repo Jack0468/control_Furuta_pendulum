@@ -98,6 +98,7 @@ Jack's review notes, 2026-11-04, with what was done about each.
 
 Closed items, newest first. Details are in the [LOGBOOK](LOGBOOK.md).
 
+- [x] Aleksei's third draft merged (actuator limitation, aim and operating point, requirements summary), 2026-11-06
 - [x] Report restructured to a 6-page body plus references and a 3-figure appendix; tray limitation added (D-22), 2026-11-04
 - [x] Aleksei's second draft merged into the report (stacking step, arm-modelling elements, grouped parameter table), 2026-11-04
 - [x] Jack's review notes applied to the report; `week11_observer.m` extended; marking criteria doc added, 2026-11-04

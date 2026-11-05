@@ -3,7 +3,7 @@
 % MARKING CONVENTION (shown in colour until built with --final):
 %   \begin{rw}...\end{rw}  BLUE    AI-drafted prose. REWRITE IN YOUR OWN WORDS, then remove the environment.
 %   \vfy{...}              ORANGE  Something a person must check (source not read, value not verified).
-%   Black                          Equations, tables and data, plus Aleksei's own prose (merged 2026-11-04,
+%   Black                          Equations, tables and data, plus Aleksei's own prose (merged 2026-11-04 and 2026-11-06,
 %                                  converted to our alpha sign and symbols).
 %
 % Page limit: 6 pages, not counting references and the appendix (build.py checks this).
@@ -56,7 +56,7 @@ The University of Sydney}}
 
 \begin{abstract}
 \begin{rw}
-The Furuta pendulum is a small under-actuated laboratory system whose upright position is an unstable equilibrium. Motivated by a serving arm that carries a drink on an unactuated tray joint, this paper tests how far a linear controller can stabilise this highly nonlinear system. A nonlinear Euler--Lagrange model is linearised about upright to give a four-state model with one voltage input and two encoder measurements. Pole placement with integral action on the arm angle is combined with a discrete-time state observer that estimates the unmeasured velocities at 1\,kHz. The controller is validated on the full nonlinear model with voltage saturation, datasheet-based encoder quantisation, disturbances and parameter uncertainty. It recovers from a 10\textdegree{} tilt in 0.97\,s using at most 6.6\,V and tracks a 30\textdegree{} arm step with 1.4\% overshoot and 1.38\,s settling. Gain margins are $-4.6$/$+16.6$\,dB with a phase margin of 36\textdegree{}. A firm tap reaches 14.6\textdegree{}, just inside the 15\textdegree{} limit. Monte Carlo tests show that the observer reduces robustness to parameter error, and that this depends strongly on observer speed.
+The Furuta pendulum is a small under-actuated laboratory system whose upright position is an unstable equilibrium. Motivated by a serving arm that carries a drink on an unactuated tray joint, this paper tests how far a linear controller can stabilise this highly nonlinear system. A nonlinear Euler--Lagrange model is linearised about upright to give a four-state model with one voltage input and two encoder measurements. Pole placement with integral action on the arm angle is combined with a discrete-time state observer that estimates the unmeasured velocities at 1\,kHz. It is validated on the nonlinear model with saturation, encoder quantisation, disturbances and parameter error. It recovers from a 10\textdegree{} tilt in 0.97\,s using at most 6.6\,V and tracks a 30\textdegree{} arm step with 1.4\% overshoot and 1.38\,s settling. Gain margins are $-4.6$/$+16.6$\,dB with a phase margin of 36\textdegree{}. A firm tap reaches 14.6\textdegree{}, just inside the 15\textdegree{} limit. Monte Carlo tests show that the observer reduces robustness to parameter error, and that this depends strongly on observer speed.
 \end{rw}
 \end{abstract}
 
@@ -78,13 +78,10 @@ In our model a pendulum released just 2\textdegree{} from upright passes 15\text
 Models are normally derived by the Euler--Lagrange method \cite{gafvert1998,antonio2014}. Hamza et al.\ review linear, nonlinear, self-learning and adaptive controllers \cite{hamza2019}. Energy control swings the pendulum up and hands over to a stabilising controller \cite{astrom2000}. Sliding-mode \cite{izutsu2008}, predictive \cite{jung2004} and H$_\infty$ \cite{pujol2014} methods offer wider ranges or built-in robustness, but are more complex.
 \end{rw}
 Acosta~\cite{acosta2010} surveyed nonlinear stabilisation strategies for the Furuta pendulum, including energy shaping, forwarding and feedback linearisation, and found experimentally that a linear state-feedback (LQR) stabiliser recovered from initial tilts of up to 0.75\,rad, comparable to the same result from a nonlinear energy shaping controller. \vfy{Acosta: full text not accessed, so confirm 0.75 rad and these methods}
-\begin{rw}
-LQR has also been verified experimentally on rotary pendulums \cite{tang2020}, and pole placement and LQR were found equivalent on a related reaction-wheel prototype \cite{souza2026}.
-\end{rw}
 Barrios Valero~\cite{barrios2016} analysed previous work on the Furuta pendulum and showed in simulation that appropriate pole placement could return the pendulum to the upright position from an initial pendulum angle of 6\textdegree{}. This supports the use of linear state feedback. In this design the closed-loop pole locations are determined from overshoot, settling time and rise time, instead of the use of a linear quadratic regulator.
 
 \begin{rw}
-Our aim is balance near upright, not swing-up, so a linear state-space design is a suitable choice. It also asks a useful question: how much of a highly nonlinear problem can an LTI approximation solve, and where does it stop working? Because encoders measure only angles, and differentiating them amplifies quantisation \cite{belanger1998}, we use a state observer, and we examine the robustness it costs, since observer-based loops have no guaranteed margins \cite{doyle1978}.
+We balance near upright, not swing-up, so a linear state-space design suits, and we ask how much of a highly nonlinear problem an LTI design can solve. Because encoders measure only angles, and differentiating them amplifies quantisation \cite{belanger1998}, we use a state observer, and we examine the robustness it costs, since observer-based loops have no guaranteed margins \cite{doyle1978}.
 
 Section~II develops the nonlinear model, Section~III the control problem and linear model, and Section~IV the controller and observer. Section~V validates them, and Section~VI concludes.
 \end{rw}
@@ -119,9 +116,6 @@ The arm is driven by a DC motor with armature resistance $R_m$ and motor constan
 \begin{equation}
 \tau = \frac{k_m}{R_m}\left(V_m - k_m\dd\right). \label{eq:motor}
 \end{equation}
-\begin{rw}
-Equation \eqref{eq:motor} shows that back-EMF acts as extra damping on the arm.
-\end{rw}
 
 \subsection{Parameters}
 \begin{rw}
@@ -160,15 +154,18 @@ Real joints also show Coulomb friction and stiction \cite{gafvert1998,gafvert199
 We test the response to three disturbance torques. Each has a physical source in the serving task, and enters the model through $\tau_d$ or $\tau_p$ in \eqref{eq:arm}--\eqref{eq:pend}.
 \begin{itemize}
 \item \emph{Bump on the tray.} A customer knocks the tray or takes a glass. We model this as a short pulse on the pendulum, $\tau_p=20$\,mN\,m for 20\,ms, chosen as a firm knock. It acts as a sudden velocity kick of about 4.4\,rad/s (250\textdegree/s). This is the hardest test for the observer, because the kick only appears in $\alpha$ after it has happened.
-\item \emph{Constant arm drag.} The encoder cable pulls on the arm, or the motor has friction. We model this as a step $\tau_d=2$\,mN\,m, about 4\% of the 0.05\,N\,m stall torque at 10\,V. It tests whether the arm still reaches its target, that is, the steady-state error.
-\item \emph{Random torques.} Vibration and unmodelled friction, modelled as zero-mean white noise held over each sample, with assumed standard deviations of 0.2 and 0.05\,mN\,m on the arm and pendulum. Together with the encoder quantisation below, it tests how much noise reaches the motor voltage.
+\item \emph{Constant arm drag.} The encoder cable pulls on the arm, or the motor has friction. We model this as a step $\tau_d=2$\,mN\,m, about 4\% of the 0.05\,N\,m stall torque at 10\,V. It tests the steady-state error.
+\item \emph{Random torques.} Vibration and unmodelled friction, modelled as zero-mean white noise held over each sample, with assumed standard deviations of 0.2 and 0.05\,mN\,m on the arm and pendulum. It tests how much noise reaches the voltage.
 \end{itemize}
 Section~V-D reports the effect of each on performance.
 \end{rw}
 
 \subsection{Actuator limits and sensors}
 \begin{rw}
-We limit the voltage to $\pm10$\,V, a conservative choice inside the $\pm15$\,V drive range of the hardware \cite{quanserdocs} and the 18\,V rating of a motor with matching constants \cite{allied}. That motor is rated at 0.54\,A continuous and 2.1\,A at stall, so only brief currents above the rating are acceptable. Its inductance gives an electrical time constant of 0.14\,ms, which justifies neglecting it. The arm angle is limited to about $\pm90^\circ$ by the encoder cable\vfy{assumed}. The controller runs at 1\,kHz, as a similar loop has on an ESP32 \cite{souza2026}.
+\end{rw}
+The QUBE-Servo 2 input is limited to $\pm10$\,V, which is inside the $\pm15$\,V limit of the hardware \cite{quanserdocs}. This caps the motor torque at about 0.05\,N\,m, and the available torque drops further as the arm speeds up because of back-EMF. The controller is designed assuming the motor can supply any voltage, but recovering from a specific tilt needs a peak that exceeds the voltage threshold in simulation, so the real input would saturate. This limits how large a tilt or disturbance the controller can recover from. Using slower poles would reduce the required voltage, at the cost of a slower response.
+\begin{rw}
+A motor with matching constants \cite{allied} is rated at 18\,V, 0.54\,A continuous and 2.1\,A at stall, so only brief currents above the rating are acceptable. Its inductance gives an electrical time constant of 0.14\,ms, which justifies neglecting it. The arm angle is limited to about $\pm90^\circ$ by the encoder cable\vfy{assumed}. The controller runs at 1\,kHz, as a similar loop has on an ESP32 \cite{souza2026}.
 
 Only $\theta$ and $\alpha$ are measured, by 512-cycle optical encoders read in quadrature (2048 counts/rev) \cite{heds5540}. The output is digital, so the dominant error is quantisation, not analogue noise:
 \end{rw}
@@ -182,14 +179,11 @@ which behaves like noise of standard deviation $\sigma_v=q/\sqrt{12}=0.886$\,mra
 % =====================================================================
 \section{Problem Definition}
 \subsection{Aims and operating point}
-\begin{rw}
-The aim is to keep the drink upright, move the arm to a serving position, and reject bumps within actuator limits. The operating point is $\bar x=0$, $\bar u=0$. Any arm angle is also an equilibrium, because $\theta$ does not appear in the dynamics, so $\bar\theta=0$ is chosen without loss of generality. Swing-up is outside the scope.
-\end{rw}
+For this system we would like to control the pendulum so that it stays in equilibrium with the arm not including any external masses. The aim is to keep the pendulum upright, move the arm to a commanded angle $r$, and reject bumps within the actuator limits.
+
+The system is linearised about the upright equilibrium $\bar x=[\bar\theta\;\;0\;\;0\;\;0]^T$, $\bar u=0$. Because the arm moves in the horizontal plane, it is in equilibrium at every angle $\bar\theta$, so a single linear model is valid whatever angle the arm is commanded to, while the pendulum must stay near $\alpha=0$ for the small-angle linearisation to hold. The design is tested by commanding the arm from $0^\circ$ to $r=30^\circ$ as a step. \begin{rw}Swing-up is outside the scope.\end{rw}
 
 \subsection{Linear state-space model}
-\begin{rw}
-The model is nonlinear and so cannot be used directly with state-space design.
-\end{rw}
 Equations \eqref{eq:arm}--\eqref{eq:motor} are linearised about the upright equilibrium using $\sin\alpha\approx\alpha$, $\cos\alpha\approx1$, and neglecting products of small quantities. Writing $a=J_r+m_pL_r^2$, $b=\tfrac12m_pL_pL_r$, $d=\tfrac12m_pgL_p$ and $B_{eq}=D_r+k_m^2/R_m$, this gives
 \begin{equation}
 M\ddot\eta+D_\eta\dot\eta+K_\eta\eta=G\,V_m,
@@ -231,16 +225,18 @@ The open-loop poles are $0$, $-14.06$, $-1.75$ and $+12.09$\,rad/s, so a lean gr
 
 \subsection{Design criteria}
 \begin{rw}
-Each aim above gives a criterion in Table~\ref{tab:req}. The numbers follow from the serving task using stated assumptions, and the speed and overshoot limits convert to a region for the dominant closed-loop poles, which is what a state-space design needs.
+\end{rw}
+The controller is designed around the following main requirements. The pendulum must recover from a $10^\circ$ displacement to within $1^\circ$ of upright in under 1.5\,s. When the arm is commanded to $30^\circ$, the response must have an overshoot below 5\%, an undershoot below 10\%, a rise time of at least 0.3\,s and a settling time below 2.5\,s. Throughout, the peak motor voltage must stay below 10\,V. The controller must also reject disturbances: after a bump to the pendulum, the pendulum must stay within $15^\circ$ of upright and the arm within $90^\circ$, and under a constant arm drag the final arm angle error must be below $2^\circ$. Finally, the design should remain stable under $\pm20\%$ variations in the model parameters.
+\begin{rw}
+Table~\ref{tab:req} lists them. The numbers follow from the serving task, and convert to a region for the dominant poles:
 \begin{itemize}
 \item \emph{Keep the drink in the glass: $|\alpha|\le15^\circ$.} A level drink in a glass of radius $R=35$\,mm with 10\,mm of freeboard spills at $\arctan(10/35)=15.9^\circ$. We round this down to 15\textdegree, where $\sin\alpha\approx\alpha$ holds within 1.2\%, so the linear model also stays accurate.
-\item \emph{Recover from a tilt: $|\alpha|<1^\circ$ within 1.5\,s of a 10\textdegree{} release.} A 10\textdegree{} error represents a tray set down unevenly. The 1.5\,s is a design choice, shorter than one arm move.
+\item \emph{Recover from a tilt.} A 10\textdegree{} release represents a tray set down unevenly; 1.5\,s is a design choice, shorter than one arm move.
 \item \emph{Serve quickly: $T_s\le2.5$\,s.} A commercial robot bar makes over 80 drinks per hour \cite{makrshakr}, or 45\,s per drink. Allowing a quarter of that for settling over four arm moves gives 2.8\,s per move, which we round down to 2.5\,s. With $T_s\approx4/(\zeta\omega_n)$, this requires $\zeta\omega_n\ge1.6$\,rad/s.
 \item \emph{Do not swing past the customer: overshoot $\le5$\%.} This is a design choice. With $\zeta=-\ln(OS)/\sqrt{\pi^2+\ln^2(OS)}$, it requires $\zeta\ge0.69$.
 \item \emph{Do not slosh the drink: $\omega_n\lesssim4.5$\,rad/s, $t_r\ge0.3$\,s.} For liquid depth $H$, the first slosh mode of a cylinder satisfies $\omega^2=(1.841g/R)\tanh(1.841H/R)$ \cite{reclari2014}, about 22.7\,rad/s. Keeping the dominant poles about five times slower gives $\omega_n\lesssim4.5$\,rad/s, close to the limit $z/2\approx5.2$\,rad/s set by the right-half-plane zero $z$. With $t_r\approx1.8/\omega_n$ this is about 0.4\,s, and we check a 0.3\,s floor on the simulated response.
 \item \emph{Accept a wrong-way start: undershoot $\le10$\%.} The right-half-plane zero makes undershoot unavoidable, so we bound it rather than try to remove it.
-\item \emph{Stay within limits and hold position.} $|V_m|\le10$\,V and $|\theta|\le90^\circ$ are the limits from Section~II-D. A mean $\theta$ error below 2\textdegree{} under drag is about 3\,mm at the arm tip.
-\item \emph{Tolerate parameter error: $\pm20$\%.} The parameters are uncertain (Section~II-C).
+\item \emph{Hold position.} A 2\textdegree{} drag error is about 3\,mm at the arm tip.
 \end{itemize}
 Together these place the dominant poles where $\zeta\ge0.69$, $\mathrm{Re}(s)\le-1.6$\,rad/s and $|s|\lesssim4.5$\,rad/s.
 \end{rw}
@@ -279,7 +275,7 @@ The plant has four states, so we choose a dominant pair inside the region above,
 \begin{itemize}
 \item \emph{D1, fast poles far away.} $\zeta=0.7$ and $\omega_n=4$\,rad/s give $-2.8\pm2.86j$, with fast poles at $-30$ and $-40$, 11--14 times further left. This tests the assumption that well-separated poles make the second-order formulas accurate. It needs large gains ($k_\alpha=110$), so it demands 19\,V for a 10\textdegree{} tilt, well beyond the actuator limit. It also misses the overshoot limit and does not improve the recoverable angle.
 \item \emph{D2, fast poles closer.} The same dominant pair, with fast poles at $-12$ and $-15$, about 4--5 times further left, the usual minimum separation. The gains fall ($k_\alpha=30.3$) and the voltage drops to 5.3\,V, with similar settling and overshoot, and less undershoot.
-\item \emph{D3, slower dominant pair.} $\omega_n=3$\,rad/s gives $-2.1\pm2.14j$, with the same fast poles. Slowing down saves only 0.6\,V and leaves little settling margin (2.15\,s).
+\item \emph{D3, slower dominant pair.} $\omega_n=3$\,rad/s ($-2.1\pm2.14j$) saves only 0.6\,V, with little settling margin (2.15\,s).
 \item \emph{D4, more damping.} $\zeta=0.75$, for margin above 0.69, and $\omega_n=3.6$\,rad/s give $-2.7\pm2.38j$, with fast poles at $4\sigma$ and $5\sigma$ for $\sigma=\zeta\omega_n=2.7$. This has the lowest voltage, and less overshoot than D1--D3.
 \end{itemize}
 D2 and D4 both meet the criteria on the linear model.
@@ -390,7 +386,7 @@ All tests use the nonlinear model \eqref{eq:arm}--\eqref{eq:motor}, integrated w
 \end{rw}
 
 \begin{figure*}[t]
-\centering\includegraphics[width=0.68\textwidth]{w12_validation_overview.png}
+\centering\includegraphics[width=0.64\textwidth]{w12_validation_overview.png}
 \caption{Nonlinear closed-loop responses with the observer: release from 10\textdegree{} (left), reference step from 0 to 30\textdegree{} at 0.5\,s (centre), tap at 0.5\,s and arm drag from 2.5\,s (right). Rows: arm angle, pendulum angle (true and estimated), motor voltage with limits.}
 \label{fig:overview}
 \end{figure*}
@@ -419,7 +415,7 @@ The bottom-right panel shows the cost of this start. The voltage sits at the 10\
 \end{rw}
 
 \begin{figure}[t]
-\centering\includegraphics[width=0.58\figw]{w12_monte_carlo.png}
+\centering\includegraphics[width=0.54\figw]{w12_monte_carlo.png}
 \caption{Pendulum angle for 40 plants with $\pm20$\% random parameters, released from 10\textdegree, with a tap at 2\,s.}
 \label{fig:mc}
 \end{figure}
@@ -458,7 +454,6 @@ Future work should measure the damping and arm inertia on real hardware, add Cou
 \bibitem{izutsu2008} M. Izutsu, Y. Pan, and K. Furuta, ``Swing-up of Furuta pendulum by nonlinear sliding mode control,'' \textit{SICE J. Control, Meas., Syst. Integr.}, vol. 1, no. 1, pp. 12--17, 2008. \vfy{not read}
 \bibitem{jung2004} S. Jung and J. T. Wen, ``Nonlinear model predictive control for the swing-up of a rotary inverted pendulum,'' \textit{J. Dyn. Syst., Meas., Control}, vol. 126, no. 3, pp. 666--673, 2004. \vfy{not read}
 \bibitem{acosta2010} J. \'A. Acosta, ``Furuta's pendulum: A conservative nonlinear model for theory and practise,'' \textit{Math. Probl. Eng.}, vol. 2010, Art. no. 742894, 2010. \vfy{abstract only: read}
-\bibitem{tang2020} T. F. Tang, S. H. Chong, and K. K. Pang, ``Stabilisation of a rotary inverted pendulum system with double-PID and LQR control: Experimental verification,'' \textit{Int. J. Autom. Control}, vol. 14, no. 1, 2020. \vfy{not read; add pages}
 \bibitem{souza2026} R. H. S. de Souza, J. B. dos Santos, L. D. da Silva, R. Breganon, and U. N. L. T. Alves, ``State-feedback control of a reaction-wheel inverted pendulum prototype,'' \textit{Front. Control Eng.}, vol. 7, Art. no. 1905949, 2026.
 \bibitem{barrios2016} S. Barrios Valero, ``Design and implementation of a Furuta pendulum device for benchmarking non-linear control methods,'' Bachelor's thesis, Univ. Zaragoza, Zaragoza, Spain, 2016.
 \bibitem{belanger1998} P. R. B\'elanger, P. Dobrovolny, A. Helmy, and X. Zhang, ``Estimation of angular velocity and acceleration from shaft-encoder measurements,'' \textit{Int. J. Robot. Res.}, vol. 17, no. 11, pp. 1225--1233, 1998. \vfy{not read}

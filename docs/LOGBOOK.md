@@ -309,3 +309,31 @@ No simulation was run for this: text and layout only, using the numbers already 
 ### Sign convention check
 
 Checked symbolically, with no simulation: the report's energies give its equations of motion, these match `furuta_nl.m`, and its M, D and K give the printed A and B. Aleksei's draft is self-consistent but uses the opposite α direction: substituting α → −α turns his equations into ours. A(3,2), A(3,4), A(4,3) and B(4) change sign, and so would k_α and k_α̇. The α direction is stated in the report only, not in his draft. His Simulink's sign can't be checked, because the script that sets its A, B and K isn't in the repo (I-09).
+
+## 2026-11-06 (due today): Aleksei's third draft merged
+
+Checked first: the Overleaf copy Jack pasted is identical to GitHub `de928cb`, so no human edits had been made to `report/main.tex` since 4 Nov.
+
+**Merged in his words, with `r` for his θ_ref:**
+
+- his actuator limitation (Section II-D), with our citation and motor ratings kept
+- his aim and operating point, replacing our blue III-A
+- his summary of the design requirements, at the start of III-C
+
+**Not merged:**
+
+- his numeric A, open-loop poles (+9.96) and zero (+8.97), which are from the old damping and use his opposite α sign
+- his requirements table, which uses T_s ≤ 1.5 s (ζω_n ≥ 2.67) against the agreed 2.5 s
+- the unfinished sentence "This desing could be used as a"
+- his disturbance paragraph, which is our earlier text that the expanded list replaced
+
+**To fit 6 pages:** these cuts were made, with no numbers changed:
+
+- Tang et al. (unread) and the LQR sentence citing it
+- the back-EMF sentence, which his limitation now covers
+- the criteria items his paragraph now states
+- some shorter wording elsewhere
+- the two body figures, shrunk slightly
+
+AI-assisted: merge and fit.
+

@@ -86,7 +86,7 @@ ylabel('||e||'); xlabel('t [s]'); yticks([1e-9 1e-6 1e-3 1]);
 % No legend (it hides the curves); the report caption names them: blue angles [rad], orange rates [rad/s],
 % dashed rates with exact encoders.
 subplot(3, 2, 6); plot(S_fs.t, S_fs.u, S_obs.t, S_obs.u, '--'); grid on; xlim([0 1.5]);
-ylabel('V_m [V]'); xlabel('t [s]'); legend('full state', 'observer-based', 'Location', 'southeast');
+ylabel('V_m [V]'); xlabel('t [s]'); legend('true state', 'observer-based', 'Location', 'southeast');
 furuta_savefig(gcf, 'w11_observer_convergence', 7.16, 2.9);
 
 %% 3. Choice of observer poles: speed vs noise

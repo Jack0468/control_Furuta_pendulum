@@ -15,8 +15,8 @@ B =
    18.1591
 
 Open-loop poles: [0 12.09 -14.06 -1.75]
-Reachability rank : 4 of 4
-Observability rank: 4 of 4 (theta and alpha)
+Reachability rank : 4 of 4 (condition number 3.65e+03)
+Observability rank: 4 of 4 (theta and alpha; condition number 457)
 Observability rank: 4 (theta only), 3 (alpha only)
 Zeros of theta/Vm: [10.31 -11.06]  (RHP zero => non-minimum phase)
 Unstable time constant: 83 ms

@@ -156,6 +156,7 @@ def main():
     b.set_ylim(-0.1, 0.17)
     fig.tight_layout()
     out = Path(__file__).resolve().parent.parent / "figures" / "furuta_diagram.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, dpi=300, bbox_inches="tight")
     print(f"Saved {out}")
 

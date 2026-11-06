@@ -11,8 +11,8 @@ sys = ss(A, B, C, D, 'StateName', {'theta','alpha','theta_dot','alpha_dot'}, ...
 disp('A ='); disp(A); disp('B ='); disp(B);
 p_ol = eig(A);
 fprintf('Open-loop poles: %s\n', mat2str(p_ol.', 4));
-fprintf('Reachability rank : %d of %d\n', rank(ctrb(A, B)), size(A, 1));
-fprintf('Observability rank: %d of %d (theta and alpha)\n', rank(obsv(A, C)), size(A, 1));
+fprintf('Reachability rank : %d of %d (condition number %.3g)\n', rank(ctrb(A, B)), size(A, 1), cond(ctrb(A, B)));
+fprintf('Observability rank: %d of %d (theta and alpha; condition number %.3g)\n', rank(obsv(A, C)), size(A, 1), cond(obsv(A, C)));
 fprintf('Observability rank: %d (theta only), %d (alpha only)\n', ...
         rank(obsv(A, C(1,:))), rank(obsv(A, C(2,:))));
 z_theta = tzero(ss(A, B, C(1,:), 0));

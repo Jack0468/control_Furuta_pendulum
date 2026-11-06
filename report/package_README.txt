@@ -22,7 +22,7 @@ HOW TO REPRODUCE
 WHAT EACH FILE REPRODUCES (report section, equation, table or figure)
   Model and design functions
     furuta_params.m        Table I parameters (J_r = m_r L_r^2 / 3).
-    furuta_nl.m            nonlinear equations of motion (4)-(6), Section II-A.
+    furuta_nl.m            nonlinear equations of motion and motor model (2)-(4), Section II-A.
     furuta_linmodel.m      linearisation and the A, B, C matrices, Section III-B.
     furuta_design.m        final gains K_x, k_i (Section IV-B) and observer gain L_d (IV-C).
     furuta_sim_obs.m       1 kHz sampled loop: nonlinear plant, quantised encoders (7),

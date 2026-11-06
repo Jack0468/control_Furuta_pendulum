@@ -457,3 +457,21 @@ AI-assisted: merge and fit.
 - **antigravity_cli skill:**
   - **Liveness:** per-run heartbeat status, logs kept, `died` exit code 8, process-tree kill on timeout, and `agy_status.py`.
   - **Errors:** real failure reasons are reported, so the output-token limit was found behind the earlier exit-3 failures; the wrapper retries with a shorter-answer request.
+
+### Final Claude marking (97/100) and fixes
+
+- **Marker verdict:** a fresh strict marker gave 97/100, a go for submission. It flagged Problem Definition "aims justified" (−3) and a set of consistency issues, all applied (`scratch/final_marker_fixes.py`).
+- **Problem Definition:** III-A now justifies arm tracking, as a balancing vehicle must also move to a commanded position [Pujol]; a repeated III-B clause was trimmed to pay for it.
+- **IV-B:**
+  - Jack's rewrite of this paragraph is kept. "D4 then beat D2 on every test (Table III)" now cites the with-integrator results (1.38 vs 1.97 s, 14.6° vs 15.0°, 9.0 vs 9.7 V), since Table III has no integrator.
+  - "D2–D4 all meet" the linear criteria; the 26° is labelled D4 with the true state (V-D too).
+- **Symbols and terms:** the encoder offset is now b_e and the RHP zero z₀; "tap" is used throughout (no "bump").
+- **Wording:**
+  - aluminium-bar mass within 4%;
+  - "the step needs only 0.63 V";
+  - 8×10⁻¹⁶ by 4 s;
+  - "once anticlockwise".
+- **Captions:** dotted |1+L| = 0.5 explained; Table III defines OS, US and V₁₀°; Fig. 2 caption says two plants fall before the tap.
+- **Other text:** damping symbols and units in V-E; "still 0.22 V" with torques; the conclusion no longer says "double-counted"; the Acknowledgment says the log is "kept by the authors".
+- **Figures:** Figs. 1 and 6 re-exported with no numbers changed. Fig. 1 has no legend (the caption names the line styles) and ±12 V axes so the ±10 V limits show; Fig. 6 legend reads "true state".
+- **Package:** README equation numbers (2)–(4); stale Kalman note removed from `run_all.m`; `furuta_diagram.py` creates `figures/`. PDF 8 pages (6-page body), zip rebuilt.

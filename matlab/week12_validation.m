@@ -160,9 +160,9 @@ for i = 1:3
     S = T{i,1};
     subplot(3,3,i);   plot(S.t, deg(S.x(:,1)), S.t, deg(S.xhat(:,1)), '--'); grid on; ylabel('\theta [deg]'); title(T{i,2});
     subplot(3,3,3+i); plot(S.t, deg(S.x(:,2)), S.t, deg(S.xhat(:,2)), '--'); grid on; ylabel('\alpha [deg]');
-    subplot(3,3,6+i); plot(S.t, S.u); grid on; ylabel('V_m [V]'); xlabel('t [s]'); yline([P.Vmax -P.Vmax], 'r--');
+    subplot(3,3,6+i); plot(S.t, S.u); grid on; ylabel('V_m [V]'); xlabel('t [s]'); yline([P.Vmax -P.Vmax], 'r--'); ylim([-12 12]);
 end
-subplot(3,3,1); legend('true', 'estimate', 'Location', 'southeast');
+% No legend (it covers the traces): the report caption says solid = true, dashed = estimate.
 furuta_savefig(gcf, 'w12_validation_overview', 5.0, 2.3);   % printed at 0.7\textwidth, so text is 8 pt
 
 figure; plot(S3p.t, deg(S3p.x(:,1)), S3i.t, deg(S3i.x(:,1))); grid on;

@@ -1,0 +1,227 @@
+Console output of run_all (MATLAB R2025b, Windows 11), from a clean unzip of this package on 2026-11-06. Run time 267 s.
+
+
+===== week9_model_and_openloop =====
+A =
+         0         0    1.0000         0
+         0         0         0    1.0000
+         0   55.1525   -2.6089   -0.3632
+         0  168.5810   -2.5786   -1.1101
+
+B =
+         0
+         0
+   18.3728
+   18.1591
+
+Open-loop poles: [0 12.09 -14.06 -1.75]
+Reachability rank : 4 of 4
+Observability rank: 4 of 4 (theta and alpha)
+Observability rank: 4 (theta only), 3 (alpha only)
+Zeros of theta/Vm: [10.31 -11.06]  (RHP zero => non-minimum phase)
+Unstable time constant: 83 ms
+Nonlinear: pendulum passes 15 deg after 0.22 s
+
+Unstable pole under +/-20% parameter changes:
+  mp  x0.8 : 11.67 rad/s
+  mp  x1.2 : 12.46 rad/s
+  Lp  x0.8 : 13.33 rad/s
+  Lp  x1.2 : 11.13 rad/s
+  Lr  x0.8 : 11.94 rad/s
+  Lr  x1.2 : 12.19 rad/s
+  Rm  x0.8 : 12.07 rad/s
+  Rm  x1.2 : 12.11 rad/s
+  km  x0.8 : 12.13 rad/s
+  km  x1.2 : 12.06 rad/s
+  Dr  x0.8 : 12.14 rad/s
+  Dr  x1.2 : 12.05 rad/s
+  Dp  x0.8 : 12.20 rad/s
+  Dp  x1.2 : 11.99 rad/s
+----- week9_model_and_openloop done in 26 s
+
+===== week10_state_feedback =====
+Requirement => zeta >= 0.69, zeta*wn >= 1.60 rad/s
+
+design         K                                         Tr[s]    Ts[s]    OS[%]    US[%]  |u|10deg   |u|step
+D1 aggressive  [-9.16 110 -3.94 7.95]                     0.48     1.55      5.2      7.6      19.2       4.8
+D2 moderate    [-1.37 30.3 -0.838 2.44]                   0.52     1.65      4.7      4.0       5.3       0.7
+D3 slow        [-0.773 27.1 -0.624 2.14]                  0.70     2.15      4.7      2.4       4.7       0.4
+D4 final       [-0.902 26.6 -0.674 2.11]                  0.64     1.76      2.8      2.9       4.6       0.5
+LQR            [-2.24 34.5 -1.14 2.82]                    0.43     1.24      2.8      5.8       6.0       1.2
+LQR closed-loop poles: [-13.48 -12.56 -3.963+3.459i -3.963-3.459i]
+
+Nonlinear (D4): max|u| = 4.6 / 0.5 / 7.3 V; max|alpha| tap = 8.0 deg; theta offset from drag = -25.7 deg
+
+Largest recoverable alpha0 with |Vm| <= 10 V:
+  D1 aggressive  27 deg
+  D2 moderate    30 deg
+  D3 slow        30 deg
+  D4 final       30 deg
+  LQR            28 deg
+
+Robustness of D4 (max real closed-loop pole, perturbed linear model):
+  mp  x0.8 : -2.40
+  mp  x1.2 : -3.19
+  Lp  x0.8 : -2.65
+  Lp  x1.2 : -2.65
+  Rm  x0.8 : -2.25
+  Rm  x1.2 : -3.34
+  km  x0.8 : -3.33
+  km  x1.2 : -2.23
+  Dr  x0.8 : -3.05
+  Dr  x1.2 : -2.42
+  Dp  x0.8 : -2.67
+  Dp  x1.2 : -2.73
+
+Integral design Ka = [-3.56 38 -1.42 3.15 -4.51]
+Integral (nonlinear, tap + drag): final theta = -0.00 deg, max|theta| = 45.3 deg, max|alpha| = 11.3 deg, max|u| = 9.8 V
+----- week10_state_feedback done in 108 s
+
+===== week10_pole_placement_derivation =====
+Step 1: zeta_min = 0.6901, sigma_min = 4/Ts = 1.6000
+        sigma = 2.7000, wd = 2.3812, predicted Ts = 1.481 s, OS = 2.84 %, tr = 0.500 s
+
+Step 2: Delta_d(s) coefficients [1 a3 a2 a1 a0] = [1 29.7 289.98 1102.25 1889.57]
+
+Step 3: a32=55.1525 a33=-2.6089 a34=-0.3632 a42=168.5810 a43=-2.5786 a44=-1.1101 b3=18.3728 b4=18.1591
+        beta1 = 13.8008, beta2 = -0.0000, beta3 = -2095.7792
+        open-loop constants [c3 c2 c1 c0] = [3.71905 -166.621 -297.601 0]
+        M =
+   1.0e+03 *
+
+         0         0    0.0184    0.0182
+    0.0184    0.0182    0.0138   -0.0000
+    0.0138   -0.0000   -2.0958         0
+   -2.0958         0         0         0
+
+        check: max|M - M_numeric| = 2.73e-12, max|c_ol - poly(A)| = 5.12e-13
+
+Step 4: rhs = Delta_d coeffs - open-loop constants = [25.9809 456.601 1399.85 1889.57]
+        from s^0: k1 = -0.901606
+        K (coefficient matching) = [-0.901606 26.5688 -0.673874 2.11254]
+
+Step 5: rank(Wc) = 4, det(Wc) = -1.4484e+09
+        K (Ackermann) = [-0.901606 26.5688 -0.673874 2.11254]
+
+Step 6: K (place) = [-0.901606 26.5688 -0.673874 2.11254]
+        eig(A - B*K) = [-13.5 -10.8 -2.7+2.3812i -2.7-2.3812i]
+        max |K_match - K_place| = 7.11e-14
+
+Step 7: voltage to start recovering from 10 deg, zeta = 0.75, fast poles at 4 and 5 sigma
+        wn =  3.0 rad/s: tr ~ 0.60 s, Ts ~ 1.78 s, V =   3.7 V
+        wn =  3.6 rad/s: tr ~ 0.50 s, Ts ~ 1.48 s, V =   4.6 V
+        wn =  4.0 rad/s: tr ~ 0.45 s, Ts ~ 1.33 s, V =   5.4 V
+        wn =  5.0 rad/s: tr ~ 0.36 s, Ts ~ 1.07 s, V =   7.8 V
+        wn =  6.0 rad/s: tr ~ 0.30 s, Ts ~ 0.89 s, V =  10.9 V
+        wn =  8.0 rad/s: tr ~ 0.23 s, Ts ~ 0.67 s, V =  20.1 V
+        wn = 10.0 rad/s: tr ~ 0.18 s, Ts ~ 0.53 s, V =  34.1 V
+        10 V reached at wn = 5.73 rad/s, so tr ~ 1.8/wn = 0.31 s
+        a 0.8 s settling target needs wn = 6.67 rad/s and 13.5 V
+----- week10_pole_placement_derivation done in 1 s
+
+===== week11_observer =====
+Observability rank (A,C): 4 of 4
+Controller poles (cont.): [-2.7+2.38i -2.7-2.38i -10.8 -13.5 -5]
+Observer poles   (cont.): [-100 -110 -120 -130]
+Kx = [-3.561 38.01 -1.423 3.146], Ki = -4.508
+L =
+    0.2128   -0.0087
+   -0.0117    0.2180
+   11.0016   -0.9012
+   -1.5159   11.8937
+
+eig(Ad - L*C) mapped back to s = log(z)/Ts: [-130 -120 -110 -100]
+Analytical L (continuous) =
+   1.0e+04 *
+
+    0.0227   -0.0000
+   -0.0003    0.0229
+    1.2408   -0.0027
+   -0.0583    1.3115
+
+eig(A - Lc*C) = [-130 -120 -110 -100], largest error from the requested poles 9.7e-13
+Ts*Lc(1:2,:) = [0.227 -0.000363;-0.00258 0.229]; Ts*Lc(3:4,:) = [12.4 -0.027;-0.583 13.1]
+Observer pole time constants: [10 9.09 8.33 7.69] ms; slowest controller pole time constant 370 ms
+Separation check: max distance between eig(closed loop) and eig(ctrl) U eig(obs) = 1.49e-13
+Largest |z| of closed loop = 0.99732 (< 1 => stable)
+
+Estimation error norm (mixes rad and rad/s, so velocities dominate): |e(0)| = 0.175, peak 7.23 at 9 ms
+  noise floor (median, t >= 0.2 s) 0.042; last above 3x floor at 0.059 s in the first 0.2 s window: 0.059 s
+  RMS error for t >= 0.2 s: theta 0.716 mrad, alpha 0.998 mrad, thetadot 1.67 deg/s, alphadot 2.53 deg/s
+  alpha_dot estimate peak 361 deg/s at 7 ms (true value there -46 deg/s); |alpha_hat| first within 1 deg of true at 7.0 ms
+  voltage at the limit for 24 ms
+Observer-based: max|u| = 10.00 V, final alpha = -0.090 deg, peak theta 21.9 deg, peak alpha after release -5.7 deg
+Full state    : max|u| = 6.63 V, peak theta 28.9 deg, peak alpha after release -6.2 deg
+
+observer poles             e<2% [s]    RMS u [V] RMS da [deg/s]   max|u| [V]  alpha_end
+slow (-15..-18)               0.529        0.046         0.57         2.82     -0.132
+medium (-40..-55)             0.223        0.095         1.09         5.96     -0.080
+chosen (-100..-130)           0.373        0.210         2.93        10.00     -0.107
+very fast (-250..-280)        0.397        0.494         7.83        10.00     -0.105
+
+observer poles              RMS u [V]  RMS e_ad[d/s]     tap max|a|   max|u| tap   unstable
+slow (-15..-18)                 0.045           0.53          320.2        10.00      52/200
+medium (-40..-55)               0.095           1.05           20.4         8.08      10/200
+chosen (-100..-130)             0.216           2.94           14.6         8.97       3/200
+very fast (-250..-280)          0.498           7.84           12.7         9.76       2/200
+true state                          -              -           11.4         9.94       1/200
+
+alpha_dot error RMS (t >= 2 s): finite difference 28.83 deg/s, observer 2.93 deg/s
+One encoder count per sample = q/Ts = 3.07 rad/s = 176 deg/s
+----- week11_observer done in 16 s
+
+===== week12_validation =====
+V1 recovery 10 deg: |alpha|<1 deg after 0.97 s, max|u| = 6.65 V, max|theta| = 29.1 deg
+V2 30 deg step: Ts = 1.38 s, tr = 0.75 s, OS = 1.4 %, US = 1.3 %, max|u| = 0.63 V
+V2 unquantised: Ts = 1.43 s; quantised arm ripple (t >= 3 s) = 0.71 deg peak to peak, settling band +/-0.6 deg; max|alpha| during the step = 0.82 deg
+V3 tap + drag: max|alpha| = 14.6 deg, max|theta| = 57.0 deg, final theta: -0.13 deg (integrator) vs -38.2 deg (none), max|u| = 8.97 V
+V3 |alpha|<1 deg 1.05 s after the tap; mean theta over the last 1 s: 0.25 deg (integrator), -38.7 deg (none); true-state tap max|alpha| = 11.4 deg
+V4 alpha offset 10 arcmin: mean final theta -0.03 deg (integrator), 5.9 deg (none); true alpha_end -0.082 deg
+V4 alpha offset 40 arcmin: mean final theta -0.05 deg (integrator), 24.1 deg (none); true alpha_end -0.027 deg
+V5 noise: RMS u = 0.216 V, RMS alpha = 0.088 deg, RMS theta = 0.36 deg, RMS alpha_dot error = 2.97 deg/s
+V6 Monte Carlo (40 plants): linear loop stable 39, upright after 10 deg recovery 38, upright with tap 31; recovery max|u| worst 10.00 V (2 saturated), worst t(|alpha|<1) 3.45 s, 2 not settled in 4 s; tap max|alpha| median 17.0 / worst 321.4 deg
+V6 mean parameter factor, fell vs stayed up (tap test, 9 fell):
+   mp  0.964 vs 1.006
+   Lp  0.976 vs 1.007
+   Lr  0.908 vs 1.006
+   Rm  1.100 vs 1.003
+   km  0.920 vs 1.007
+   Dr  1.008 vs 0.949
+   Dp  1.085 vs 0.985
+   Jr  1.032 vs 1.011
+   motor gain km/Rm factor: 0.842 vs 1.017
+V7 largest recoverable alpha0:  24 deg (anti-windup true)  24 deg (anti-windup false)
+V8 D2    Kx = [-4.85 43.5 -1.75 3.64], Ki = -6.87: step Ts 1.97 s, OS 2.8 %, ripple 0.81 deg; 10 deg 7.6 V; tap 15.0 deg, 9.7 V; RMS u 0.249 V
+V8 final Kx = [-3.56 38 -1.42 3.15], Ki = -4.51: step Ts 1.38 s, OS 1.4 %, ripple 0.71 deg; 10 deg 6.6 V; tap 14.6 deg, 9.0 V; RMS u 0.216 V
+V9 reference gain 0 x Kx(1): Ts 1.43 s, OS 1.7 %, US 1.3 %
+V9 reference gain 1 x Kx(1): Ts 1.82 s, OS 50.7 %, US 9.5 %
+----- week12_validation done in 71 s
+
+===== week12_margins =====
+Open-loop poles of the loop outside the unit circle: 1 (observer), 1 (true state)
+observer-based  stable=1 | gain margins [0.589 6.74] ([-4.59 16.6] dB) at [7.13 114] rad/s | phase margins 36.1 deg at 21.5 rad/s | delay margin 29.4 ms
+true-state      stable=1 | gain margins [0.472 64.6] ([-6.52 36.2] dB) at [7.27 3.14e+03] rad/s | phase margins 58.7 deg at 28.5 rad/s | delay margin 36.0 ms
+
+Stable multiplier range, one parameter varied, others nominal (nominal = 1):
+  k_theta          nominal   -3.561: x0.258 to x2.486 (-0.920 to -8.853)
+  k_alpha          nominal   38.006: x0.620 to x3.107 (23.556 to 118.101)
+  k_thetadot       nominal   -1.423: x0.590 to x1.836 (-0.840 to -2.612)
+  k_alphadot       nominal    3.146: x0.504 to x2.400 (1.584 to 7.550)
+  k_i              nominal   -4.508: x0.020 to x3.225 (-0.090 to -14.539)
+  plant-input gain x0.590 to x6.730
+
+Estimation error e[k+1] = (Ad - L*C) e[k]: |z| = [0.9048 0.8958 0.8781 0.8869] (all < 1), s = [-130 -120 -110 -100]
+Ratio to the fastest controller pole (-13.5): [7.41 8.15 8.89 9.63]
+
+Linear vs nonlinear, release from alpha0 (no quantisation, observer initialised from y):
+   5 deg: max|alpha| lin 5.0 / nl 5.0 deg; max|theta| lin 13.8 / nl 14.0 deg; max|u| lin 3.32 / nl 3.32 V (limit 10); RMS alpha diff 0.014 deg
+  10 deg: max|alpha| lin 10.0 / nl 10.0 deg; max|theta| lin 27.6 / nl 29.1 deg; max|u| lin 6.63 / nl 6.63 V (limit 10); RMS alpha diff 0.113 deg
+  20 deg: max|alpha| lin 20.0 / nl 20.0 deg; max|theta| lin 55.3 / nl 69.4 deg; max|u| lin 13.27 / nl 10.00 V (limit 10); RMS alpha diff 1.335 deg
+
+Nominal controller and observer on plants with published parameter values:
+  J_r = m_r L_r^2/12       linear max|z| 0.9986 | 10 deg: end |alpha| 0.04 deg, max|u| 6.6 V | tap: max|alpha| 8.3 deg, max|u| 9.3 V, RMS u (t>2) 0.202 V
+  D_r 0.0015, D_p 0.0005   linear max|z| 0.9996 | 10 deg: end |alpha| 0.92 deg, max|u| 6.6 V | tap: max|alpha| 12.7 deg, max|u| 8.2 V, RMS u (t>2) 1.016 V
+  D_r 0.001, D_p 0.00005   linear max|z| 0.9982 | 10 deg: end |alpha| 0.11 deg, max|u| 6.6 V | tap: max|alpha| 13.4 deg, max|u| 9.0 V, RMS u (t>2) 0.219 V
+
+Peak motor current: 10 deg release 0.79 A, tap 1.06 A; stall current at 10 V = 1.19 A
+----- week12_margins done in 27 s

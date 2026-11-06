@@ -39,6 +39,8 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-23 | 2026-11-06 | **Rise-time floor set by the 10 V limit, found iteratively; no payload claims** (Jack) | The gains grow with ω_n: 10 V for a 10° tilt is reached at ω_n = 5.73 rad/s (t_r ≈ 0.31 s), and an 0.8 s settling target needs 13.5 V. No payload was modelled directly, so the ±20% is justified from sources instead: copper winding resistance rises about 20% over 50 °C | Active |
 | D-24 | 2026-11-06 | **Bartender framing dropped; criteria justified from the model, the motor and the literature** (Jack) | The serving arm was not modelled directly. Same numbers: 15° is the linear region, 10° is beyond the 6° of Barrios Valero, the ω_n cap is now z/2 = 5.2 rad/s from the RHP zero (Åström & Murray), 2.5 s settling is an iterative choice above the ≈1 s floor. Replaces D-18 | Active |
 | D-25 | 2026-11-06 | **Aleksei's words first in Sections I–III** (Jack) | His third draft (`main (3).tex`, with unresolved merge markers) rewrote the Introduction, System Model, Aim, state-space model and design criteria. Merged in his words, converted to our symbols; key information is never cut to fit, only padding in our own wording | Active |
+| D-26 | 2026-11-06 | **Minimal references: keep only those needed for a claim, preferring sources we have read** (Jack) | Izutsu, Jung, Hamza, Bélanger and Baltazar removed (claims now rest on Acosta, which was read in full, or on our own Section II-E); Åström–Furuta cited as the 1996 IFAC paper actually read. 15 references, in first-cited order | Active |
+| D-27 | 2026-11-06 | **8 pages in total: 6-page body, then appendix, acknowledgment and references (IEEE order)** (Jack) | Wide appendix figures are defined at the end of the body so they can float to page 7 | Active |
 
 ---
 
@@ -411,3 +413,33 @@ AI-assisted: merge and fit.
 - **`report/furuta_diagram.py`** (matplotlib) draws `figures/furuta_diagram.png`: (a) a 3D view with the motor axis, θ from θ = 0, the arm (L_r, m_r) and the pendulum leaning against +θ̇ by α; (b) the view from the motor along the arm, with α clockwise, l_p = L_p/2, L_p and m_pg. Lengths are drawn to Table I. It is in the Appendix and cited from Section II.
 - **Tone pass on the blue text** (Jack's request): reworded towards Jack's style ("we", "hence", "as", "which", fewer colons and semicolons). No content or numbers changed; the text stays blue. The wordiest changes were pulled back to keep the 6-page body.
 
+### Independent marking and fixes (D-26, D-27)
+
+- **Marker (a subagent, strict reading of the rubric): 83/100.** Points lost: Intro clarity and model justification (−2), System Model disturbance basis and noise effect (−3), Problem Definition clarity (−3), Numerical Validations figures and alternative method (−8), Conclusion numbers (−1).
+- **Text fixes:**
+  - **Introduction:** split into three paragraphs; the "However…" and "more things that can move" sentences replaced; Gäfvert's model justified by Xu's matching structure.
+  - **Section II:** the drag basis is now a fifth of Gäfvert's 10 mN·m Coulomb friction; the 10 V limit is a design choice everywhere; the tilt that saturates is named (20° needs 13 V).
+  - **Section III:**
+    - the "external masses" sentence is deleted and the III-B list that repeated Section II is condensed;
+    - ω_B and ω_n are now distinguished, and the cos α error (3.4%) is stated;
+    - the voltage iteration moved to IV-B.
+  - **Section IV:** k_θ = −0.90 labelled as D4 without the integrator; the integrator pole position explained; Table III caption now says no integrator; the Doyle claim matched to what the paper shows.
+  - **Section V:** the noise result (V5) is reported; the 1.38 s settling-time caveat added; an alternative method given for the ±20% miss (faster observer: 2/200 at 2.3× noise; disturbance estimation).
+  - **Conclusion:** results with numbers; "testing revealed" (it was the linear model).
+  - **Acknowledgment:** says which sections AI drafted, and how to reproduce (run_all.m).
+- **Figures** were re-exported at their printed size (8 pt text). No numbers changed: the rerun reproduced V1–V9, the Monte Carlo and Table IV exactly.
+  - **Monte Carlo:** failed plants in red, legend, ±60° axis, no title.
+  - **Overview:** at 0.7 of the text width; the legend moved off the curve.
+  - **Observer convergence:** θ̇ and α̇ labels; units on ‖e‖.
+  - **Captions:** the open-loop caption is corrected (agree to about 30°); Fig. 6 text notes the 13 V and the arm angles are not plotted.
+- **Space** came from duplicates (the 10 V point stated three times, a III-B remark, Table I rows repeating values in II-E and II-F) and from inlining two short displays. No key information was cut.
+- **Structure:** IEEE order (Appendix, Acknowledgment, References), references in first-cited order, "Fig." mid-sentence. The PDF is now 8 pages.
+
+### Submission package and reproducibility check
+
+- **Portal requirement:** zip only, for an independent reader to reproduce the results. `build.py --package` now adds:
+  - `Simulink/` (Aleksei's linear-plant models, marked supplementary);
+  - `python/furuta_diagram.py` (Fig. 3);
+  - a full `README.txt` (`report/package_README.txt`: requirements, steps, fixed seeds, and which script reproduces each figure, table and equation);
+  - `expected_results.txt`.
+- **Clean run:** unzipped into an empty folder and ran `run_all` there. Exit 0 in 267 s, 14 figures, and every number matches the report (V1–V9, margins, gain ranges, Step 7, observer gain). That console output is `report/expected_results.txt`.

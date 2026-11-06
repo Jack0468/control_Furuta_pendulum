@@ -74,7 +74,7 @@ fprintf('\nStep 6: K (place) = %s\n', fmt(K_place));
 fprintf('        eig(A - B*K) = %s\n', mat2str(eig(A - B*K_match).', 5));
 fprintf('        max |K_match - K_place| = %.2e\n', max(abs(K_match - K_place)));
 
-%% Step 7: how the 10 V limit bounds the speed (report Section III-C; gains only, no simulation)
+%% Step 7: how the 10 V limit bounds the speed (report Section IV-B; gains only, no simulation)
 % Same pole pattern as the final design: zeta = 0.75, fast poles at 4 and 5 sigma.
 % Released from 10 deg with the arm at rest, the first voltage is K*x0 = k_alpha * 10 deg.
 z7 = 0.75; a10 = deg2rad(10);

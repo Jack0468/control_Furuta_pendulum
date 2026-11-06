@@ -118,13 +118,21 @@ def main():
 
     if args.package:
         archive = here / "Furuta_matlab_submission.zip"
+        root = here.parent
         # The Kalman and tray-mass studies are background (docs 09, 03): the report doesn't use them.
-        files = sorted(f for f in (here.parent / "matlab").glob("*.m") if f.name not in ("week11_kalman.m", "week12_tray_mass.m"))
+        files = [(f, Path("matlab") / f.name) for f in sorted((root / "matlab").glob("*.m"))
+                 if f.name not in ("week11_kalman.m", "week12_tray_mass.m")]
+        files += [(f, Path("Simulink") / f.name) for f in sorted((root / "Simulink").glob("*")) if f.is_file()]
+        files += [(here / "furuta_diagram.py", Path("python") / "furuta_diagram.py"),
+                  (here / "package_README.txt", Path("README.txt"))]
+        expected = here / "expected_results.txt"   # console output of run_all, saved by a clean run
+        if expected.exists():
+            files.append((expected, Path("expected_results.txt")))
+        else:
+            print("\nWARNING: report/expected_results.txt is missing, so the zip has no reference output.")
         with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
-            for f in files:
-                z.write(f, Path("matlab") / f.name)
-            z.writestr("README.txt", "Run matlab/run_all.m from inside the matlab folder. Requires the "
-                                     "Control System Toolbox. Tested on R2025b. Figures go to ../figures.\n")
+            for src, dst in files:
+                z.write(src, dst)
         print(f"\nMATLAB package: {archive} ({len(files)} files)")
 
     if args.open:

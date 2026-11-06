@@ -94,11 +94,12 @@ for n = 1:Nmc
     Acl = [sk.A, -sk.B*D.Ki, -sk.B*D.Kx; D.Ts*[1 0 0 0], 1, zeros(1,4); ...
            D.L*Ck, -D.Bd*D.Ki, D.Ad - D.Bd*D.Kx - D.L*D.C];
     pole_lin(n) = max(abs(eig(Acl)));
-    plot(SB.t, deg(SB.x(:,2)), 'Color', [0 0.45 0.74 0.35]);
+    hmc(n) = plot(SB.t, deg(SB.x(:,2)), 'Color', [0 0.45 0.74 0.35]);
 end
-grid on; xlabel('t [s]'); ylabel('\alpha [deg]'); ylim([-40 40]);
-title(sprintf('Monte Carlo: %d plants with \\pm20%% parameters (tap at 2 s)', Nmc));
-furuta_savefig(gcf, 'w12_monte_carlo', 3.5, 2.2);
+set(hmc(~upB), 'Color', [0.85 0.2 0.1 0.8]);   % plants that fall after the tap
+grid on; xlabel('t [s]'); ylabel('\alpha [deg]'); ylim([-60 60]);
+legend([hmc(find(upB, 1)), hmc(find(~upB, 1))], {'recovers', 'falls'}, 'Location', 'southwest');
+furuta_savefig(gcf, 'w12_monte_carlo', 2.63, 1.4);   % printed at 0.75\figw, so text is 8 pt
 res.V6 = struct('N', Nmc, 'up_recovery', sum(upA), 'up_with_tap', sum(upB), 'lin_stable', sum(pole_lin < 1), ...
                 'max_u', max(mu), 'n_sat', sum(mu >= P.Vmax), 't1_worst', max(t1), 'n_unsettled', sum(isnan(t1)), ...
                 'alpha_max_median', deg(median(amx)), 'alpha_max_worst', deg(max(amx)));
@@ -161,8 +162,8 @@ for i = 1:3
     subplot(3,3,3+i); plot(S.t, deg(S.x(:,2)), S.t, deg(S.xhat(:,2)), '--'); grid on; ylabel('\alpha [deg]');
     subplot(3,3,6+i); plot(S.t, S.u); grid on; ylabel('V_m [V]'); xlabel('t [s]'); yline([P.Vmax -P.Vmax], 'r--');
 end
-subplot(3,3,1); legend('true', 'estimate');
-furuta_savefig(gcf, 'w12_validation_overview', 7.16, 3.3);
+subplot(3,3,1); legend('true', 'estimate', 'Location', 'southeast');
+furuta_savefig(gcf, 'w12_validation_overview', 5.0, 2.3);   % printed at 0.7\textwidth, so text is 8 pt
 
 figure; plot(S3p.t, deg(S3p.x(:,1)), S3i.t, deg(S3i.x(:,1))); grid on;
 xlabel('t [s]'); ylabel('\theta [deg]'); legend('no integrator', 'with integrator');

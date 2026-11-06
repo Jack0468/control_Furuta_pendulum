@@ -67,16 +67,16 @@ fprintf('Observer-based: max|u| = %.2f V, final alpha = %.3f deg, peak theta %.1
 fprintf('Full state    : max|u| = %.2f V, peak theta %.1f deg, peak alpha after release %.1f deg\n', ...
         max(abs(S_fs.u)), rad2deg(max(abs(S_fs.x(:,1)))), rad2deg(min(S_fs.x(:,2))));
 
-lbl = {'\theta [deg]', '\alpha [deg]', '\theta'' [deg/s]', '\alpha'' [deg/s]'};
+lbl = {'$\theta$ [deg]', '$\alpha$ [deg]', '$\dot\theta$ [deg/s]', '$\dot\alpha$ [deg/s]'};
 figure('Position', [100 100 900 650]);
 for i = 1:4
     subplot(3, 2, i);
     plot(S_obs.t, rad2deg(S_obs.x(:,i)), S_obs.t, rad2deg(S_obs.xhat(:,i)), '--'); grid on;
-    ylabel(lbl{i}); xlim([0 1.5]);
+    ylabel(lbl{i}, 'Interpreter', 'latex'); xlim([0 1.5]);
     if i == 1, legend('true', 'estimate'); title('Observer estimates, \alpha_0 = 10^\circ, estimate starts at 0'); end
 end
 subplot(3, 2, 5); semilogy(S_obs.t, vecnorm(S_obs.e, 2, 2)); grid on; xlim([0 1.5]);
-ylabel('||e||'); xlabel('t [s]'); yticks([1e-3 1e-2 1e-1 1]);
+ylabel('||e|| (rad, rad/s)'); xlabel('t [s]'); yticks([1e-3 1e-2 1e-1 1]);
 subplot(3, 2, 6); plot(S_fs.t, S_fs.u, S_obs.t, S_obs.u, '--'); grid on; xlim([0 1.5]);
 ylabel('V_m [V]'); xlabel('t [s]'); legend('full state', 'observer-based', 'Location', 'southeast');
 furuta_savefig(gcf, 'w11_observer_convergence', 7.16, 2.9);

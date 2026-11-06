@@ -40,7 +40,7 @@ Jack's review notes, 2026-11-04, with what was done about each.
 | [ ] | — | **Move to one report.** Aleksei is still writing in his own copy, and his abstract, 6-page note and duplicate System Model remain there | Team | His second draft's new content is merged into `report/main.tex`. Further edits should go there, or they'll need merging by hand |
 | [ ] | I-09 | **Get Aleksei's design script into the repo,** or confirm his abstract's results aren't used. Check his gain signs against his report's α convention | Aleksei | His `.slx` files need A, B, C and K from a script that isn't committed. Details in the LOGBOOK, 2026-11-04 |
 | [ ] | D-25 | **Check the $z/2$ bandwidth bound in Skogestad & Postlethwaite (2005), Aleksei's source, and add the section number** | Aleksei | Fri 6 Nov | Justifies the speed criterion in Section III-C. Åström & Murray was dropped in favour of his citation |
-| [ ] | D-25 | **Read Baltazar et al. (2024) and confirm the 1.68 s settling time** | Aleksei | Fri 6 Nov | His source for the 1.5 s recovery criterion; marked orange |
+| [x] | D-26 | ~~Read Baltazar et al. (2024)~~ **Removed from the report 2026-11-06** (minimal references); the 1.5 s recovery limit is now stated as a design choice |
 | [ ] | D-25 | **Tell Aleksei his third draft is merged** and that his Overleaf copy has unresolved git conflict markers | Jack | Fri 6 Nov | Edit `report/main.tex` from now on, not his copy |
 | [ ] | — | Look over the regenerated figures in `figures/` and the draft PDF | Jack | `python report/build.py --open` |
 
@@ -88,11 +88,12 @@ Jack's review notes, 2026-11-04, with what was done about each.
 
 | Done | Task | Who | By |
 | --- | --- | --- | --- |
-| [ ] | Clone the repo fresh, run `run_all`, and check the numbers and figures match the report | Team | Thu 5 Nov |
-| [ ] | Build with `python report/build.py --final --package` for the final PDF and MATLAB zip | Jack | Fri 6 Nov |
+| [x] | Clone the repo fresh, run `run_all`, and check the numbers and figures match the report. **Done 2026-11-06** from a clean unzip of the submission zip: exit 0, 267 s, 14 figures, every number matches | Team | Thu 5 Nov |
+| [x] | Build with `python report/build.py --final --package` for the final PDF and MATLAB zip. **Done 2026-11-06**; rebuild if anything changes | Jack | Fri 6 Nov |
 | [ ] | Check the PDF: machine-readable, body ≤ 6 pages, IEEE format, all seven sections | Team | Fri 6 Nov |
 | [ ] | Proofread | Team | Fri 6 Nov |
-| [ ] | Submit the report PDF and MATLAB files on Canvas | Jack | **Fri 6 Nov** |
+| [ ] | **Self-enrol in the Canvas group "Open Design Project" first** (both of you); only one member then submits | Team | **Fri 6 Nov** |
+| [ ] | Upload `report/Furuta_matlab_submission.zip` (zip only) to the **MATLAB/Simulink portal**, and `report/Furuta_report_final.pdf` to the **main assignment portal** | Jack | **Fri 6 Nov** |
 
 ---
 
@@ -100,9 +101,11 @@ Jack's review notes, 2026-11-04, with what was done about each.
 
 Closed items, newest first. Details are in the [LOGBOOK](LOGBOOK.md).
 
+- [x] Marker feedback (83/100) applied: text, figures at printed size, IEEE order, minimal references, 8 pages (D-26, D-27), 2026-11-06
 - [x] Aleksei's third draft merged, his words first in Sections I–III (D-25), 2026-11-06
 - [x] Bartender framing dropped; criteria justified from the model, the motor and the literature (D-24), 2026-11-06
 - [x] Speed limit now set by the 10 V limit, with the iteration stated; payload claims removed and the ±20% justified from sources (D-23), 2026-11-06
+- [x] Marker feedback (83/100) applied: text, figures at printed size, IEEE order, minimal references, 8 pages (D-26, D-27), 2026-11-06
 - [x] Aleksei's third draft merged (actuator limitation, aim and operating point, requirements summary), 2026-11-06
 - [x] Report restructured to a 6-page body plus references and a 3-figure appendix; tray limitation added (D-22), 2026-11-04
 - [x] Aleksei's second draft merged into the report (stacking step, arm-modelling elements, grouped parameter table), 2026-11-04

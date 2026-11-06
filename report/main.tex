@@ -211,7 +211,7 @@ The reachability matrix has rank 4, so all poles can be placed using the single 
 \end{rw}
 
 \subsection{State feedback: an iterative design}
-\begin{rw}
+
 As the plant has four states, we choose a dominant pole pair inside the pole region of Section~III-C, which sets the response, plus two faster real poles. Matching the coefficients of $\det(sI-A+BK)$ to the desired polynomial gives four linear equations in the gains. We compared four pole sets, each testing one design choice (Table~\ref{tab:designs}).
 \begin{itemize}
 \item \emph{D1, fast poles far away.} $\zeta=0.7$ and $\omega_n=4$\,rad/s give $-2.8\pm2.86j$, with fast poles at $-30$ and $-40$, 11--14 times further left. This tests the assumption that well-separated poles make the second-order formulas accurate. It needs large gains ($k_\alpha=110$) and hence demands 19\,V for a 10\textdegree{} tilt, which is well beyond the actuator limit.
@@ -221,8 +221,11 @@ As the plant has four states, we choose a dominant pole pair inside the pole reg
 \end{itemize}
 Faster poles need more voltage, which we found iteratively. With $\zeta=0.75$, fast poles at $4\sigma$ and $5\sigma$ and the true state, recovering from a 10\textdegree{} tilt initially needs 4.6\,V at $\omega_n=3.6$\,rad/s but 10\,V at $\omega_n=5.7$\,rad/s. An early 0.8\,s settling target needed $\omega_n\approx6.7$\,rad/s and 13.5\,V, hence we dropped it. D2 and D4 both meet the criteria on the linear model.
 
-Testing on the nonlinear model exposed a problem, as without integral action a constant 2\,mN\,m drag leaves the arm resting 26\textdegree{} from its target with the pendulum upright. Holding the arm against the drag needs a steady $\tau_dR_m/k_t=0.4$\,V, which proportional feedback can only provide through an error of $0.4/|k_\theta|$ ($k_\theta=-0.90$ for D4 without the integrator). Hence we added an integrator $\dot\xi=\theta-r$, which keeps growing until $\theta=r$ and therefore supplies this voltage itself. The augmented model $\dot x_a=\left[\begin{smallmatrix}A&0\\C_r&0\end{smallmatrix}\right]x_a+\left[\begin{smallmatrix}B\\0\end{smallmatrix}\right]u-\left[\begin{smallmatrix}0\\1\end{smallmatrix}\right]r$, with $x_a=[x^T\;\xi]^T$, has a fifth pole, which we place at $-5$, between the dominant pair and the fast poles. As $\xi$ is computed from the measured $\theta$, it does not need to be estimated. If the reference also enters through the proportional term, a 30\textdegree{} step overshoots by 51\% on the linear model. Feeding the reference only through the integrator (a type-1 servo) reduces this to 1.7\% with the same gains. With the integrator and observer on the nonlinear model, D4 settles sooner than D2 (1.38\,s against 1.97\,s), with a smaller bump at lower voltage (14.6\textdegree{} and 9.0\,V against 15.0\textdegree{} and 9.7\,V) and less noise voltage (0.22 against 0.25\,V RMS). Hence we chose D4. The final law is
-\end{rw}
+Testing on the nonlinear model exposed a problem, as without integral action a constant 2\,mN\,m drag leaves the arm resting 26\textdegree{} from its target with the pendulum upright. Holding the arm against the drag needs a steady $\tau_dR_m/k_t=0.4$\,V, which proportional feedback can only provide through an error of $0.4/|k_\theta|$ ($k_\theta=-0.90$ for D4 without the integrator). Hence we added an integrator $\dot\xi=\theta-r$, which keeps growing until $\theta=r$ and therefore supplies this voltage itself. The augmented model $\dot x_a=\left[\begin{smallmatrix}A&0\\C_r&0\end{smallmatrix}\right]x_a+\left[\begin{smallmatrix}B\\0\end{smallmatrix}\right]u-\left[\begin{smallmatrix}0\\1\end{smallmatrix}\right]r$, with $x_a=[x^T\;\xi]^T$, has a fifth pole, which we place at $-5$, between the dominant pair and the fast poles. Feeding the reference through the integrator only, rather than also through
+the proportional term, cut the overshoot from 51\% to 1.7\%. D4 then beat
+D2 on every test (Table~\ref{tab:designs}), so it was chosen, giving the
+final control law
+
 \begin{equation}
 u=\mathrm{sat}\!\left(-K_x\hat x-k_i\xi\right),\quad \dot\xi=\theta-r,
 \end{equation}

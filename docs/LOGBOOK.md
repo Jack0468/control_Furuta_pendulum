@@ -38,6 +38,7 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-22 | 2026-11-04 | **Page limit: 6 pages, not counting references and the appendix** (Jack). Tray and glass stated as a model limitation, with no redesign | Our copy of the brief says 8, so confirm on Canvas; 6 fits either way. A schooner glass alone is over twice what the motor can hold, so no redesign could make it a rig payload | Active |
 | D-23 | 2026-11-06 | **Rise-time floor set by the 10 V limit, found iteratively; no payload claims** (Jack) | The gains grow with ω_n: 10 V for a 10° tilt is reached at ω_n = 5.73 rad/s (t_r ≈ 0.31 s), and an 0.8 s settling target needs 13.5 V. No payload was modelled directly, so the ±20% is justified from sources instead: copper winding resistance rises about 20% over 50 °C | Active |
 | D-24 | 2026-11-06 | **Bartender framing dropped; criteria justified from the model, the motor and the literature** (Jack) | The serving arm was not modelled directly. Same numbers: 15° is the linear region, 10° is beyond the 6° of Barrios Valero, the ω_n cap is now z/2 = 5.2 rad/s from the RHP zero (Åström & Murray), 2.5 s settling is an iterative choice above the ≈1 s floor. Replaces D-18 | Active |
+| D-25 | 2026-11-06 | **Aleksei's words first in Sections I–III** (Jack) | His third draft (`main (3).tex`, with unresolved merge markers) rewrote the Introduction, System Model, Aim, state-space model and design criteria. Merged in his words, converted to our symbols; key information is never cut to fit, only padding in our own wording | Active |
 
 ---
 
@@ -358,3 +359,49 @@ AI-assisted: merge and fit.
 
 - Sections II-A (sign convention and assumptions), II-B (parameters) and the first part of II-C (simplifications, uncertainty, ±20%) are now Jack's words, in black. Sign corrected to our convention (positive α leans *against* positive arm rotation). Blue blocks 32 → 30. Still 6 pages.
 - **Arm ±90° limit** reworded as a workspace limit we chose, not a hardware (encoder cable) limit, which was never verified. Not binding (57° after the tap), and the Monte Carlo survival test uses α only, so no results change. One orange item cleared.
+
+### Jack's Section IV questions answered in the text
+
+- **"Region above"** now names the pole region of Section III-C.
+- **26° drag offset explained:** a steady 0.4 V (τ_d R_m/k_m) is needed to hold the arm against the drag, and without an integrator it can only come from an angle error 0.4/|k_θ|, with k_θ = −0.90 for D4 without the integrator (Ackermann on the report's A, B gives 25.4°; the simulation gave 26°).
+- **Integrator:** augmented model [A 0; C_θ 0], [B; 0], −[0; 1]r added; ξ is computed from the measured θ, so the observer still estimates x only.
+- **Observer derivation:** motivation (closed form, check on `place`), the substitution e_2 = ė_1 + L_1e_1, and why the diagonal choice decouples the two angle errors.
+- Trims to stay at 6 pages: D1 "misses overshoot" sentence, L_d entries, D2/D4 noise voltage, D3 poles (in Table III), shorter conclusion.
+
+### Papers folder checked; arm mass; AI declaration drafted
+
+- **Acosta 2010 read in full:** the Introduction's claims hold (Sec. 3.2; Fig. 6: LQR 0.75 rad, energy shaping 0.82 rad, on hardware). Orange marks removed. His rig has a slip ring on the arm joint, now cited for the ±90° being our choice.
+- **Rocket claim:** the NASA SLS pole-cart paper (Pei & Rothhaar) is about launch vehicles, so "rocket landings" became "unstable launch vehicles". Venue and year still to confirm.
+- **Friction:** Bellati et al. (IEEE URUCON 2021, read) replaces the unread Gäfvert 1999 for Coulomb friction and stiction.
+- **Arm mass:** no source found, so checked against a solid aluminium bar, L_r × 20 × 20 mm at 2700 kg/m³ = 0.092 kg, within 3% of 0.095 kg.
+- **AI declaration:** Lecture 1-2 says only "ask an LLM agent, but be critical"; the brief says AI agents follow the Lecture 1 guidelines. Draft in the Acknowledgment, orange until checked.
+- **Drag numbers:** Section V-D said 39° without the integrator (final gains with k_i switched off, mean over 5–6 s) while Section IV says 26° (D4 designed without an integrator). V-D now points to Section IV instead.
+- Trims to stay at 6 pages. Orange 15 → 11.
+
+### Aleksei's third draft merged (D-25)
+
+- **Source:** `main (3).tex` from Aleksei, based on our commit 69daef3 and still containing git conflict markers (`<<<<<<< HEAD` … `>>>>>>> 64eb98d`). His side of each conflict is his new text; everything outside the conflicts was our old version, so Sections IV–VI keep the current text.
+- **Taken in his words:** Introduction; System Model (J̄_p and l_p = L_p/2 in place of c, separate k_t and k_m, the Gäfvert sign note, a Linearisation subsection, Parameters, Disturbances, Sensors and noise, Limitations); Aim; State-space model (symbolic A_21, A_22, B_2, C and D, regulated output C_r); design criteria with his justifications (Skogestad z/2 bound, Baltazar 1.68 s, limits).
+- **Changed for consistency:**
+  - q → η for the generalised coordinates, since q is the encoder resolution.
+  - θ_ref → r, as in the rest of the report.
+  - "Luenberger observer" → "state observer" (earlier decision); there is no Luenberger bibitem.
+  - "rocket landings" → "unstable launch vehicles" [Pei].
+  - The ±90° arm bound is now a workspace limit, not the encoder cable (Section II-F).
+  - The structure sentence now names all six sections.
+  - The motor inductance sentence was removed from Section II-F, since his Section II-A now gives the 0.14 ms.
+  - Section IV: τ_dR_m/k_t, and C_r replaces C_θ.
+  - Section V-E now points to Section II-F, and the Monte Carlo text uses k_t/R_m.
+- **Kept from ours:**
+  - Table II (criteria with results), because Section V needs it. His "time-based criteria" table repeats three of its rows, so it was not added.
+  - The parameter table's "Basis" column with sources; his version had units only.
+  - The encoder offset b, which Section V-D uses.
+  - Jack's simplification and ±20% paragraphs, now in Section II-F.
+  - The voltage-limit iteration (D-23), added to his "Speed" justification.
+  - The aluminium-bar check on m_r.
+- **Figure:** his open-loop release figure (`w9_openloop_release.png`) is in the Appendix, cited from the Introduction.
+- **References:**
+  - Added Skogestad & Postlethwaite (2005) and Baltazar et al. (2024), both orange.
+  - Removed Åström & Murray (his Skogestad citation covers the z/2 bound) and Antonio-Cruz and Arai (no longer cited).
+  - The abstract no longer mentions unactuated arm joints.
+- **Page fit:** some AI-drafted detail was cut, then restored when Jack said key information must not be deleted. The body fits instead by inlining four short equations (Euler–Lagrange, V, the linearised equation, C and D) and two redundant AI phrases. The overview figure is at 0.6 of the text width.

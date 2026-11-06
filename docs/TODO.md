@@ -39,7 +39,9 @@ Jack's review notes, 2026-11-04, with what was done about each.
 | --- | --- | --- | --- | --- |
 | [ ] | — | **Move to one report.** Aleksei is still writing in his own copy, and his abstract, 6-page note and duplicate System Model remain there | Team | His second draft's new content is merged into `report/main.tex`. Further edits should go there, or they'll need merging by hand |
 | [ ] | I-09 | **Get Aleksei's design script into the repo,** or confirm his abstract's results aren't used. Check his gain signs against his report's α convention | Aleksei | His `.slx` files need A, B, C and K from a script that isn't committed. Details in the LOGBOOK, 2026-11-04 |
-| [ ] | D-24 | **Check the $z/2$ bandwidth bound in Åström & Murray, *Feedback Systems* (2nd ed.), and add the section number** | Jack | Fri 6 Nov | Justifies the ω_n ≲ 5.2 rad/s criterion in Section III-C. Replaces the serving-arm item (D-18 superseded) |
+| [ ] | D-25 | **Check the $z/2$ bandwidth bound in Skogestad & Postlethwaite (2005), Aleksei's source, and add the section number** | Aleksei | Fri 6 Nov | Justifies the speed criterion in Section III-C. Åström & Murray was dropped in favour of his citation |
+| [ ] | D-25 | **Read Baltazar et al. (2024) and confirm the 1.68 s settling time** | Aleksei | Fri 6 Nov | His source for the 1.5 s recovery criterion; marked orange |
+| [ ] | D-25 | **Tell Aleksei his third draft is merged** and that his Overleaf copy has unresolved git conflict markers | Jack | Fri 6 Nov | Edit `report/main.tex` from now on, not his copy |
 | [ ] | — | Look over the regenerated figures in `figures/` and the draft PDF | Jack | `python report/build.py --open` |
 
 ## 2. Refresh and publish
@@ -57,14 +59,14 @@ Jack's review notes, 2026-11-04, with what was done about each.
 | Done | ID | Task | Who | By | Notes |
 | --- | --- | --- | --- | --- | --- |
 | [ ] | — | Read the sources tagged in the report's reference list, starting with Hamza 2019 | Team | Wed 4 Nov | The brief rejects unverified references; [doc 10 §1](10_literature_review.md) shows what was only an abstract or record |
-| [ ] | — | Read Acosta 2010 and confirm the 0.75 rad LQR claim and the methods listed in the Introduction | Aleksei | Wed 4 Nov | Full text blocked for automated access. `--final` hides the orange mark, so fix or remove the sentence first |
-| [ ] | — | Give a source for the rocket-landing claim in the Introduction, or drop it | Aleksei | Wed 4 Nov | No source in either draft |
+| [x] | — | Read Acosta 2010 and confirm the 0.75 rad LQR claim and the methods listed in the Introduction | Aleksei | Wed 4 Nov | Full text blocked for automated access. `--final` hides the orange mark, so fix or remove the sentence first **Done 2026-11-06:** full text read (papers folder). Sec. 3.2 surveys energy shaping, forwarding, feedback linearisation; Fig. 6 gives 0.75 rad (LQR), 0.82 rad (energy shaping), 1.45 rad, on hardware. Orange mark removed |
+| [x] | — | Give a source for the rocket-landing claim in the Introduction, or drop it | Aleksei | Wed 4 Nov | No source in either draft **Done 2026-11-06:** Pei & Rothhaar (NASA SLS pole-cart) is about *launch* vehicles, so the sentence now says launch vehicles. Venue and year still orange |
 | [ ] | — | Check Aleksei's MATEC paper: it's about a *tilted* Furuta pendulum, so does it support what he cites it for? | Aleksei | Wed 4 Nov | Only needed if it's cited: his report draft doesn't cite it. The site blocked automated access |
-| [ ] | I-03 | Find a source for m_r = 0.095 kg, ideally the QUBE-Servo 2 workbook | Jack | Wed 4 Nov | J_r depends on it. The TU Delft sheet was unreachable |
+| [x] | I-03 | Find a source for m_r = 0.095 kg, ideally the QUBE-Servo 2 workbook | Jack | Wed 4 Nov | J_r depends on it. The TU Delft sheet was unreachable **Done 2026-11-06:** no source found; checked instead against a solid aluminium bar, L_r × 20 × 20 mm at 2700 kg/m³ = 0.092 kg (Section II-B, Table I 'Al bar') |
 | [ ] | — | Check the copper temperature coefficient (0.393 %/°C) against IEC 60028 or a textbook | Jack | Fri 6 Nov | Marked orange: only a secondary copy of the standard was seen. It justifies the ±20% range in Section II-C |
 | [ ] | — | Confirm the 6-page limit on Canvas | Jack | Wed 4 Nov | Our copy of the brief says at most 8 pages; the rubric gives no limit. The report is built to 6, which fits either way |
-| [ ] | — | Confirm the arm's ±90° cable limit, or state it as an assumption | Team | Wed 4 Nov | Both of you assumed it |
-| [ ] | — | Get the AI-citation rules from Canvas or your tutor, then write the declaration | Team | Thu 5 Nov | Searched every course PDF: no rule stated, only "ask an LLM, but be critical" (Lecture 1, p. 32) and slides crediting "source: ChatGPT" |
+| [x] | — | Confirm the arm's ±90° cable limit, or state it as an assumption | Team | Wed 4 Nov | Both of you assumed it **Done 2026-11-06:** now a workspace limit we chose; Acosta's rig uses a slip ring for full rotation |
+| [x] | — | Get the AI-citation rules from Canvas or your tutor, then write the declaration | Team | Thu 5 Nov | Searched every course PDF: no rule stated, only "ask an LLM, but be critical" (Lecture 1, p. 32) and slides crediting "source: ChatGPT" **Done 2026-11-06:** Lecture 1-2 has only 'ask an LLM agent, but be critical' (p. 32); the brief says AI agents follow the Lecture 1 guidelines. Declaration drafted in the Acknowledgment, orange until checked against Canvas |
 | [ ] | — | Confirm `Template-Latex.zip` matches the one on Canvas | Jack | Wed 4 Nov | |
 | [ ] | I-05 | Only if you cite textbooks: check chapter numbers against your edition | Team | Thu 5 Nov | The report draft cites none |
 
@@ -98,6 +100,7 @@ Jack's review notes, 2026-11-04, with what was done about each.
 
 Closed items, newest first. Details are in the [LOGBOOK](LOGBOOK.md).
 
+- [x] Aleksei's third draft merged, his words first in Sections I–III (D-25), 2026-11-06
 - [x] Bartender framing dropped; criteria justified from the model, the motor and the literature (D-24), 2026-11-06
 - [x] Speed limit now set by the 10 V limit, with the iteration stated; payload claims removed and the ±20% justified from sources (D-23), 2026-11-06
 - [x] Aleksei's third draft merged (actuator limitation, aim and operating point, requirements summary), 2026-11-06

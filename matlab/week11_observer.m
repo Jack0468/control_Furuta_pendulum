@@ -47,6 +47,10 @@ fprintf('Largest |z| of closed loop = %.5f (< 1 => stable)\n', max(abs(z_all)));
 x0 = [0; deg2rad(10); 0; 0];
 S_obs = furuta_sim_obs(P, D, x0, 4, struct('xhat0', zeros(4,1)));
 S_fs  = furuta_sim_obs(P, D, x0, 4, struct('full_state', true));
+S_nq  = furuta_sim_obs(P, D, x0, 4, struct('xhat0', zeros(4,1), 'quant', false));   % same start, exact encoders
+enq = vecnorm(S_nq.e, 2, 2);
+fprintf('\nWithout quantisation: |e| = %.2g at 0.2 s, %.2g at 1 s, %.2g at 4 s (converges to zero)\n', ...
+        enq(find(S_nq.t >= 0.2, 1)), enq(find(S_nq.t >= 1, 1)), enq(end));
 en = vecnorm(S_obs.e, 2, 2); e0 = en(1); [epk, kpk] = max(en);
 wf = S_obs.t >= 0.2;                       % after the start-up transient: quantisation noise floor
 floor_e = median(en(wf));
@@ -75,8 +79,12 @@ for i = 1:4
     ylabel(lbl{i}, 'Interpreter', 'latex'); xlim([0 1.5]);
     if i == 1, legend('true', 'estimate'); title('Observer estimates, \alpha_0 = 10^\circ, estimate starts at 0'); end
 end
-subplot(3, 2, 5); semilogy(S_obs.t, vecnorm(S_obs.e, 2, 2)); grid on; xlim([0 1.5]);
-ylabel('||e|| (rad, rad/s)'); xlabel('t [s]'); yticks([1e-3 1e-2 1e-1 1]);
+subplot(3, 2, 5);
+semilogy(S_obs.t, vecnorm(S_obs.e(:,1:2), 2, 2), S_obs.t, vecnorm(S_obs.e(:,3:4), 2, 2), ...
+         S_nq.t, vecnorm(S_nq.e(:,3:4), 2, 2), 'k--'); grid on; xlim([0 1.5]); ylim([1e-10 30]);
+ylabel('||e||'); xlabel('t [s]'); yticks([1e-9 1e-6 1e-3 1]);
+% No legend (it hides the curves); the report caption names them: blue angles [rad], orange rates [rad/s],
+% dashed rates with exact encoders.
 subplot(3, 2, 6); plot(S_fs.t, S_fs.u, S_obs.t, S_obs.u, '--'); grid on; xlim([0 1.5]);
 ylabel('V_m [V]'); xlabel('t [s]'); legend('full state', 'observer-based', 'Location', 'southeast');
 furuta_savefig(gcf, 'w11_observer_convergence', 7.16, 2.9);

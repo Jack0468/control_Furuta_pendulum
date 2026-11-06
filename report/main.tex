@@ -75,7 +75,7 @@ We use the Euler--Lagrange equations of motion derived by G\"afvert~\cite{gafver
 
 % =====================================================================
 \section{System Model}
-The system model is based on the equations of motion given by G\"afvert~\cite{gafvert1998}. The arm angle $\theta$ is measured about the motor shaft and the pendulum angle $\alpha$ is measured from the upright position, so that $\alpha=0$ is the unstable equilibrium (Fig.~\ref{fig:diagram} in the Appendix). The arm is modelled as a uniform rod of mass $m_r$, length $L_r$ and inertia $J_r$ about the motor axis, and the pendulum as a uniform rod of mass $m_p$, length $L_p$, centre-of-mass distance $l_p=L_p/2$ and inertia $J_p$ about its centre of mass. For convenience, the pendulum inertia about its pivot is written as $\bar J_p=J_p+m_pl_p^2$.
+The arm angle $\theta$ is measured about the motor shaft and the pendulum angle $\alpha$ is measured from the upright position, so that $\alpha=0$ is the unstable equilibrium (Fig.~\ref{fig:diagram} in the Appendix). The arm is modelled as a uniform rod of mass $m_r$, length $L_r$ and inertia $J_r$ about the motor axis, and the pendulum as a uniform rod of mass $m_p$, length $L_p$, centre-of-mass distance $l_p=L_p/2$ and inertia $J_p$ about its centre of mass. For convenience, the pendulum inertia about its pivot is written as $\bar J_p=J_p+m_pl_p^2$.
 
 \subsection{Equations of motion}
 The pendulum swings in the plane perpendicular to the arm, and positive $\alpha$ leans against positive arm rotation, so $\alpha$ is measured in the opposite direction to~\cite{gafvert1998}, which reverses the sign of the coupling terms. We assume rigid links, viscous joint friction and negligible motor inductance.
@@ -132,7 +132,7 @@ $k_t, k_m$ & Torque / back-EMF constant & 0.042\,N\,m/A & \cite{xu2023}\\ \hline
 \subsection{Disturbances}
 We model three disturbances: a bump to the pendulum, as a 20\,mN\,m, 20\,ms torque pulse on the pendulum (about a 4.4\,rad/s velocity kick); constant arm drag from the encoder cable or motor friction, as a 2\,mN\,m step; and random unmodelled torques, as sample-held white noise with assumed standard deviations of 0.2 and 0.05\,mN\,m on the arm and pendulum.
 \begin{rw}
-These enter through $\tau_p$ and $\tau_d$ in \eqref{eq:arm}--\eqref{eq:pend}. The pulse represents a firm knock and is the hardest test for the observer, as it only sees the kick in $\alpha$ afterwards. The drag is about 4\% of the 0.05\,N\,m stall torque and a fifth of the 10\,mN\,m Coulomb friction G\"afvert identified on a larger rig~\cite{gafvert1998}. The random torques are assumed, and Section~V-D reports their effect.
+These enter through $\tau_p$ and $\tau_d$ in \eqref{eq:arm}--\eqref{eq:pend}. The pulse represents a firm knock and is the hardest test for the observer, as it only sees the kick in $\alpha$ afterwards. The drag is about 4\% of the 0.05\,N\,m stall torque and a fifth of the 10\,mN\,m Coulomb friction G\"afvert identified on a larger rig~\cite{gafvert1998}. The random torques are assumed. The pulse tests the 15\textdegree{} limit, the drag the steady-state error and the noise the voltage (Section~V-D).
 \end{rw}
 
 \subsection{Sensors and noise}
@@ -170,12 +170,12 @@ which gives the linear model $\dot x=Ax+Bu$, $y=Cx$, with $A=\left[\begin{smallm
 A_{21}&=\frac{m_pgl_p}{\Delta}\begin{bmatrix}0&b\\0&a\end{bmatrix},\quad B_2=\frac{k_t}{R_m\Delta}\begin{bmatrix}\bar J_p\\b\end{bmatrix},\nonumber\\
 A_{22}&=-\frac{1}{\Delta}\begin{bmatrix}\bar J_pd_r&bD_p\\b\,d_r&aD_p\end{bmatrix}.
 \end{align}
-The two encoders measure the arm and pendulum angles only, so $C=[I_2\;\;0_{2\times2}]$ and $D=0$. The regulated output is the arm angle, $z=C_rx$ with $C_r=[1\;\;0\;\;0\;\;0]$. The system therefore has four states but only two measurements, so the angular velocities must be estimated by an observer. Substituting the parameter values, the model becomes
+The two encoders measure the arm and pendulum angles only, so $C=[I_2\;\;0_{2\times2}]$ and $D=0$, and the two velocities must be estimated by an observer. The regulated output is the arm angle, $z=C_rx$ with $C_r=[1\;\;0\;\;0\;\;0]$. Substituting the parameter values, the model becomes
 \begin{equation}
 A=\begin{bmatrix}0&0&1&0\\0&0&0&1\\0&55.15&-2.61&-0.36\\0&168.58&-2.58&-1.11\end{bmatrix},\;
 B=\begin{bmatrix}0\\0\\18.37\\18.16\end{bmatrix}.
 \end{equation}
-The open-loop poles are $0$, $-14.06$, $-1.75$ and $+12.09$\,rad/s. The pole at $+12.09$\,rad/s confirms that the upright equilibrium is unstable, and the pole at the origin reflects that the arm is free to rotate. The transfer function from $V_m$ to $\theta$ also has a right-half-plane zero at $+10.31$\,rad/s: the arm first moves the wrong way, to tip the pendulum in the direction of travel. This limits how fast the arm can be made to track.
+The open-loop poles are $0$, $-14.06$, $-1.75$ and $+12.09$\,rad/s. The pole at $+12.09$\,rad/s confirms that the upright equilibrium is unstable. The transfer function from $V_m$ to $\theta$ also has a right-half-plane zero at $+10.31$\,rad/s: the arm first moves the wrong way, to tip the pendulum in the direction of travel. This limits how fast the arm can be made to track.
 
 \subsection{Design criteria}
 The controller is designed around the following main requirements. The pendulum must recover from a $10^\circ$ displacement to within $1^\circ$ of upright in under 1.5\,s. When the arm is commanded to $30^\circ$, the response must have an overshoot below 5\%, an undershoot below 10\%, a rise time of at least 0.3\,s and a settling time below 2.5\,s. Throughout, the peak motor voltage must stay below 10\,V. The controller must also reject disturbances: after a bump to the pendulum, the pendulum must stay within $15^\circ$ of upright and the arm within $90^\circ$. The $15^\circ$ bound is not the angle at which the pendulum falls; the controller can still catch it beyond this, by moving the arm under the pendulum, provided the motor is not saturated. Under a constant arm drag the final arm angle error must be below $2^\circ$. Finally, the design should remain stable under $\pm20\%$ variations in the model parameters. \begin{rw}Table~\ref{tab:req} lists these alongside the results from Section~V.\end{rw}
@@ -302,20 +302,21 @@ True state & -- & -- & 11.4\textdegree & 1\\
 
 \subsection{Stability ranges and margins}
 \begin{rw}
-Table~\ref{tab:ranges} gives the range of each gain, with the others nominal, over which the sampled linear loop remains stable. Figure~\ref{fig:margins} in the Appendix shows the loop broken at the plant input. As the loop has one unstable open-loop pole, stability requires the Nyquist plot to encircle $-1$ once. The gain can fall to 0.59 times ($-4.6$\,dB) or rise to 6.7 times ($+16.6$\,dB) nominal before instability. The lower limit exists because an unstable plant needs a minimum gain. The phase margin is 36\textdegree{} and the delay margin 29\,ms. With the true state fed back the phase margin is 59\textdegree, hence the observer costs about 23\textdegree{}.
+Table~\ref{tab:ranges} gives the stable range of each gain with the others nominal, and of all gains scaled together; any negative $k_i$ down to $-14.5$ is stable, as $k_i=0$ only leaves the integrator pole at $z=1$. Figure~\ref{fig:margins} in the Appendix shows the loop broken at the plant input. As the loop has one unstable open-loop pole, stability requires the Nyquist plot to encircle $-1$ once. The gain can fall to 0.59 times ($-4.6$\,dB) or rise to 6.7 times ($+16.6$\,dB) nominal before instability. The lower limit exists because an unstable plant needs a minimum gain. The phase margin is 36\textdegree{} and the delay margin 29\,ms. With the true state fed back the phase margin is 59\textdegree, hence the observer costs about 23\textdegree{}.
 \end{rw}
 
 \begin{table}[t]
-\caption{Stable range of each gain (*lowest value tested)}\label{tab:ranges}
+\caption{Stable range of each gain, the others nominal, and of all gains scaled together}\label{tab:ranges}
 \centering\footnotesize
 \begin{tabular}{llll}
 \hline
 Gain & Nominal & Stable range & Multiplier\\ \hline
 $k_\theta$ & $-3.56$ & $-0.92$ to $-8.85$ & 0.26--2.49\\
 $k_\alpha$ & 38.01 & 23.6 to 118 & 0.62--3.11\\
-$k_{\dot\theta}$ & $-1.42$ & $-0.84$ to $-2.61$ & 0.59--1.84\\
-$k_{\dot\alpha}$ & 3.15 & 1.58 to 7.55 & 0.50--2.40\\
-$k_i$ & $-4.51$ & $-0.09$ to $-14.5$ & 0.02*--3.23\\
+$k_{\dot\theta}$ & $-1.42$ & $-0.84$ to $-2.62$ & 0.59--1.84\\
+$k_{\dot\alpha}$ & 3.15 & 1.58 to 7.54 & 0.50--2.40\\
+$k_i$ & $-4.51$ & $0^-$ to $-14.5$ & $0^+$--3.23\\
+All gains & -- & -- & 0.59--6.73\\
 \hline
 \end{tabular}
 \end{table}
@@ -323,7 +324,7 @@ $k_i$ & $-4.51$ & $-0.09$ to $-14.5$ & 0.02*--3.23\\
 % =====================================================================
 \section{Numerical Validations}
 \begin{rw}
-All tests use the nonlinear model \eqref{eq:arm}--\eqref{eq:motor}, integrated with fourth-order Runge--Kutta, with a 1\,kHz controller, zero-order hold, the quantised encoders \eqref{eq:quant} and $\pm10$\,V saturation; Section~V-D adds the random torques.
+All tests use the nonlinear model \eqref{eq:arm}--\eqref{eq:motor}, integrated with fourth-order Runge--Kutta, with a 1\,kHz controller, zero-order hold, the quantised encoders \eqref{eq:quant} and $\pm10$\,V saturation.
 \end{rw}
 
 \begin{figure*}[t]
@@ -336,7 +337,7 @@ All tests use the nonlinear model \eqref{eq:arm}--\eqref{eq:motor}, integrated w
 \begin{rw}
 On the left of Fig.~\ref{fig:overview}, the pendulum is released from 10\textdegree{} with the arm at rest. It is within 1\textdegree{} of upright after 0.97\,s, with the voltage peaking at 6.6\,V and a current of 0.79\,A.
 
-The centre column is the 30\textdegree{} arm step, with $r$ stepping from 0 to 30\textdegree{} at $t=0.5$\,s. Measured from that instant, the 10--90\% rise time is 0.75\,s and the 2\% ($\pm0.6$\textdegree) settling time 1.38\,s. The arm first moves 0.4\textdegree{} the wrong way (1.3\% undershoot), as the right-half-plane zero predicts, and then overshoots by 1.4\%. The pendulum tilts by at most 0.82\textdegree{} and only uses 0.63\,V. The right column is covered in Section~V-D.
+The centre column is the 30\textdegree{} arm step, with $r$ stepping from 0 to 30\textdegree{} at $t=0.5$\,s. Measured from that instant, the 10--90\% rise time is 0.75\,s and the 2\% ($\pm0.6$\textdegree) settling time 1.38\,s. The arm first moves 0.4\textdegree{} the wrong way (1.3\% undershoot), as the right-half-plane zero predicts, and then overshoots by 1.4\%. The pendulum tilts by at most 0.82\textdegree{} and only uses 0.63\,V.
 \end{rw}
 
 \subsection{Linear versus nonlinear model}
@@ -346,7 +347,7 @@ Figure~\ref{fig:linnl} in the Appendix compares the same controller on both mode
 
 \subsection{Estimation error}
 \begin{rw}
-Figure~\ref{fig:obs} in the Appendix tests convergence from the worst-case start, where the pendulum is released from 10\textdegree{} while the observer starts at $\hat x=0$. The angle estimates correct first ($\hat\alpha$ is within 1\textdegree{} after 7\,ms), while the velocity estimates overshoot, because the observer treats the angle error as motion. The error norm peaks at 7.2 after 9\,ms and falls to about 0.04 by 60\,ms, consistent with observer time constants of about 10\,ms. All eigenvalues of $A_d-L_dC$ lie inside the unit circle, so the error would decay to zero, but quantisation sets a noise floor. After 0.2\,s the RMS errors are 0.72 and 1.0\,mrad on the angles, close to $\sigma_v=0.886$\,mrad, and 1.7 and 2.5\textdegree/s on the velocities. This start holds the voltage at the 10\,V limit for 24\,ms, whereas the true state only needs 6.6\,V, hence the other tests initialise $\hat x$ from the first encoder reading.
+Figure~\ref{fig:obs} in the Appendix tests convergence from the worst-case start, where the pendulum is released from 10\textdegree{} while the observer starts at $\hat x=0$. The angle estimates correct first ($\hat\alpha$ is within 1\textdegree{} after 7\,ms), while the velocity estimates overshoot, because the observer treats the angle error as motion. The rate-error norm peaks at 7.2\,rad/s after 9\,ms and falls to about 0.04\,rad/s by 60\,ms, consistent with observer time constants of about 10\,ms. All eigenvalues of $A_d-L_dC$ lie inside the unit circle, so the error converges to zero: with exact encoders the same start gives an error norm of $5\times10^{-6}$ by 1\,s (dashed in Fig.~\ref{fig:obs}). With quantisation it reaches a noise floor: after 0.2\,s the RMS errors are 0.72 and 1.0\,mrad on the angles, close to $\sigma_v=0.886$\,mrad, and 1.7 and 2.5\textdegree/s on the velocities. This start holds the voltage at the 10\,V limit for 24\,ms, whereas the true state only needs 6.6\,V, hence the other tests initialise $\hat x$ from the first encoder reading.
 \end{rw}
 
 \begin{figure}[t]
@@ -357,9 +358,9 @@ Figure~\ref{fig:obs} in the Appendix tests convergence from the worst-case start
 
 \subsection{Disturbances and measurement noise}
 \begin{rw}
-The tap reaches 14.6\textdegree, which is inside the 15\textdegree{} criterion by only 0.4\textdegree, using 9.0\,V and 1.06\,A, and $|\alpha|$ is back below 1\textdegree{} after 1.05\,s. With the true state the peak is 11.4\textdegree, hence the difference comes from the observer's delay in seeing an unmeasured kick. Under arm drag the integrator leaves a mean error of 0.25\textdegree{} (26\textdegree{} without it, Section~IV-B), and 0.05\textdegree{} for the datasheet's maximum 40\,arcmin encoder offset.
+The tap (Fig.~\ref{fig:overview}, right) reaches 14.6\textdegree, which is inside the 15\textdegree{} criterion by only 0.4\textdegree, using 9.0\,V and 1.06\,A, and $|\alpha|$ is back below 1\textdegree{} after 1.05\,s. With the true state the peak is 11.4\textdegree, hence the difference comes from the observer's delay in seeing an unmeasured kick. Under arm drag the integrator leaves a mean error of 0.25\textdegree{} (26\textdegree{} without it, Section~IV-B), and 0.05\textdegree{} for the datasheet's maximum 40\,arcmin encoder offset.
 
-Quantisation has an effect that the linear analysis does not predict. The observer and quantiser form a small limit cycle, with about 0.7\textdegree{} peak-to-peak arm ripple and 0.22\,V RMS. This fits inside the $\pm0.6$\textdegree{} band of a 30\textdegree{} step, but moves the measured settling time from 1.43\,s without quantisation to 1.38\,s, so part of the headline 1.38\,s is due to the ripple. With the random torques added as well, the RMS voltage is 0.22\,V, the RMS pendulum and arm angles are 0.09\textdegree{} and 0.36\textdegree, and the RMS $\da$ estimation error is 2.97\textdegree/s. This voltage noise is feasible, and a slower observer would only reduce it at a cost in robustness.
+The observer and quantiser form a small limit cycle, which the linear analysis does not predict, with about 0.7\textdegree{} peak-to-peak arm ripple and 0.22\,V RMS. This fits inside the $\pm0.6$\textdegree{} band of a 30\textdegree{} step, but moves the measured settling time from 1.43\,s without quantisation to 1.38\,s, so part of the headline 1.38\,s is due to the ripple. With the random torques added as well, the RMS voltage is 0.22\,V, the RMS pendulum and arm angles are 0.09\textdegree{} and 0.36\textdegree, and the RMS $\da$ estimation error is 2.97\textdegree/s. This voltage noise is feasible, and a slower observer would only reduce it at a cost in robustness.
 \end{rw}
 
 \subsection{Parameter uncertainty}
@@ -372,7 +373,7 @@ Figure~\ref{fig:mc} shows 40 plants with all parameters randomly varied by $\pm2
 \begin{rw}
 The Furuta pendulum is a nonlinear, under-actuated benchmark whose upright position requires continuous feedback. We showed that an LTI observer-based controller, designed by pole placement, stabilises the full nonlinear model at 1\,kHz within voltage limits, using only two quantised encoders. It recovers from 10\textdegree{} in 0.97\,s, tracks a 30\textdegree{} step with 1.4\% overshoot and 1.38\,s settling, and has margins of $-4.6$/$+16.6$\,dB and 36\textdegree, meeting all nominal criteria with 0.4\textdegree{} to spare on the tap limit. It catches tilts of up to 24\textdegree, but only 38 of 40 plants with $\pm20$\% parameters recover and 31 survive the tap, so the uncertainty criterion is only partly met. Testing revealed a double-counted reference, the cost of a slow observer and a quantisation limit cycle.
 
-Future work should measure the damping and arm inertia on hardware, add Coulomb friction, and estimate the disturbance torque in the observer. Energy-based swing-up \cite{astrom1996} would also extend the operating range to the full circle.
+Future work should measure the damping (the least certain parameter) and arm inertia on hardware, add Coulomb friction, which the linear design ignores, and estimate the disturbance torque in the observer to recover the 3.2\textdegree{} it costs on the tap. Energy-based swing-up \cite{astrom1996} would also extend the operating range to the full circle.
 \end{rw}
 
 % Appendix figures (Section A): defined here so they can float to the top of page 7.
@@ -403,7 +404,7 @@ Figure~\ref{fig:diagram} shows the geometry used in Section~II, Figs.~\ref{fig:m
 
 \begin{figure*}[t]
 \centering\includegraphics[width=0.84\textwidth]{w11_observer_convergence.png}
-\caption{Observer convergence with $\alpha_0=10^\circ$ and $\hat x(0)=0$. Top and middle: true and estimated $\theta$, $\alpha$, $\dot\theta$, $\dot\alpha$. Bottom left: estimation-error norm (log scale). Bottom right: motor voltage, feeding back the true state and the estimate.}
+\caption{Observer convergence with $\alpha_0=10^\circ$ and $\hat x(0)=0$. Top and middle: true and estimated $\theta$, $\alpha$, $\dot\theta$, $\dot\alpha$. Bottom left: error norms (log scale) of the angles (blue, rad) and rates (orange, rad/s), and of the rates with exact encoders (dashed). Bottom right: motor voltage, feeding back the true state and the estimate.}
 \label{fig:obs}
 \end{figure*}
 

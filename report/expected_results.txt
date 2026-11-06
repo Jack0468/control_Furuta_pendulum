@@ -1,4 +1,4 @@
-Console output of run_all (MATLAB R2025b, Windows 11), from a clean unzip of this package on 2026-11-06. Run time 267 s.
+Console output of run_all (MATLAB R2025b, Windows 11), from a clean unzip of this package on 2026-11-06. Run time 297 s.
 
 
 ===== week9_model_and_openloop =====
@@ -37,7 +37,7 @@ Unstable pole under +/-20% parameter changes:
   Dr  x1.2 : 12.05 rad/s
   Dp  x0.8 : 12.20 rad/s
   Dp  x1.2 : 11.99 rad/s
------ week9_model_and_openloop done in 26 s
+----- week9_model_and_openloop done in 16 s
 
 ===== week10_state_feedback =====
 Requirement => zeta >= 0.69, zeta*wn >= 1.60 rad/s
@@ -75,7 +75,7 @@ Robustness of D4 (max real closed-loop pole, perturbed linear model):
 
 Integral design Ka = [-3.56 38 -1.42 3.15 -4.51]
 Integral (nonlinear, tap + drag): final theta = -0.00 deg, max|theta| = 45.3 deg, max|alpha| = 11.3 deg, max|u| = 9.8 V
------ week10_state_feedback done in 108 s
+----- week10_state_feedback done in 50 s
 
 ===== week10_pole_placement_derivation =====
 Step 1: zeta_min = 0.6901, sigma_min = 4/Ts = 1.6000
@@ -117,7 +117,7 @@ Step 7: voltage to start recovering from 10 deg, zeta = 0.75, fast poles at 4 an
         wn = 10.0 rad/s: tr ~ 0.18 s, Ts ~ 0.53 s, V =  34.1 V
         10 V reached at wn = 5.73 rad/s, so tr ~ 1.8/wn = 0.31 s
         a 0.8 s settling target needs wn = 6.67 rad/s and 13.5 V
------ week10_pole_placement_derivation done in 1 s
+----- week10_pole_placement_derivation done in 0 s
 
 ===== week11_observer =====
 Observability rank (A,C): 4 of 4
@@ -145,6 +145,8 @@ Observer pole time constants: [10 9.09 8.33 7.69] ms; slowest controller pole ti
 Separation check: max distance between eig(closed loop) and eig(ctrl) U eig(obs) = 1.49e-13
 Largest |z| of closed loop = 0.99732 (< 1 => stable)
 
+Without quantisation: |e| = 0.0035 at 0.2 s, 5e-06 at 1 s, 7.8e-16 at 4 s (converges to zero)
+
 Estimation error norm (mixes rad and rad/s, so velocities dominate): |e(0)| = 0.175, peak 7.23 at 9 ms
   noise floor (median, t >= 0.2 s) 0.042; last above 3x floor at 0.059 s in the first 0.2 s window: 0.059 s
   RMS error for t >= 0.2 s: theta 0.716 mrad, alpha 0.998 mrad, thetadot 1.67 deg/s, alphadot 2.53 deg/s
@@ -168,7 +170,7 @@ true state                          -              -           11.4         9.94
 
 alpha_dot error RMS (t >= 2 s): finite difference 28.83 deg/s, observer 2.93 deg/s
 One encoder count per sample = q/Ts = 3.07 rad/s = 176 deg/s
------ week11_observer done in 16 s
+----- week11_observer done in 24 s
 
 ===== week12_validation =====
 V1 recovery 10 deg: |alpha|<1 deg after 0.97 s, max|u| = 6.65 V, max|theta| = 29.1 deg
@@ -195,7 +197,7 @@ V8 D2    Kx = [-4.85 43.5 -1.75 3.64], Ki = -6.87: step Ts 1.97 s, OS 2.8 %, rip
 V8 final Kx = [-3.56 38 -1.42 3.15], Ki = -4.51: step Ts 1.38 s, OS 1.4 %, ripple 0.71 deg; 10 deg 6.6 V; tap 14.6 deg, 9.0 V; RMS u 0.216 V
 V9 reference gain 0 x Kx(1): Ts 1.43 s, OS 1.7 %, US 1.3 %
 V9 reference gain 1 x Kx(1): Ts 1.82 s, OS 50.7 %, US 9.5 %
------ week12_validation done in 71 s
+----- week12_validation done in 161 s
 
 ===== week12_margins =====
 Open-loop poles of the loop outside the unit circle: 1 (observer), 1 (true state)
@@ -203,12 +205,12 @@ observer-based  stable=1 | gain margins [0.589 6.74] ([-4.59 16.6] dB) at [7.13 
 true-state      stable=1 | gain margins [0.472 64.6] ([-6.52 36.2] dB) at [7.27 3.14e+03] rad/s | phase margins 58.7 deg at 28.5 rad/s | delay margin 36.0 ms
 
 Stable multiplier range, one parameter varied, others nominal (nominal = 1):
-  k_theta          nominal   -3.561: x0.258 to x2.486 (-0.920 to -8.853)
-  k_alpha          nominal   38.006: x0.620 to x3.107 (23.556 to 118.101)
-  k_thetadot       nominal   -1.423: x0.590 to x1.836 (-0.840 to -2.612)
-  k_alphadot       nominal    3.146: x0.504 to x2.400 (1.584 to 7.550)
-  k_i              nominal   -4.508: x0.020 to x3.225 (-0.090 to -14.539)
-  plant-input gain x0.590 to x6.730
+  k_theta          nominal   -3.561: x0.258 to x2.486 (-0.920 to -8.854)
+  k_alpha          nominal   38.006: x0.620 to x3.108 (23.561 to 118.125)
+  k_thetadot       nominal   -1.423: x0.591 to x1.839 (-0.841 to -2.616)
+  k_alphadot       nominal    3.146: x0.504 to x2.396 (1.584 to 7.536)
+  k_i              nominal   -4.508: x0.000 to x3.226 (-0.000 to -14.542)
+  plant-input gain x0.590 to x6.727
 
 Estimation error e[k+1] = (Ad - L*C) e[k]: |z| = [0.9048 0.8958 0.8781 0.8869] (all < 1), s = [-130 -120 -110 -100]
 Ratio to the fastest controller pole (-13.5): [7.41 8.15 8.89 9.63]
@@ -224,4 +226,4 @@ Nominal controller and observer on plants with published parameter values:
   D_r 0.001, D_p 0.00005   linear max|z| 0.9982 | 10 deg: end |alpha| 0.11 deg, max|u| 6.6 V | tap: max|alpha| 13.4 deg, max|u| 9.0 V, RMS u (t>2) 0.219 V
 
 Peak motor current: 10 deg release 0.79 A, tap 1.06 A; stall current at 10 V = 1.19 A
------ week12_margins done in 27 s
+----- week12_margins done in 33 s

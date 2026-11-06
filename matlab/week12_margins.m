@@ -49,7 +49,7 @@ furuta_savefig(gcf, 'w12_margins', 7.16, 2.4);
 %% 3. Range of each controller parameter that keeps the sampled linear loop stable
 rho = @(Kx_, Ki_, g) max(abs(eig([Ad, -g*Bd*Ki_, -g*Bd*Kx_; Ts*Ct, 1, zeros(1,4); ...
                                   L*C, -Bd*Ki_, Ad - Bd*Kx_ - L*C])));
-grid_ = logspace(log10(0.02), log10(50), 4000);
+grid_ = logspace(-4, log10(50), 6000);     % down to 1e-4 x nominal, so k_i's lower limit is found, not truncated
 [~, i1] = min(abs(grid_ - 1));
 names = {'k_theta', 'k_alpha', 'k_thetadot', 'k_alphadot', 'k_i', 'plant-input gain'};
 fprintf('\nStable multiplier range, one parameter varied, others nominal (nominal = 1):\n');

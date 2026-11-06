@@ -443,3 +443,17 @@ AI-assisted: merge and fit.
   - a full `README.txt` (`report/package_README.txt`: requirements, steps, fixed seeds, and which script reproduces each figure, table and equation);
   - `expected_results.txt`.
 - **Clean run:** unzipped into an empty folder and ran `run_all` there. Exit 0 in 267 s, 14 figures, and every number matches the report (V1–V9, margins, gain ranges, Step 7, observer gain). That console output is `report/expected_results.txt`.
+
+### Second marking with Gemini (agy) and fixes
+
+- **Process:** an anonymised PDF (no names) was marked by `gemini-3.8-flash-medium` through the antigravity_cli skill, after a blind Claude mark of 89/100 (`scratch/agy_mark/`). Gemini gave 87/100. Every disagreement was checked against the report.
+- **Fixes:**
+  - **Table V:** the k_i lower limit was an artefact of the search grid starting at 0.02 × nominal. Any negative k_i down to −14.5 is stable (`week12_margins` grid now starts at 1e-4). A row for all gains scaled together (×0.59–6.73) answers the "one gain at a time" criticism.
+  - **V-C and Fig. 6:** with exact encoders the estimation error converges to zero (5×10⁻⁶ at 1 s, 8×10⁻¹⁶ at 4 s; dashed in Fig. 6). Angle and rate error norms are plotted separately, in their own units.
+  - **II-D:** says what each disturbance tests.
+  - **VI:** each future-work item now has a reason.
+  - **Space:** recovered from statements made twice.
+- **Package:** clean-folder `run_all` repeated (exit 0, 297 s); `report/expected_results.txt` refreshed; Table V limits updated to the finer grid (k_θ̇ −2.62, k_α̇ 7.54).
+- **antigravity_cli skill:**
+  - **Liveness:** per-run heartbeat status, logs kept, `died` exit code 8, process-tree kill on timeout, and `agy_status.py`.
+  - **Errors:** real failure reasons are reported, so the output-token limit was found behind the earlier exit-3 failures; the wrapper retries with a shorter-answer request.

@@ -118,8 +118,8 @@ def main():
 
     if args.package:
         archive = here / "Furuta_matlab_submission.zip"
-        # The Kalman study is background (doc 09): the report doesn't use it.
-        files = sorted(f for f in (here.parent / "matlab").glob("*.m") if f.name != "week11_kalman.m")
+        # The Kalman and tray-mass studies are background (docs 09, 03): the report doesn't use them.
+        files = sorted(f for f in (here.parent / "matlab").glob("*.m") if f.name not in ("week11_kalman.m", "week12_tray_mass.m"))
         with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
             for f in files:
                 z.write(f, Path("matlab") / f.name)

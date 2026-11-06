@@ -73,3 +73,18 @@ K_place = place(A, B, p);
 fprintf('\nStep 6: K (place) = %s\n', fmt(K_place));
 fprintf('        eig(A - B*K) = %s\n', mat2str(eig(A - B*K_match).', 5));
 fprintf('        max |K_match - K_place| = %.2e\n', max(abs(K_match - K_place)));
+
+%% Step 7: how the 10 V limit bounds the speed (report Section III-C; gains only, no simulation)
+% Same pole pattern as the final design: zeta = 0.75, fast poles at 4 and 5 sigma.
+% Released from 10 deg with the arm at rest, the first voltage is K*x0 = k_alpha * 10 deg.
+z7 = 0.75; a10 = deg2rad(10);
+poles7 = @(w) [w*(-z7 + 1i*sqrt(1 - z7^2)*[1 -1]), -4*z7*w, -5*z7*w];
+v10 = @(w) abs(place(A, B, poles7(w))*[0; a10; 0; 0]);
+w_lim = fzero(@(w) v10(w) - P.Vmax, [4 8]);
+w08 = 4/(z7*0.8);                                  % an 0.8 s settling target
+fprintf('\nStep 7: voltage to start recovering from 10 deg, zeta = %.2f, fast poles at 4 and 5 sigma\n', z7);
+for w = [3 3.6 4 5 6 8 10]
+    fprintf('        wn = %4.1f rad/s: tr ~ %.2f s, Ts ~ %.2f s, V = %5.1f V\n', w, 1.8/w, 4/(z7*w), v10(w));
+end
+fprintf('        10 V reached at wn = %.2f rad/s, so tr ~ 1.8/wn = %.2f s\n', w_lim, 1.8/w_lim);
+fprintf('        a 0.8 s settling target needs wn = %.2f rad/s and %.1f V\n', w08, v10(w08));

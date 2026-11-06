@@ -24,7 +24,7 @@ The pendulum must stay upright indefinitely, with a stable closed loop, and the 
 
 - Input: |V_m| ≤ 10 V.
 - States: |α| ≲ 15° for the linear model to stay valid. The controller's region of attraction is larger; see [04_controller_and_observer.md](04_controller_and_observer.md).
-- Arm: |θ| ≤ 90°, to limit cable wind-up and stay within a sensible workspace.
+- Arm: |θ| ≤ 90°, a workspace limit we chose (2026-11-06: not a hardware limit; a slip ring or hollow shaft allows full rotation).
 
 ## 2. Requirements
 
@@ -38,7 +38,7 @@ The pendulum must stay upright indefinitely, with a stable closed loop, and the 
 | R6 | Disturbance: pendulum tap | 20 mN·m for 20 ms: max \|α\| < 15°, recovered within 2 s | Drink stays in the glass, and the linear model stays valid, §4 |
 | R7 | Disturbance: arm drag | 2 mN·m constant: steady-state θ error < 2° (with integral action: 0) | About 4% of stall torque, a realistic cable drag |
 | R8 | Robustness | R1, R2, R5 still met with ±20% on m_p, L_p, R_m, k_m, D_r, D_p | Parameter uncertainty |
-| R9 | Arm excursion | \|θ\| ≤ 90° during R2 and R6 | Cable and workspace limit |
+| R9 | Arm excursion | \|θ\| ≤ 90° during R2 and R6 | Workspace limit we chose (not a hardware limit) |
 
 ## 3. Converting requirements into pole locations
 
@@ -68,6 +68,8 @@ $$
 
 ## 4. Application and how the requirements follow from it
 
+> **Superseded 2026-11-06 (D-24).** The report no longer uses the serving-arm application, as it was not modelled directly. The same limits are now justified from the linear model, the motor and the literature (report Section III-C). This section is kept as history.
+
 **Result:** the requirements are derived from a concrete application, a **serving robot arm carrying a drink on a tray mounted on an unactuated (passive) joint**. This is Jack's robotic bartender idea, and it is a real research problem: the *waiter's problem* [Heins & Schoellig 2026; Biagiotti et al. 2023].
 
 The lab rig is a scale model of the motion, not a working bartender. The numbers below are assumptions chosen to be reasonable and are stated openly.
@@ -92,7 +94,7 @@ The lab rig is a scale model of the motion, not a working bartender. The numbers
 
 - **Effective tilt:** the liquid responds to the tilt and to acceleration, tan(tilt) ≈ a/g. Only α is used here, so the spill limit is approximate.
 - **Scale:** the rig is small. By dynamic similarity, time scales with √(length), so a taller real tray would be slower by that factor. The 2.5 s is applied directly at rig scale, so it is a target for the demonstrator, not a scaled-up specification.
-- **Payload:** the pendulum is a uniform rod, with no tray or glass modelled. A real tray and glass would be top-heavy. In a scratch study, the final gains stay up with up to 20 g at the tip and fall at 30 g (LOGBOOK, 2026-11-04). An Australian schooner glass weighs 300–330 g empty (Jack's figure; source still needed), more than twice the 141 g at the tip at which gravity at 15° reaches the motor's stall torque. The glass figures therefore describe the application, not a payload on the rig. The report states this in Section II-C.
+- **Payload:** the pendulum is a uniform rod, with no tray or glass modelled. A real tray and glass would be top-heavy. In a scratch study, the final gains stay up with up to 20 g at the tip and fall at 30 g (LOGBOOK, 2026-11-04). The report makes no payload claim (D-23), as no payload was modelled directly. The tray study is kept here as background only.
 
 ### Other applications considered
 

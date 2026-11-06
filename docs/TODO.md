@@ -39,7 +39,7 @@ Jack's review notes, 2026-11-04, with what was done about each.
 | --- | --- | --- | --- | --- |
 | [ ] | — | **Move to one report.** Aleksei is still writing in his own copy, and his abstract, 6-page note and duplicate System Model remain there | Team | His second draft's new content is merged into `report/main.tex`. Further edits should go there, or they'll need merging by hand |
 | [ ] | I-09 | **Get Aleksei's design script into the repo,** or confirm his abstract's results aren't used. Check his gain signs against his report's α convention | Aleksei | His `.slx` files need A, B, C and K from a script that isn't committed. Details in the LOGBOOK, 2026-11-04 |
-| [ ] | D-18 | **Aleksei to confirm the serving-arm application and 2.5 s settling limit** | Aleksei | Jack accepted on 2026-11-04. [Doc 03 §4](03_design_requirements.md). Be ready to answer "why is the tray inverted?" |
+| [ ] | D-24 | **Check the $z/2$ bandwidth bound in Åström & Murray, *Feedback Systems* (2nd ed.), and add the section number** | Jack | Fri 6 Nov | Justifies the ω_n ≲ 5.2 rad/s criterion in Section III-C. Replaces the serving-arm item (D-18 superseded) |
 | [ ] | — | Look over the regenerated figures in `figures/` and the draft PDF | Jack | `python report/build.py --open` |
 
 ## 2. Refresh and publish
@@ -61,7 +61,7 @@ Jack's review notes, 2026-11-04, with what was done about each.
 | [ ] | — | Give a source for the rocket-landing claim in the Introduction, or drop it | Aleksei | Wed 4 Nov | No source in either draft |
 | [ ] | — | Check Aleksei's MATEC paper: it's about a *tilted* Furuta pendulum, so does it support what he cites it for? | Aleksei | Wed 4 Nov | Only needed if it's cited: his report draft doesn't cite it. The site blocked automated access |
 | [ ] | I-03 | Find a source for m_r = 0.095 kg, ideally the QUBE-Servo 2 workbook | Jack | Wed 4 Nov | J_r depends on it. The TU Delft sheet was unreachable |
-| [ ] | — | Give a source for the schooner glass weight (300–330 g), or reword the sentence in Section II-C | Jack | Wed 4 Nov | Marked orange in the report. The brief rejects unverified references |
+| [ ] | — | Check the copper temperature coefficient (0.393 %/°C) against IEC 60028 or a textbook | Jack | Fri 6 Nov | Marked orange: only a secondary copy of the standard was seen. It justifies the ±20% range in Section II-C |
 | [ ] | — | Confirm the 6-page limit on Canvas | Jack | Wed 4 Nov | Our copy of the brief says at most 8 pages; the rubric gives no limit. The report is built to 6, which fits either way |
 | [ ] | — | Confirm the arm's ±90° cable limit, or state it as an assumption | Team | Wed 4 Nov | Both of you assumed it |
 | [ ] | — | Get the AI-citation rules from Canvas or your tutor, then write the declaration | Team | Thu 5 Nov | Searched every course PDF: no rule stated, only "ask an LLM, but be critical" (Lecture 1, p. 32) and slides crediting "source: ChatGPT" |
@@ -98,6 +98,8 @@ Jack's review notes, 2026-11-04, with what was done about each.
 
 Closed items, newest first. Details are in the [LOGBOOK](LOGBOOK.md).
 
+- [x] Bartender framing dropped; criteria justified from the model, the motor and the literature (D-24), 2026-11-06
+- [x] Speed limit now set by the 10 V limit, with the iteration stated; payload claims removed and the ±20% justified from sources (D-23), 2026-11-06
 - [x] Aleksei's third draft merged (actuator limitation, aim and operating point, requirements summary), 2026-11-06
 - [x] Report restructured to a 6-page body plus references and a 3-figure appendix; tray limitation added (D-22), 2026-11-04
 - [x] Aleksei's second draft merged into the report (stacking step, arm-modelling elements, grouped parameter table), 2026-11-04

@@ -48,7 +48,7 @@ Progress, decisions and open issues are tracked in **[docs/LOGBOOK.md](docs/LOGB
 | `week11_kalman.m` | Steady-state Kalman filter study (background; `run_all` skips it) |
 | `week12_validation.m` | Validation tests V1–V9 on the nonlinear plant |
 | `week12_margins.m` | Bode/Nyquist margins, stable gain ranges, linear vs nonlinear, published parameter values |
-| `week12_tray_mass.m` | Effect of a tray and drink at the pendulum tip (run directly; `run_all` skips it) |
+| `week12_tray_mass.m` | Background: effect of a tip mass (run directly; not used in the report or the Canvas zip) |
 
 ```matlab
 cd matlab

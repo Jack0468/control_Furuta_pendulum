@@ -31,11 +31,13 @@ AI assistance (Claude) was used throughout for derivations, code and drafting. E
 | D-15 | 2026-11-03 | Dropped the 6 V voltage target; the limit is ±10 V | With J_r = `/3` the gains are higher and 6 V isn't achievable; 10 V is inside the ±15 V drive range and 18 V motor rating | Active |
 | D-16 | 2026-11-03 | **Published damping: D_r 0.0005, D_p 0.0001** (Jack's decision) | The only damping values with a source (Xu et al. 2023) | Active |
 | D-17 | 2026-11-03 | Restored the pendulum spin term in the nonlinear model | Gäfvert and the QUBE model in Xu et al. keep it; an earlier claim that Quanser drops it was wrong. Linear model unchanged | Active |
-| D-18 | 2026-11-03 | **Application: serving arm carrying a drink on a passive joint** (Jack's bartender idea). Tilt, speed and settling requirements derived from it | Doc 03 §4. Golf, mixer, weather station and ML benchmark considered and rejected | Accepted by Jack 2026-11-04; Aleksei still to confirm |
+| D-18 | 2026-11-03 | **Application: serving arm carrying a drink on a passive joint** (Jack's bartender idea). Tilt, speed and settling requirements derived from it | Doc 03 §4. Golf, mixer, weather station and ML benchmark considered and rejected | **Superseded 2026-11-06 by D-24** |
 | D-19 | 2026-11-03 | **Final controller poles: Aleksei's,** −2.7 ± 2.38j, −10.8, −13.5, plus our integrator pole at −5 (Jack's decision) | On the updated model they meet the tap limit (14.6°) with less voltage and ripple than D2 (doc 04 §3c). Replaces D-05 | Active |
 | D-20 | 2026-11-04 | **One report: ours as the base, with Aleksei's prose merged in.** Our α sign, 2.5 s settling limit, integrator and observer poles −100…−130 are kept (Jack's decision) | Our draft covers all seven sections. His observer −40…−55 gives a 20.4° tap and 10/200 unstable plants on the current model, against 14.6° and 3/200 | Active |
 | D-21 | 2026-11-04 | **Report keeps to course content** (Jack's review): LQR removed from the design comparison, Kalman removed, "Luenberger" replaced by "state observer" | The brief asks for observer-based state feedback as learned in the unit. LQR stays only where the literature review discusses existing approaches, which the rubric marks | Active |
 | D-22 | 2026-11-04 | **Page limit: 6 pages, not counting references and the appendix** (Jack). Tray and glass stated as a model limitation, with no redesign | Our copy of the brief says 8, so confirm on Canvas; 6 fits either way. A schooner glass alone is over twice what the motor can hold, so no redesign could make it a rig payload | Active |
+| D-23 | 2026-11-06 | **Rise-time floor set by the 10 V limit, found iteratively; no payload claims** (Jack) | The gains grow with ω_n: 10 V for a 10° tilt is reached at ω_n = 5.73 rad/s (t_r ≈ 0.31 s), and an 0.8 s settling target needs 13.5 V. No payload was modelled directly, so the ±20% is justified from sources instead: copper winding resistance rises about 20% over 50 °C | Active |
+| D-24 | 2026-11-06 | **Bartender framing dropped; criteria justified from the model, the motor and the literature** (Jack) | The serving arm was not modelled directly. Same numbers: 15° is the linear region, 10° is beyond the 6° of Barrios Valero, the ω_n cap is now z/2 = 5.2 rad/s from the RHP zero (Åström & Murray), 2.5 s settling is an iterative choice above the ≈1 s floor. Replaces D-18 | Active |
 
 ---
 
@@ -337,3 +339,22 @@ Checked first: the Overleaf copy Jack pasted is identical to GitHub `de928cb`, s
 
 AI-assisted: merge and fit.
 
+### Speed limit from the voltage limit; ±20% justified from sources
+
+- **Step 7 added to `week10_pole_placement_derivation.m`** (gains only, no simulation; runs in seconds). With ζ = 0.75 and fast poles at 4σ and 5σ, the first voltage for a 10° release is 4.6 V at ω_n = 3.6 and reaches 10 V at ω_n = 5.73 rad/s. An 0.8 s settling target needs ω_n = 6.67 rad/s and 13.5 V. These are true-state numbers; the full loop uses more (6.6 V on the release).
+- **Report Section III-C:** a new criterion item sets t_r ≥ 0.3 s from the voltage limit and states the iteration. Slosh stays as the cap on ω_n.
+- **Payload claims removed** (Jack: not modelled directly). Section II-C now justifies the ±20% from the copper temperature coefficient (IEC 60028, seen in a secondary copy) and the motor's −10 to 60 °C operating range. `week12_tray_mass.m` stays in the repo as background, but is no longer in the Canvas zip.
+- Three short AI-drafted phrases were trimmed to stay at 6 pages.
+- **Introduction:** the serving arm is now stated as the motivation for the requirements only ("no drink is modelled"); the duplicate sentence in Section II-C and "or takes a glass" in the tray-bump item were removed. Still 6 pages.
+
+### Bartender framing dropped (D-24)
+
+- **Report:** abstract, introduction, Section II-C disturbances and every Section III-C criterion now justified from the linear model, the motor and published results. No numbers changed, no simulation run. The slosh limit (ω_n ≲ 4.5 rad/s) is replaced by the RHP-zero bound z/2 ≈ 5.2 rad/s; the design (ω_n = 3.6) meets both. The tap is now "Tap on the pendulum".
+- **References:** Heins & Schoellig, Biagiotti et al., Reclari et al. and Makr Shakr removed. Åström & Murray, *Feedback Systems* (2nd ed., 2021) added for the z/2 bound, marked orange until the section is checked.
+- **Section II-C:** Xu et al.'s arm inertia now worded as "a smaller arm inertia, equivalent to m_rL_r²/12".
+- Still 6 pages, 0 warnings.
+
+### Jack's wording for Section II merged
+
+- Sections II-A (sign convention and assumptions), II-B (parameters) and the first part of II-C (simplifications, uncertainty, ±20%) are now Jack's words, in black. Sign corrected to our convention (positive α leans *against* positive arm rotation). Blue blocks 32 → 30. Still 6 pages.
+- **Arm ±90° limit** reworded as a workspace limit we chose, not a hardware (encoder cable) limit, which was never verified. Not binding (57° after the tap), and the Monte Carlo survival test uses α only, so no results change. One orange item cleared.

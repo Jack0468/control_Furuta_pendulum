@@ -405,3 +405,9 @@ AI-assisted: merge and fit.
   - Removed Åström & Murray (his Skogestad citation covers the z/2 bound) and Antonio-Cruz and Arai (no longer cited).
   - The abstract no longer mentions unactuated arm joints.
 - **Page fit:** some AI-drafted detail was cut, then restored when Jack said key information must not be deleted. The body fits instead by inlining four short equations (Euler–Lagrange, V, the linearised equation, C and D) and two redundant AI phrases. The overview figure is at 0.6 of the text width.
+
+### Geometry diagram and tone pass
+
+- **`report/furuta_diagram.py`** (matplotlib) draws `figures/furuta_diagram.png`: (a) a 3D view with the motor axis, θ from θ = 0, the arm (L_r, m_r) and the pendulum leaning against +θ̇ by α; (b) the view from the motor along the arm, with α clockwise, l_p = L_p/2, L_p and m_pg. Lengths are drawn to Table I. It is in the Appendix and cited from Section II.
+- **Tone pass on the blue text** (Jack's request): reworded towards Jack's style ("we", "hence", "as", "which", fewer colons and semicolons). No content or numbers changed; the text stays blue. The wordiest changes were pulled back to keep the 6-page body.
+

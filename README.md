@@ -55,7 +55,7 @@ cd matlab
 run_all
 ```
 
-Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `figures/`. To build the report PDF: `python report/build.py`.
+Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `figures/`. To build the report PDF: `python report/build.py`. The geometry diagram in the appendix (`figures/furuta_diagram.png`) is drawn by `python report/furuta_diagram.py` (matplotlib).
 
 ## Key numbers
 
@@ -73,7 +73,7 @@ Requires the Control System Toolbox. Tested on MATLAB R2025b. Figures go to `fig
 
 ```
 docs/        design documents and logbook
-report/      LaTeX report and build.py (run: python report/build.py)
+report/      LaTeX report, build.py (run: python report/build.py) and furuta_diagram.py
 matlab/      all code (run_all.m reproduces everything)
 figures/     generated figures
 references/  local copies of course PDFs and datasheets (git-ignored; README lists sources)
